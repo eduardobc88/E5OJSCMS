@@ -17,8 +17,16 @@ html
             //- global scripts css
             link(rel='stylesheet', href=e5ojs_global_data.e5ojs_base_url+'/back-end/css/e5ojs-global-admin.css')
             script(type='text/javascript', src=e5ojs_global_data.e5ojs_base_url+'/back-end/js/e5ojs-global-admin.js')
+            // e5ojs media
+            script(type='text/javascript', src=e5ojs_global_data.e5ojs_base_url+'/back-end/js/e5ojs-media.js')
         block e5ojs_block_local_css_script
     body(class="body")
+        div(class="e5ojs-media-popup-wrapper")
+            div(class="container-fluid")
+                div(class="col-xs-12")
+                    div(class="card")
+                        div(class="card-content")
+                            p(class="card-title")='E5OJS MEDIA'
         div(class="e5o-admin-all-wrapper")
             div(class="e5ojs-header-bar")
                 div(class="container-fluid")
