@@ -1,0 +1,15 @@
+doctype html
+html
+  head
+    title= title
+    script(type='text/javascript', src='/bower_components/jquery/dist/jquery.min.js')
+    link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.min.css')
+    link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Raleway:400,200,300,200italic,300italic,400italic,500,600,700,800,900italic,900,800italic,700italic,600italic,500italic,100italic,100')
+    link(rel='stylesheet', href='/front-end/css/e5ojs-error.css')
+  body
+      div(class="container")
+          div(class="row")
+              div(class="col-xs-12")
+                  h1= message
+                  h2= error.status
+                  pre #{error.stack}

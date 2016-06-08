@@ -1,0 +1,22 @@
+{
+  "name": "e5ojs",
+  "description": "Libraries for FrontEnd",
+  "main": "",
+  "authors": [
+    "eduardobc <eduardobc.88@gmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "font-awesome": "latest",
+    "bootstrap": "latest",
+    "summernote": "^0.8.1"
+  }
+}

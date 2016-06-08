@@ -1,0 +1,19 @@
+doctype html
+html
+    head
+        title="E5OJS - Home"
+        block e5ojs_block_global_css_script
+            script(type='text/javascript', src=e5ojs_global_data.e5ojs_base_url+'/bower_components/jquery/dist/jquery.min.js')
+            link(rel='stylesheet', href=e5ojs_global_data.e5ojs_base_url+'/bower_components/bootstrap/dist/css/bootstrap.min.css')
+            //-link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700italic,700,900,900italic')
+            //- materialize framework
+            link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css')
+            script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js')
+            link(rel='stylesheet', href=e5ojs_global_data.e5ojs_base_url+'/back-end/css/e5ojs-global.css')
+            script(type='text/javascript', src=e5ojs_global_data.e5ojs_base_url+'/back-end/js/e5ojs-global.js')
+        block e5ojs_block_local_css_script
+    body(class="body")
+        div(class="e5o-admin-all-wrapper")
+            block e5ojs_block_content
+        div(class="e5o-admin-footer-wrapper")
+            block e5ojs_block_footer

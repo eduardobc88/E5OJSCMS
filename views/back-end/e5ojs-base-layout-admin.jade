@@ -1,0 +1,80 @@
+doctype html
+html
+    head
+        meta(http-equiv="Content-Type" content="text/html; charset=UTF-8")
+        meta(name="viewport" content="width=device-width, user-scalable=no")
+        title="E5OJS - Home"
+        block e5ojs_block_global_css_script
+            script(type='text/javascript', src=e5ojs_global_data.e5ojs_base_url+'/bower_components/jquery/dist/jquery.min.js')
+            link(rel='stylesheet', href=e5ojs_global_data.e5ojs_base_url+'/bower_components/bootstrap/dist/css/bootstrap.min.css')
+            script(type='text/javascript', src=e5ojs_global_data.e5ojs_base_url+'/bower_components/bootstrap/dist/js/bootstrap.min.js')
+            //-link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700italic,700,900,900italic')
+            //- materialize framework
+            link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css')
+            script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js')
+            //- google material icons
+            link(rel='stylesheet', href='https://fonts.googleapis.com/icon?family=Material+Icons')
+            //- global scripts css
+            link(rel='stylesheet', href=e5ojs_global_data.e5ojs_base_url+'/back-end/css/e5ojs-global-admin.css')
+            script(type='text/javascript', src=e5ojs_global_data.e5ojs_base_url+'/back-end/js/e5ojs-global-admin.js')
+        block e5ojs_block_local_css_script
+    body(class="body")
+        div(class="e5o-admin-all-wrapper")
+            div(class="e5ojs-header-bar")
+                div(class="container-fluid")
+                        div(class="search-bar-content")
+                            div(class="container")
+                                div(class="col-xs-12")
+                                    form(action="#", method="get")
+                                        i(class="material-icons")='search'
+                                        input(id="header_bar_search" class="header_bar_search" type="text" name="header_bar_search" placeholder="Search")
+                        div(class="col-xs-12")
+                            ul(class="content")
+                                li(class="content-left")
+                                    a(href="#" class="e5ojs-btn open-menu")
+                                        i(class="material-icons icon-menu")='menu'
+                                        i(class="material-icons icon-arrow")='arrow_back'
+                                    h1='E5OJS'
+                                li(class="content-right")
+                                    ul(class="options")
+                                        li
+                                            a(href="#" class="e5ojs-btn search-btn")
+                                                i(class="material-icons")='search'
+                                        li
+                                            a(href=e5ojs_global_data.e5ojs_base_url+"/admin/log-out/" class="e5ojs-btn log-out-btn")
+                                                i(class="material-icons")='exit_to_app'
+            div(class="e5ojs-menu-left-wrapper")
+                div(class="user-info")
+                    img(src=e5ojs_global_data.e5ojs_base_url+"/back-end/assets/profile-menu.png" class="img-bkg")
+                    img(src=e5ojs_global_data.e5ojs_base_url+"/back-end/assets/default-profile-image.jpg" class="img-profile")
+                    div(class="user-data-wrapper")
+                        p(class="user-data")=result_data[0].user_name
+                        p(class="user-data")=result_data[0].user_last_name
+                ul(class="options")
+                    li
+                        a(href=e5ojs_global_data.e5ojs_base_url+"/admin/" class="e5ojs-btn option-btn waves-effect waves-dark")='Dashboard'
+                            i(class="material-icons")='dashboard'
+                    li
+                        a(href=e5ojs_global_data.e5ojs_base_url+"/admin/pages/" class="e5ojs-btn option-btn waves-effect waves-dark")='Pages'
+                            i(class="material-icons")='filter_none'
+                    li
+                        a(href=e5ojs_global_data.e5ojs_base_url+"/admin/posts/all/" class="e5ojs-btn option-btn waves-effect waves-dark")='Posts'
+                            i(class="material-icons")='insert_drive_file'
+                    li
+                        a(href=e5ojs_global_data.e5ojs_base_url+"/admin/media/" class="e5ojs-btn option-btn waves-effect waves-dark")='Media'
+                            i(class="material-icons")='collections'
+                    li
+                        a(href=e5ojs_global_data.e5ojs_base_url+"/admin/settings/" class="e5ojs-btn option-btn waves-effect waves-dark")='Settings'
+                            i(class="material-icons")='settings'
+            div(class="container e5ojs-content-right-wrapper")
+                - if( typeof(e5ojs_message) !== 'undefined' && e5ojs_message.status )
+                    div(class="e5ojs-message "+e5ojs_message.type+"-message")
+                        i(class="material-icons")=e5ojs_message.type
+                        p(class="message")=e5ojs_message.text
+                div(class="row")
+                    div(class="col-xs-12")
+                        h2(class="page-title")=title
+                        p(class="page-description")='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
+                block e5ojs_block_content
+        div(class="e5o-admin-footer-wrapper")
+            block e5ojs_block_footer

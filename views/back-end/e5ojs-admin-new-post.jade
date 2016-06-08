@@ -1,0 +1,39 @@
+extends e5ojs-base-layout-admin
+block e5ojs_block_local_css_script
+    link(rel='stylesheet', href=e5ojs_global_data.e5ojs_base_url+'/back-end/css/summernote.css')
+    script(type='text/javascript', src=e5ojs_global_data.e5ojs_base_url+'/back-end/js/summernote.js')
+    script(type='text/javascript', src=e5ojs_global_data.e5ojs_base_url+'/back-end/js/e5ojs-new-edit-post.js')
+block e5ojs_block_content
+    form(id="e5ojs-post-form-wrapper" action=e5ojs_global_data.e5ojs_base_url+"/admin/posts/action/new-post/" method="post")
+        div(class="row top-page-options")
+            div(class="col-xs-12")
+                div(class="post-actions")
+                    a(data-status="publish" class="waves-effect waves-dark "+(( post_status == "publish" )?" current":""))='Publish'
+                    a(data-status="pending" class="waves-effect waves-dark "+(( post_status == "pending" )?" current":""))='Pending'
+                    a(data-status="trash" class="waves-effect waves-dark "+(( post_status == "trash" )?" current":""))='Trash'
+        div(class="row")
+            div(class="col-xs-12 col-md-12")
+                div(class="card")
+                    div(class="card-content")
+                        div(class="card-image")
+                            img(src="https://placeholdit.imgix.net/~text?txtsize=50&bg=818181&txtclr=FFFFFF&txt=IMAGE&w=800&h=150&txttrack=0")
+                            span(class="card-title")='Post Info'
+                            //- p(class="card-title")='Post Info'
+                        div(class="input-field")
+                            input(id="post_title" type="text" class="validate" name="post_title")
+                            label(for="post_title")='Post title'
+                        div(class="summernote-wrapper")
+                            label(for="post_content")='Post content'
+                            textarea(id="post_content" class="materialize-textarea" name="post_content")
+                        div(class="input-field")
+                            textarea(id="post_excerpt" class="materialize-textarea" name="post_excerpt")
+                            label(for="post_excerpt")='Post excerpt'
+                        input(type="date" class="datepicker" name="post_date" value=e5ojs_global_data.e5ojs_current_date)
+                        //button(class="btn waves-effect waves-light" type="submit" name="action")='Publish'
+            //- div(class="col-xs-12 col-md-12")
+            //-     div(class="card")
+            //-         div(class="card-content")
+            //-             span(class="card-title")='Publish'
+            //-             div(class="post-publish")
+            //-                 input(type="date" class="datepicker" name="post_date" value=e5ojs_global_data.e5ojs_current_date)
+            //-                 button(class="btn waves-effect waves-light" type="submit" name="action")='Publish'
