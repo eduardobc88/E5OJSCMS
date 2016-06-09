@@ -8,6 +8,46 @@ var date_format = require('dateformat');
 var current_date = new Date();
 // remove diacritics
 var remove_diacritics = require('diacritics').remove;
+// generate slug from string
+var getSlug = require('speakingurl');
+
+// for parse upload request files
+var multer = require('multer');
+var maxSize = 1 * 1000 * 1000; // max file size 1024kb
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, __dirname + '/../public/uploads/')
+  },
+  filename: function (req, file, cb) {
+      // save file data on DB
+
+      var file_name_strip = getSlug(remove_diacritics( (file.originalname.split("."))[0] ));
+      var file_name = file.fieldname;
+      var file_original_name = file.originalname;
+      var file_mime_type = file.mimetype;
+      var file_store_name = file.filename;
+      var file_size = file.size;
+      var file_ext = file_mime_type.split("/");
+      cb(null, file_name_strip+"."+file_ext[1] );
+  }
+});
+var upload = multer({
+    storage: storage,
+    limits: { fileSize: maxSize },
+    fileFilter: function (req, file, cb) {
+        if( file.mimetype !== 'image/png' ) {
+            req.fileValidationError = true;
+            return cb(null, false); // no save file
+        } else {
+            // get image data and send as part of req and get it on router function
+            req.fileValidationError = false;
+            return cb(null, true);// save file
+        }
+    }
+}).any();
+
+
+
 
 
 
@@ -80,6 +120,54 @@ router.get('/log-out', function(req, res, next) {
     res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data, result_data:null });
 });
 /* start login session */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* start media upload */
+//var upload = multer().any();
+router.post('/upload/', function(req, res, next) {
+    /*
+    { fieldname: 'userPhoto',
+    originalname: 'Screen Shot 2016-06-08 at 12.45.16 PM.png',
+    encoding: '7bit',
+    mimetype: 'image/png',
+    destination: '/Users/Lalo/Documents/NodeJS Projects/E5OJSCMS/routes/../public/uploads/',
+    filename: 'f55691f730fe64f541a4d542cbb755b3',
+    path: '/Users/Lalo/Documents/NodeJS Projects/E5OJSCMS/public/uploads/f55691f730fe64f541a4d542cbb755b3',
+    size: 502646 }
+    */
+    upload(req, res, function(err) {
+        console.log(req.fileValidationError);
+        if( req.fileValidationError ) {
+            res.json({"upload":false});
+        } else {
+            res.json({"upload":true});
+        }
+    });
+});
+/* end media upload */
+
+
+
+
+
+
+
+
 
 
 
@@ -348,7 +436,7 @@ router.post('/posts/action/edit-post/:post_id/:post_status', function(req, res, 
                 // update post on DB
                 // generate post name
                 var post_name = post_title.replace(/\s+/g, '-').toLowerCase();
-                var post_name = remove_diacritics(post_name);
+                var post_name = getSlug(remove_diacritics(post_name));
                 e5ojs_update_post( {post_id:parseInt(post_id),post_title:post_title,post_content:post_content,post_excerpt:post_excerpt,post_date:post_date,post_name:post_name,post_status:post_status},function(result_data){
                     // validate result
 
@@ -422,7 +510,7 @@ router.post('/posts/action/new-post/:post_status', function(req, res, next) {
                     var next_id = data.seq;
                     // insert post data
                     var post_name = post_title.replace(/\s+/g, '-').toLowerCase();
-                    var post_name = remove_diacritics(post_name);
+                    var post_name = getSlug(remove_diacritics(post_name));
                     e5ojs_insert_new_post({post_id:next_id,post_title:post_title,post_content:post_content,post_excerpt:post_excerpt,post_date:post_date,post_name:post_name,post_status:post_status},function(result_data){
                         // validate result
                         // create session message
