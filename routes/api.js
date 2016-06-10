@@ -23,6 +23,8 @@ router.get('/', function(req, res, next) {
 
 
 
+
+
 /* start pagination */
 router.get('/posts/page/', function(req, res, next) {
     var limit_post = 10;

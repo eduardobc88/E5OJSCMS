@@ -794,6 +794,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     padding-top: 60px;
     padding-top: 10px;
     padding-bottom: 10px;
+    display: none;
 }
 .e5ojs-media-popup-wrapper .card .card-content .card-title {
     position: relative;

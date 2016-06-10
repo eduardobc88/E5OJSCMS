@@ -1,5 +1,7 @@
 var express = require('express');
 var router = express.Router();
+// MD5
+var md5 = require('md5');
 // mongojs
 var mongojs = require('mongojs');
 var db = mongojs("e5ojs_db",['e5ojs_user']);
@@ -10,63 +12,172 @@ var current_date = new Date();
 var remove_diacritics = require('diacritics').remove;
 // generate slug from string
 var getSlug = require('speakingurl');
-
-// for parse upload request files
-var multer = require('multer');
-var maxSize = 1 * 1000 * 1000; // max file size 1024kb
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, __dirname + '/../public/uploads/')
-  },
-  filename: function (req, file, cb) {
-      // save file data on DB
-
-      var file_name_strip = getSlug(remove_diacritics( (file.originalname.split("."))[0] ));
-      var file_name = file.fieldname;
-      var file_original_name = file.originalname;
-      var file_mime_type = file.mimetype;
-      var file_store_name = file.filename;
-      var file_size = file.size;
-      var file_ext = file_mime_type.split("/");
-      cb(null, file_name_strip+"."+file_ext[1] );
-  }
-});
-var upload = multer({
-    storage: storage,
-    limits: { fileSize: maxSize },
-    fileFilter: function (req, file, cb) {
-        if( file.mimetype !== 'image/png' ) {
-            req.fileValidationError = true;
-            return cb(null, false); // no save file
-        } else {
-            // get image data and send as part of req and get it on router function
-            req.fileValidationError = false;
-            return cb(null, true);// save file
-        }
-    }
-}).any();
+// ramdom string
+var random_string = require("randomstring");
 
 
 
 
 
 
-
-
-
-
-
-// e5ojs global data
+/* start global data var */
 var e5ojs_global_data = {
     'e5ojs_base_url':'',
     'e5ojs_current_url':'',
     'e5ojs_current_date':date_format(current_date,'dd-mm-yyyy')
 };
 function e5ojs_global_data_generate(req) {
+
+    // outputs hello world
     e5ojs_global_data.e5ojs_base_url = req.protocol+"://"+req.get('host');
     e5ojs_global_data.e5ojs_current_url = req.protocol+"://"+req.get('host')+req.originalUrl;
+    e5ojs_global_data.e5ojs_media_url = req.protocol+"://"+req.get('host')+"/uploads/";
+    e5ojs_global_data.e5ojs_media_url_sizes = req.protocol+"://"+req.get('host')+"/uploads/sizes/";
+    e5ojs_global_data.e5ojs_all_media_url = req.protocol+"://"+req.get('host')+"/admin/all-media/";
     console.log("e5ojs_global_data : ",e5ojs_global_data);
 }
+/* end global data var */
+
+
+
+
+
+
+
+
+
+/* start parse upload request files */
+var multer = require('multer');
+var maxSize = (2.5) * 1000 * 1000; // max file size 1 = 1024kb
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, __dirname + '/../public/uploads/');
+  },
+  filename: function (req, file, cb) {
+      // generate name for file
+      var file_name_strip = getSlug(remove_diacritics( (file.originalname.split("."))[0] ));
+      var file_original_name = file.originalname;
+      var file_mime_type = file.mimetype;
+      var file_store_name = file.filename;
+      var file_size = file.size;
+      var file_ext = file_mime_type.split("/");
+      var file_name = req.media_file_name;
+      delete req.media_file_name;
+      cb(null, file_name );
+  }
+});
+var upload = multer({
+    storage: storage,
+    limits: { fileSize: maxSize },
+    fileFilter: function (req, file, cb) {
+        console.log("file.mimetype : ",file.mimetype);
+        if( file.mimetype !== 'image/png' && file.mimetype !== 'image/jpeg' ) {
+            req.e5ojs_file_validation_error = true;
+            return cb(null, false); // no save file
+        } else {
+            // get file data and save in DB
+            var file_name_strip = getSlug(remove_diacritics( (file.originalname.split("."))[0] ));
+            var file_original_name = file.originalname;
+            var file_mime_type = file.mimetype;
+            var file_store_name = file.filename;
+            var file_size = file.size;
+            var file_ext = file_mime_type.split("/");
+            var file_name = random_string.generate({charset:file_name_strip})+"."+file_ext[1];
+            req.media_file_name = file_name;
+
+            var file_data = {
+                'media_id':'', // after will be filled
+                'media_name':file_original_name,
+                'media_file_name':file_name,
+                'media_file_name_clean':file_name.split(".")[0],
+                'media_mime_type':file_mime_type,
+                'media_date':date_format(current_date,'dd-mm-yyyy'),
+            };
+            // get increment e5ojs_media
+            e5ojs_get_next_id('media',function(data){
+                var next_id = data.seq;
+                file_data.media_id = next_id;
+                // save on DB
+                //console.log(file_data);
+                e5ojs_insert_new_media(file_data,function(result_data){
+                    // validate error
+                    result_data.media_file_name = e5ojs_global_data.e5ojs_media_url+result_data.media_file_name;
+                    // get image data and send as part of req and get it on router function
+                    req.e5ojs_file_validation_error = false;
+                    req.e5ojs_file_data = result_data; // pass data to request
+                    return cb(null, true);// save file
+                });
+            });
+
+        }
+
+    }
+}).any();
+/* end parse upload request files */
+
+
+
+/* start resize image files */
+var e5ojs_image_sizes = new Array({width:150,height:150},{width:200,height:200},{width:300,height:150},{width:800,height:200});
+var image_sizes_pointer = 0;
+var e5ojs_folder_images_sizes = "sizes/";
+var e5ojs_sizes_return = {};
+function e5ojs_generate_image_file(img_object_data,callback) {
+
+    var media_file_name = img_object_data.media_file_name.split("/");
+    media_file_name = media_file_name[media_file_name.length-1];
+    media_file_name = (media_file_name.split("."))[0];
+    var file_ext = (img_object_data.media_mime_type.split("/"))[1];
+    // paths
+    var file_path =  __dirname + '/../public/uploads/'+media_file_name+"."+file_ext;
+    var file_path_to_save =__dirname + '/../public/uploads/'+e5ojs_folder_images_sizes+media_file_name+"-"+e5ojs_image_sizes[image_sizes_pointer].width+"x"+e5ojs_image_sizes[image_sizes_pointer].height+"."+file_ext;
+
+    // generate array to return with sizes to attach on req json
+    var size_string = e5ojs_image_sizes[image_sizes_pointer].width+"x"+e5ojs_image_sizes[image_sizes_pointer].height;
+    var file_size_name = e5ojs_global_data.e5ojs_media_url_sizes+media_file_name+"-"+e5ojs_image_sizes[image_sizes_pointer].width+"x"+e5ojs_image_sizes[image_sizes_pointer].height+"."+file_ext;
+    e5ojs_sizes_return[size_string] = file_size_name;
+
+
+    // generate images sizes
+    var crop_error = false;
+    e5ojs_crop_image(file_path,file_path_to_save,e5ojs_image_sizes[image_sizes_pointer],function(err){
+        if( err ) {
+            crop_error = true;
+        }
+        // next image crop
+        image_sizes_pointer = image_sizes_pointer+1;
+        if( image_sizes_pointer < e5ojs_image_sizes.length ) {
+            e5ojs_generate_image_file(img_object_data,callback);
+        } else {
+            // return result
+            image_sizes_pointer = 0;
+            callback(crop_error);
+        }
+    });
+
+}
+function e5ojs_crop_image(image_path,image_path_to_save,image_size,callback) {
+    // obtain an image object:
+    var lwip = require('lwip');
+    var error = false;
+    // generate images sizes
+    lwip.open(image_path, function(err, image){
+        if( err )
+            callback(err);
+        // define a batch of manipulations and save to disk as JPEG:
+        image.batch()
+        .crop(image_size.width, image_size.height) // crop a 200X200 square from center
+        .writeFile(image_path_to_save, function(err){
+            if( err )
+                callback(error);
+            else
+                callback(error);
+        });
+    });
+}
+/* end resize image files */
+
+
 
 
 
@@ -82,6 +193,25 @@ function e5ojs_global_data_generate(req) {
 //   multi - if all documents matching criteria should be updated
 //
 // db.myCollection.update({condField: 'condValue'}, { $set: { dateField: new Date(2011, 0, 1)}}, false, true);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -127,48 +257,82 @@ router.get('/log-out', function(req, res, next) {
 
 
 
-
-
-
-
-
-
-
-
-
-
 /* start media upload */
-//var upload = multer().any();
 router.post('/upload/', function(req, res, next) {
-    /*
-    { fieldname: 'userPhoto',
-    originalname: 'Screen Shot 2016-06-08 at 12.45.16 PM.png',
-    encoding: '7bit',
-    mimetype: 'image/png',
-    destination: '/Users/Lalo/Documents/NodeJS Projects/E5OJSCMS/routes/../public/uploads/',
-    filename: 'f55691f730fe64f541a4d542cbb755b3',
-    path: '/Users/Lalo/Documents/NodeJS Projects/E5OJSCMS/public/uploads/f55691f730fe64f541a4d542cbb755b3',
-    size: 502646 }
-    */
-    upload(req, res, function(err) {
-        console.log(req.fileValidationError);
-        if( req.fileValidationError ) {
-            res.json({"upload":false});
+    // get page with validate session
+    e5ojs_global_data_generate(req);
+
+    // get session vars
+    var e5ojs_session = req.session;
+    if( e5ojs_session !== 'undefined' && typeof e5ojs_session.e5ojs_user_data !== 'undefined' && e5ojs_session.e5ojs_user_data != null ) {
+        // exists vars
+        var user_name = e5ojs_session.e5ojs_user_data.user_login;
+        var user_pass = e5ojs_session.e5ojs_user_data.user_pass;
+        e5ojs_validate_admin_session_db_callback(user_name,user_pass,req,res,next,function(user_data){
+            if( user_data.result_login ) {
+                // process image
+                upload(req, res, function(err) {
+                    if( req.e5ojs_file_validation_error ) {
+                        // remove var req
+                        delete req.e5ojs_file_validation_error;
+                        delete req.e5ojs_file_data;
+                        res.json({"upload":false});
+                    } else {
+                        var e5ojs_file_data = req.e5ojs_file_data;
+                        delete req.e5ojs_file_validation_error;
+                        delete req.e5ojs_file_data;
+                        // generate image sizes
+                        e5ojs_generate_image_file(e5ojs_file_data,function(err){
+                            if( err ) {
+                                e5ojs_sizes_return = new Array();
+                                res.json({"upload":false});
+                            } else {
+                                e5ojs_file_data.sizes = e5ojs_sizes_return;
+                                e5ojs_sizes_return = new Array();
+                                res.json({"upload":true,"e5ojs_file_data":e5ojs_file_data});
+                            }
+                        });
+                    }
+                });
+            } else {
+                // clear session data
+                var e5ojs_session = req.session;
+                e5ojs_session.e5ojs_user_data = null;
+                e5ojs_session.destroy();
+                // return log-in page
+                res.json({"upload":false});
+            }
+        });
+    } else {
+        // doesn´t exists vars
+        // clear session data
+        var e5ojs_session = req.session;
+        e5ojs_session.e5ojs_user_data = null;
+        e5ojs_session.destroy();
+        // return log-in page
+        res.json({"upload":false});
+    }
+
+});
+// get all media return json
+router.get('/all-media/',function(req, res, next){
+    // validate session
+    e5ojs_global_data_generate(req);
+
+    e5ojs_get_all_media(function(media_data){
+        if( media_data != false ) {
+            var media_sizes = {};
+            e5ojs_image_sizes.forEach(function(size,key){
+                var size_key = size.width+"x"+size.height;
+                media_sizes[size_key] = size_key;
+            });
+            res.json( new Array({status:true,media_posts:media_data,sizes:media_sizes}) );
         } else {
-            res.json({"upload":true});
+            res.json({status:false});
         }
     });
 });
 /* end media upload */
-
-
-
-
-
-
-
-
-
 
 
 
@@ -739,8 +903,32 @@ function e5ojs_change_post_status_multiple(post_ids,status,callback) {
         }
     });
 }
-
 /* end post DB functions */
+
+
+
+
+
+
+/* start media DB function */
+function e5ojs_get_all_media(callback) {
+    db.e5ojs_media.find({},function(err, media_data){
+        // validate error
+        if( err ) {
+            callback(false);
+        } else {
+            callback(media_data);
+        }
+
+    });
+}
+function e5ojs_insert_new_media(post_data,callback) {
+    db.e5ojs_media.insert(post_data,function(err, result_data){
+        // validate error
+        callback(result_data);
+    });
+}
+/* end media DB function */
 
 
 
@@ -879,6 +1067,11 @@ function e5ojs_validate_admin_request_session_vars(req,res,next) {
     }
 }
 /* end validate admin session */
+
+
+
+
+
 
 
 

@@ -5,6 +5,10 @@ html
         meta(name="viewport" content="width=device-width, user-scalable=no")
         title="E5OJS - Home"
         block e5ojs_block_global_css_script
+            // set data vars script
+            script.
+                var e5ojs_all_media_url = "#{e5ojs_global_data.e5ojs_all_media_url}";
+                var e5ojs_media_sizes_url = "#{e5ojs_global_data.e5ojs_media_url_sizes}";
             script(type='text/javascript', src=e5ojs_global_data.e5ojs_base_url+'/bower_components/jquery/dist/jquery.min.js')
             link(rel='stylesheet', href=e5ojs_global_data.e5ojs_base_url+'/bower_components/bootstrap/dist/css/bootstrap.min.css')
             script(type='text/javascript', src=e5ojs_global_data.e5ojs_base_url+'/bower_components/bootstrap/dist/js/bootstrap.min.js')
@@ -41,15 +45,13 @@ html
                                         span(id="e5ojs-upload-form-status")
                                     div(class="media-wrapper")
                                         div(class="media-items")
-                                            - for(i=0;i<=200;i++) {
-                                            div(class="card-image waves-effect waves-dark")
-                                                img(src="https://placeholdit.imgix.net/~text?txtsize=50&bg=4CAF50&txtclr=FFFFFF&txt="+i+"&w=100&h=100&txttrack=0" class="img-responsive item")
-                                            - }
                                 div(class="col-xs-12 col-md-2 right")
                                     div(class="media-info")
                                         img(src="https://placeholdit.imgix.net/~text?txtsize=50&bg=4CAF50&txtclr=FFFFFF&txt="+i+"&w=200&h=200&txttrack=0" class="img-responsive")
                                         div(class="data")
                                             p(class="file-name")="File name"
+                                div(class="col-xs-12")
+                                    a(class="waves-effect waves-dark" id="e5ojs-media-select")='Select'
         div(class="e5o-admin-all-wrapper")
             div(class="e5ojs-header-bar")
                 div(class="container-fluid")

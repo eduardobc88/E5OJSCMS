@@ -14,10 +14,13 @@
     "express": "~4.13.1",
     "express-session": "^1.13.0",
     "jade": "~1.11.0",
+    "lwip": "0.0.9",
+    "md5": "^2.1.0",
     "mongojs": "^2.4.0",
     "monk": "^1.0.1",
     "morgan": "~1.6.1",
     "multer": "^1.1.0",
+    "randomstring": "^1.1.5",
     "serve-favicon": "~2.3.0",
     "speakingurl": "^9.0.0"
   }

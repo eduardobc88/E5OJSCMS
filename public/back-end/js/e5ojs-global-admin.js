@@ -125,7 +125,6 @@ function e5ojs_header_menu() {
 function e5ojs_auto_close_left_menu_wrapper() {
     var right_wrapper_position_left = $(".e5ojs-content-right-wrapper").offset().left;
     var left_wrapper_width = $(".e5ojs-menu-left-wrapper").width();
-    console.log(right_wrapper_position_left+" <= "+(left_wrapper_width+20));
     if( right_wrapper_position_left <= (left_wrapper_width+20) ) {
         // close
         $(".e5ojs-menu-left-wrapper").addClass("e5ojs-menu-left-wrapper-close");
