@@ -1,10 +1,10 @@
 var express = require('express');
 var router = express.Router();
 // MD5
-var md5 = require('md5');
+//var md5 = require('md5');
 // mongojs
 var mongojs = require('mongojs');
-var db = mongojs("e5ojs_db",['e5ojs_user']);
+var db = mongojs("e5ojs_db");
 // format date
 var date_format = require('dateformat');
 var current_date = new Date();
@@ -12,8 +12,7 @@ var current_date = new Date();
 var remove_diacritics = require('diacritics').remove;
 // generate slug from string
 var getSlug = require('speakingurl');
-// ramdom string
-var random_string = require("randomstring");
+
 
 
 
@@ -70,11 +69,13 @@ var upload = multer({
     storage: storage,
     limits: { fileSize: maxSize },
     fileFilter: function (req, file, cb) {
-        console.log("file.mimetype : ",file.mimetype);
         if( file.mimetype !== 'image/png' && file.mimetype !== 'image/jpeg' ) {
             req.e5ojs_file_validation_error = true;
             return cb(null, false); // no save file
         } else {
+            // ramdom string
+            var random_string = require("randomstring");
+
             // get file data and save in DB
             var file_name_strip = getSlug(remove_diacritics( (file.originalname.split("."))[0] ));
             var file_original_name = file.originalname;
@@ -513,6 +514,7 @@ router.get('/posts/action/new-post/', function(req, res, next) {
     e5ojs_get_admin_page(req, res, next,'e5ojs-admin-new-post', 'NEW POST');
 });
 router.get('/posts/action/edit-post/:post_id/', function(req, res, next) {
+    console.log("post_id",req.params);
     /*
     get template with post data it will be edited
     */
@@ -532,6 +534,7 @@ router.get('/posts/action/edit-post/:post_id/', function(req, res, next) {
         e5ojs_validate_admin_session_db_callback(user_name,user_pass,req,res,next,function(user_data){
             if( user_data.result_login ) {
                 // get post data with id
+
                 e5ojs_get_post(post_id,function(post_data){
                     // validate error
                     // check if has message session
@@ -539,7 +542,31 @@ router.get('/posts/action/edit-post/:post_id/', function(req, res, next) {
                     var e5ojs_message = e5ojs_get_session_message(req);
                     // remove session message
                     e5ojs_clear_session_message(req);
-                    res.render('back-end/e5ojs-admin-edit-post', { title: "EDIT POST", e5ojs_global_data:e5ojs_global_data, result_data:user_data.result_data, result_query_db:1, result_query_data:post_data, e5ojs_message:e5ojs_message });
+                    var post_data_object = post_data[0];
+                    // validate post_media_attachment
+                    if( typeof post_data_object.post_media_attachment !== 'undefined' && post_data_object.post_media_attachment != null ) {
+                        post_data_object.post_media_attachment_id = "";
+                        post_data_object.post_media_attachment = "https://placeholdit.imgix.net/~text?txtsize=50&bg=818181&txtclr=FFFFFF&txt=IMAGE&w=800&h=150&txttrack=0";
+                        // render with post data
+                        res.render('back-end/e5ojs-admin-edit-post', { title: "EDIT POST", e5ojs_global_data:e5ojs_global_data, result_data:user_data.result_data, result_query_data:post_data_object, e5ojs_message:e5ojs_message });
+                    } else {
+                        // get image from DB
+                        e5ojs_get_media(parseInt(post_data_object.post_media_attachment),function(media_result){
+                            console.log("media_result",media_result);
+                            if( !media_result ) {
+                                post_data_object.post_media_attachment_id = "";
+                                post_data_object.post_media_attachment = "https://placeholdit.imgix.net/~text?txtsize=50&bg=818181&txtclr=FFFFFF&txt=IMAGE&w=800&h=150&txttrack=0";
+                            } else {
+                                var media_url = e5ojs_global_data.e5ojs_media_url_sizes+media_result[0].media_file_name_clean+"-800x200."+(media_result[0].media_mime_type.split("/"))[1];
+                                post_data_object.post_media_attachment_id = media_result[0].media_id;
+                                post_data_object.post_media_attachment_url = media_url;
+                            }
+                            // render with post data
+                            res.render('back-end/e5ojs-admin-edit-post', { title: "EDIT POST", e5ojs_global_data:e5ojs_global_data, result_data:user_data.result_data, result_query_data:post_data_object, e5ojs_message:e5ojs_message });
+                        });
+
+                    }
+
                 });
             } else {
                 // clear session data
@@ -587,6 +614,7 @@ router.post('/posts/action/edit-post/:post_id/:post_status', function(req, res, 
     var post_format_date = req.body.post_date;
     var post_date = req.body.post_date_submit;
     var post_excerpt = req.body.post_excerpt;
+    var post_media_attachment = req.body.post_media_id;
 
     // get session vars
     var e5ojs_session = req.session;
@@ -601,7 +629,7 @@ router.post('/posts/action/edit-post/:post_id/:post_status', function(req, res, 
                 // generate post name
                 var post_name = post_title.replace(/\s+/g, '-').toLowerCase();
                 var post_name = getSlug(remove_diacritics(post_name));
-                e5ojs_update_post( {post_id:parseInt(post_id),post_title:post_title,post_content:post_content,post_excerpt:post_excerpt,post_date:post_date,post_name:post_name,post_status:post_status},function(result_data){
+                e5ojs_update_post( {post_id:parseInt(post_id),post_title:post_title,post_content:post_content,post_excerpt:post_excerpt,post_date:post_date,post_name:post_name,post_media_attachment:post_media_attachment,post_status:post_status},function(result_data){
                     // validate result
 
                     // create session message
@@ -658,6 +686,7 @@ router.post('/posts/action/new-post/:post_status', function(req, res, next) {
     var post_format_date = req.body.post_date;
     var post_date = req.body.post_date_submit;
     var post_excerpt = req.body.post_excerpt;
+    var post_media_attachment = req.body.post_media_id;
 
     // get session vars
     var e5ojs_session = req.session;
@@ -675,7 +704,7 @@ router.post('/posts/action/new-post/:post_status', function(req, res, next) {
                     // insert post data
                     var post_name = post_title.replace(/\s+/g, '-').toLowerCase();
                     var post_name = getSlug(remove_diacritics(post_name));
-                    e5ojs_insert_new_post({post_id:next_id,post_title:post_title,post_content:post_content,post_excerpt:post_excerpt,post_date:post_date,post_name:post_name,post_status:post_status},function(result_data){
+                    e5ojs_insert_new_post({post_id:next_id,post_title:post_title,post_content:post_content,post_excerpt:post_excerpt,post_date:post_date,post_name:post_name,post_media_attachment:post_media_attachment,post_status:post_status},function(result_data){
                         // validate result
                         // create session message
                         var e5ojs_message = null;
@@ -919,13 +948,24 @@ function e5ojs_get_all_media(callback) {
         } else {
             callback(media_data);
         }
-
     });
 }
 function e5ojs_insert_new_media(post_data,callback) {
     db.e5ojs_media.insert(post_data,function(err, result_data){
         // validate error
         callback(result_data);
+    });
+}
+function e5ojs_get_media(media_id,callback) {
+    db.e5ojs_media.find({'media_id':media_id},function(err, media_data){
+        if( err ) {
+            callback(false);
+        } else {
+            if( media_data.length )
+                callback(media_data);
+            else
+                callback(false);
+        }
     });
 }
 /* end media DB function */
