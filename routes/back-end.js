@@ -19,21 +19,26 @@ var getSlug = require('speakingurl');
 
 
 
+
+
+
+
+
+
+
 /* start global data var */
 var e5ojs_global_data = {
     'e5ojs_base_url':'',
     'e5ojs_current_url':'',
-    'e5ojs_current_date':date_format(current_date,'dd-mm-yyyy')
+    'e5ojs_current_date':date_format(current_date,'dd-mm-yyyy'),
 };
 function e5ojs_global_data_generate(req) {
-
     // outputs hello world
     e5ojs_global_data.e5ojs_base_url = req.protocol+"://"+req.get('host');
     e5ojs_global_data.e5ojs_current_url = req.protocol+"://"+req.get('host')+req.originalUrl;
     e5ojs_global_data.e5ojs_media_url = req.protocol+"://"+req.get('host')+"/uploads/";
     e5ojs_global_data.e5ojs_media_url_sizes = req.protocol+"://"+req.get('host')+"/uploads/sizes/";
     e5ojs_global_data.e5ojs_all_media_url = req.protocol+"://"+req.get('host')+"/admin/all-media/";
-    console.log("e5ojs_global_data : ",e5ojs_global_data);
 }
 /* end global data var */
 
@@ -54,12 +59,6 @@ var storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
       // generate name for file
-      var file_name_strip = getSlug(remove_diacritics( (file.originalname.split("."))[0] ));
-      var file_original_name = file.originalname;
-      var file_mime_type = file.mimetype;
-      var file_store_name = file.filename;
-      var file_size = file.size;
-      var file_ext = file_mime_type.split("/");
       var file_name = req.media_file_name;
       delete req.media_file_name;
       cb(null, file_name );
@@ -167,6 +166,7 @@ function e5ojs_crop_image(image_path,image_path_to_save,image_size,callback) {
             callback(err);
         // define a batch of manipulations and save to disk as JPEG:
         image.batch()
+        .scale(0.80)
         .crop(image_size.width, image_size.height) // crop a 200X200 square from center
         .writeFile(image_path_to_save, function(err){
             if( err )
@@ -248,7 +248,7 @@ router.get('/log-out', function(req, res, next) {
     e5ojs_session.e5ojs_user_data = null;
     e5ojs_session.destroy();
     // return log-in page
-    res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data, result_data:null });
+    res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, result_data:null });
 });
 /* start login session */
 
@@ -329,7 +329,7 @@ router.get('/all-media/',function(req, res, next){
             });
             res.json( new Array({status:true,media_posts:media_data,sizes:media_sizes}) );
         } else {
-            res.json({status:false});
+            res.json( new Array({status:false}) );
         }
     });
 });
@@ -421,7 +421,7 @@ router.get('/posts/:post_status/', function(req, res, next) {
                 e5ojs_session.e5ojs_user_data = null;
                 e5ojs_session.destroy();
                 // return log-in page
-                res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data, result_data:user_data.result_data, result_data:null });
+                res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, result_data:user_data.result_data, result_data:null });
             }
         });
     } else {
@@ -431,7 +431,7 @@ router.get('/posts/:post_status/', function(req, res, next) {
         e5ojs_session.e5ojs_user_data = null;
         e5ojs_session.destroy();
         // return log-in page
-        res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data, result_data:null });
+        res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, result_data:null });
     }
 });
 router.get('/posts/:post_status/page/:page/', function(req, res, next) {
@@ -493,7 +493,7 @@ router.get('/posts/:post_status/page/:page/', function(req, res, next) {
                 e5ojs_session.e5ojs_user_data = null;
                 e5ojs_session.destroy();
                 // return log-in page
-                res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data, result_data:user_data.result_data, result_data:null });
+                res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, result_data:user_data.result_data, result_data:null });
             }
         });
     } else {
@@ -503,7 +503,7 @@ router.get('/posts/:post_status/page/:page/', function(req, res, next) {
         e5ojs_session.e5ojs_user_data = null;
         e5ojs_session.destroy();
         // return log-in page
-        res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data, result_data:null });
+        res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, result_data:null });
     }
 });
 router.get('/posts/action/new-post/', function(req, res, next) {
@@ -514,7 +514,6 @@ router.get('/posts/action/new-post/', function(req, res, next) {
     e5ojs_get_admin_page(req, res, next,'e5ojs-admin-new-post', 'NEW POST');
 });
 router.get('/posts/action/edit-post/:post_id/', function(req, res, next) {
-    console.log("post_id",req.params);
     /*
     get template with post data it will be edited
     */
@@ -544,18 +543,12 @@ router.get('/posts/action/edit-post/:post_id/', function(req, res, next) {
                     e5ojs_clear_session_message(req);
                     var post_data_object = post_data[0];
                     // validate post_media_attachment
-                    if( typeof post_data_object.post_media_attachment !== 'undefined' && post_data_object.post_media_attachment != null ) {
-                        post_data_object.post_media_attachment_id = "";
-                        post_data_object.post_media_attachment = "https://placeholdit.imgix.net/~text?txtsize=50&bg=818181&txtclr=FFFFFF&txt=IMAGE&w=800&h=150&txttrack=0";
-                        // render with post data
-                        res.render('back-end/e5ojs-admin-edit-post', { title: "EDIT POST", e5ojs_global_data:e5ojs_global_data, result_data:user_data.result_data, result_query_data:post_data_object, e5ojs_message:e5ojs_message });
-                    } else {
+                    if( post_data_object.post_media_attachment.length ) {
                         // get image from DB
                         e5ojs_get_media(parseInt(post_data_object.post_media_attachment),function(media_result){
-                            console.log("media_result",media_result);
-                            if( !media_result ) {
+                            if( media_result == false ) {
                                 post_data_object.post_media_attachment_id = "";
-                                post_data_object.post_media_attachment = "https://placeholdit.imgix.net/~text?txtsize=50&bg=818181&txtclr=FFFFFF&txt=IMAGE&w=800&h=150&txttrack=0";
+                                post_data_object.post_media_attachment_url = "https://placeholdit.imgix.net/~text?txtsize=50&bg=818181&txtclr=FFFFFF&txt=IMAGE&w=800&h=200&txttrack=0";
                             } else {
                                 var media_url = e5ojs_global_data.e5ojs_media_url_sizes+media_result[0].media_file_name_clean+"-800x200."+(media_result[0].media_mime_type.split("/"))[1];
                                 post_data_object.post_media_attachment_id = media_result[0].media_id;
@@ -563,10 +556,15 @@ router.get('/posts/action/edit-post/:post_id/', function(req, res, next) {
                             }
                             // render with post data
                             res.render('back-end/e5ojs-admin-edit-post', { title: "EDIT POST", e5ojs_global_data:e5ojs_global_data, result_data:user_data.result_data, result_query_data:post_data_object, e5ojs_message:e5ojs_message });
+
                         });
-
+                    } else {
+                        // no media id
+                        post_data_object.post_media_attachment_id = "";
+                        post_data_object.post_media_attachment_url = "https://placeholdit.imgix.net/~text?txtsize=50&bg=818181&txtclr=FFFFFF&txt=IMAGE&w=800&h=200&txttrack=0";
+                        // render with post data
+                        res.render('back-end/e5ojs-admin-edit-post', { title: "EDIT POST", e5ojs_global_data:e5ojs_global_data, result_data:user_data.result_data, result_query_data:post_data_object, e5ojs_message:e5ojs_message });
                     }
-
                 });
             } else {
                 // clear session data
@@ -574,7 +572,7 @@ router.get('/posts/action/edit-post/:post_id/', function(req, res, next) {
                 e5ojs_session.e5ojs_user_data = null;
                 e5ojs_session.destroy();
                 // return log-in page
-                res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data, result_data:null });
+                res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, result_data:null });
             }
         });
     } else {
@@ -584,7 +582,7 @@ router.get('/posts/action/edit-post/:post_id/', function(req, res, next) {
         e5ojs_session.e5ojs_user_data = null;
         e5ojs_session.destroy();
         // return log-in page
-        res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data, result_data:null });
+        res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, result_data:null });
     }
 });
 router.post('/posts/action/edit-post/:post_id/:post_status', function(req, res, next) {
@@ -650,7 +648,7 @@ router.post('/posts/action/edit-post/:post_id/:post_status', function(req, res, 
                 e5ojs_session.e5ojs_user_data = null;
                 e5ojs_session.destroy();
                 // return log-in page
-                res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data, result_data:null });
+                res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, result_data:null });
             }
         });
     } else {
@@ -660,7 +658,7 @@ router.post('/posts/action/edit-post/:post_id/:post_status', function(req, res, 
         e5ojs_session.e5ojs_user_data = null;
         e5ojs_session.destroy();
         // return log-in page
-        res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data, result_data:null });
+        res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, result_data:null });
     }
 });
 router.post('/posts/action/new-post/:post_status', function(req, res, next) {
@@ -724,7 +722,7 @@ router.post('/posts/action/new-post/:post_status', function(req, res, next) {
                 e5ojs_session.e5ojs_user_data = null;
                 e5ojs_session.destroy();
                 // return log-in page
-                res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data, result_data:null });
+                res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, result_data:null });
             }
         });
     } else {
@@ -734,7 +732,7 @@ router.post('/posts/action/new-post/:post_status', function(req, res, next) {
         e5ojs_session.e5ojs_user_data = null;
         e5ojs_session.destroy();
         // return log-in page
-        res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data, result_data:null });
+        res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, result_data:null });
     }
 });
 router.get('/posts/action/:post_status/:post_id/', function(req, res, next) {
@@ -800,7 +798,7 @@ router.get('/posts/action/:post_status/:post_id/', function(req, res, next) {
                 e5ojs_session.e5ojs_user_data = null;
                 e5ojs_session.destroy();
                 // return log-in page
-                res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data, result_data:null });
+                res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, result_data:null });
             }
         });
     } else {
@@ -810,7 +808,7 @@ router.get('/posts/action/:post_status/:post_id/', function(req, res, next) {
         e5ojs_session.e5ojs_user_data = null;
         e5ojs_session.destroy();
         // return log-in page
-        res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data, result_data:null });
+        res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, result_data:null });
     }
 });
 
@@ -1007,7 +1005,7 @@ function e5ojs_get_admin_page(req, res, next,template_name,title) {
                 e5ojs_session.e5ojs_user_data = null;
                 e5ojs_session.destroy();
                 // return log-in page
-                res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data, result_data:null });
+                res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, result_data:null });
             }
         });
     } else {
@@ -1017,7 +1015,7 @@ function e5ojs_get_admin_page(req, res, next,template_name,title) {
         e5ojs_session.e5ojs_user_data = null;
         e5ojs_session.destroy();
         // return log-in page
-        res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data, result_data:null });
+        res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, result_data:null });
     }
     // validate session with callback
 }
@@ -1034,7 +1032,7 @@ function e5ojs_validate_admin_session_db_callback(user_login,user_pass,req,res,n
             e5ojs_session.destroy();
             //console.log("NO DATA USER - ",e5ojs_session);
             callback({ result_data:err});
-            //res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data, result_data:err });
+            //res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, result_data:err });
         } else {
             //console.log(user[0].user_name);
             if( user.length ) {
@@ -1051,7 +1049,7 @@ function e5ojs_validate_admin_session_db_callback(user_login,user_pass,req,res,n
                 e5ojs_session.destroy();
                 //console.log("NO DATA USER - ",e5ojs_session);
                 callback({ result_data:user, result_login:0 });
-                //res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data, result_data:user });
+                //res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, result_data:user });
             }
         }
     });
@@ -1068,7 +1066,7 @@ function e5ojs_validate_admin_session_db(user_login,user_pass,req,res,next) {
             e5ojs_session.e5ojs_user_data = null;
             e5ojs_session.destroy();
             //console.log("NO DATA USER - ",e5ojs_session);
-            res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data, result_data:err });
+            res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, result_data:err });
         } else {
             //console.log(user[0].user_name);
             if( user.length ) {
@@ -1083,7 +1081,7 @@ function e5ojs_validate_admin_session_db(user_login,user_pass,req,res,next) {
                 e5ojs_session.e5ojs_user_data = null;
                 e5ojs_session.destroy();
                 //console.log("NO DATA USER - ",e5ojs_session);
-                res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data, result_data:user });
+                res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, result_data:user });
             }
         }
     });
@@ -1103,7 +1101,7 @@ function e5ojs_validate_admin_request_session_vars(req,res,next) {
         // no session vars found
         e5ojs_session.e5ojs_user_data = null;
         e5ojs_session.destroy();
-        res.render('back-end/e5ojs-index', { title: 'E5OJS - LOG-IN', e5ojs_global_data:e5ojs_global_data });
+        res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data });
     }
 }
 /* end validate admin session */

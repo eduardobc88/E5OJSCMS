@@ -1,0 +1,21 @@
+extends e5ojs-login-base-layout
+block e5ojs_block_local_css_script
+block e5ojs_block_content
+        div(class="e5ojs-login-wrapper")
+            div(class="card vertical-center")
+                div(class="card-image")
+                    img(src=e5ojs_global_data.e5ojs_base_url+"/back-end/assets/profile-menu.jpg" class="img-bkg")
+                    p(class="card-title")=title
+                div(class="card-content")
+                    form(action="/admin/" method="post" class="e5ojs-form-login" autocomplete="off")
+                        - if( result_request == 0 ) {
+                            p(class='login-error-message')='Access Error!'
+                        - }
+                        div(class="input-field")
+                            input(id="user_name" class="validate", type="text", name="user_name"  onfocus="this.removeAttribute('readonly');" readonly)
+                            label(for='user_name')='Username'
+                        div(class="input-field ")
+                            input(id="user_pass" class="validate", type="password", name="user_pass"  onfocus="this.removeAttribute('readonly');" readonly)
+                            label(for='user_pass')='Password'
+                        button(class="btn-floating btn-large waves-effect waves-dark", type="submit", name="action")
+                            i(class="material-icons")='arrow_forward'

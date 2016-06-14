@@ -44,6 +44,7 @@ app.use('/api', api);
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
+  //res.render('error', { title: 'Error 404!', description_err:"Not Found" });
   next(err);
 });
 
