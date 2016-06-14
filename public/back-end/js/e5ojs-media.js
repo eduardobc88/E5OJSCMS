@@ -30,12 +30,14 @@ var e5ojs_media = {
     e5ojs_media_open: false,
     e5ojs_media_element_selected: {},
     e5ojs_media_sizes: {},
+    e5ojs_timer_id: null,
     init: function(init_data) {
         $(this.e5ojs_media_wrapper).find(".card-title").html(init_data.title);
         return {
             e5ojs_open_media: function() {
+                console.log("e5ojs_open_media");
                 // open close media wrapper
-                function e5ojs_open_media() {
+                function e5ojs_open_media_popup() {
                     // show media popup
                     e5ojs_media.e5ojs_media_open = true;
                     $(e5ojs_media.e5ojs_media_wrapper).fadeIn();
@@ -52,28 +54,33 @@ var e5ojs_media = {
                     });
 
                 }
+                // Check to see when a user has selected a file
+                function e5ojs_check_for_upload() {
+                    e5ojs_clear_interval();
+                    e5ojs_media.e5ojs_timer_id = setInterval(function(){
+                        if( $('#e5ojs_file_input').val() !== '' && e5ojs_media.e5ojs_timer_id != null ) {
+                            e5ojs_clear_interval();
+                            $('#e5ojs-upload-form').submit();
+                        }
+                    }, 2000);
+                }
+                function e5ojs_clear_interval() {
+                    clearInterval(e5ojs_media.e5ojs_timer_id);
+                    e5ojs_media.e5ojs_timer_id = null;
+                }
                 // upload media action
                 function e5ojs_upload_media() {
-                    e5ojs_upload_media_status('Choose a file :)');
-                    // Check to see when a user has selected a file
-                    var e5ojs_timer_id;
+                    $('#e5ojs-upload-form').unbind();
+                    // clear interval
                     e5ojs_check_for_upload();
-                    function e5ojs_check_for_upload() {
-                        e5ojs_timer_id = setInterval(function(){
-                            if( $('#e5ojs_file_input').val() !== '' ) {
-                                console.log("upload file",e5ojs_timer_id);
-                                clearInterval(e5ojs_timer_id);
-                                $('#e5ojs-upload-form').submit();
-                            }
-                        }, 2000);
-                    }
+                    e5ojs_upload_media_status('Choose a file :)');
                     $('#e5ojs-upload-form').submit(function() {
-                        e5ojs_upload_media_status('Uploading the file ...');
+                        e5ojs_upload_media_status('Uploading...');
                         $(this).ajaxSubmit({
                             error: function(xhr) {
-                                $('#e5ojs_file_input').val("");
-                                e5ojs_check_for_upload();
+                                $('#e5ojs-upload-form').resetForm();
                 		        e5ojs_upload_media_status('Error: ' + xhr.status);
+                                e5ojs_check_for_upload();
                             },
                             uploadProgress: function(event, position, total, percentComplete) {
                                 var percentVal = percentComplete + '%';
@@ -84,11 +91,9 @@ var e5ojs_media = {
                         		//console.log(percentVal, position, total);
                             },
                             success: function(response) {
+                                $('#e5ojs-upload-form').resetForm();
                                 if( response.upload ) {
-                                    $('#e5ojs_file_input').val("");
-                                    e5ojs_check_for_upload();
                                     e5ojs_upload_media_status("Success!");
-
                                     var media_element = response.e5ojs_file_data;
                                     //console.log(media_element);
                                     var media_id = media_element.media_id;
@@ -100,8 +105,6 @@ var e5ojs_media = {
                                     e5ojs_option_to_media();
                                     e5ojs_select_item();
                                 } else {
-                                    $('#e5ojs_file_input').val("");
-                                    e5ojs_check_for_upload();
                                     e5ojs_upload_media_status("Error!");
                                 }
                                 // clear progress data
@@ -109,6 +112,7 @@ var e5ojs_media = {
                                     width:"0%"
                                 });
                                 $(e5ojs_media.e5ojs_media_wrapper).find("#e5ojs-upload-progress-bar-wrapper").find("p").html("");
+                                e5ojs_check_for_upload();
                             }
                         });
                         // Have to stop the form from submitting and causing
@@ -128,7 +132,6 @@ var e5ojs_media = {
                     if( $(window).width() <= 991 ) {
                         $(e5ojs_media.e5ojs_media_wrapper).find(".media-wrapper").height(window_height-(content_media_bottom_height+180));
                         $(e5ojs_media.e5ojs_media_wrapper).find(".upload-wrapper").height(window_height-(content_media_bottom_height+180));
-
                     } else {
                         $(e5ojs_media.e5ojs_media_wrapper).find(".media-wrapper").height(window_height-(content_media_bottom_height+180));
                         $(e5ojs_media.e5ojs_media_wrapper).find(".upload-wrapper").height(window_height-(content_media_bottom_height+180));
@@ -173,12 +176,16 @@ var e5ojs_media = {
                     });
                     $("#e5ojs-media-select").unbind();
                     $("#e5ojs-media-select").on("click",function(){
+                        // clear interval
+                        e5ojs_check_for_upload();
                         // close media
                         $(e5ojs_media.e5ojs_media_wrapper).fadeOut();
                         e5ojs_media.e5ojs_media_open = false;
                     });
                     $("#e5ojs-close-media").unbind();
                     $("#e5ojs-close-media").on("click",function(){
+                        // clear interval
+                        e5ojs_check_for_upload();
                         // close media
                         $(e5ojs_media.e5ojs_media_wrapper).fadeOut();
                         e5ojs_media.e5ojs_media_open = false;
@@ -186,9 +193,8 @@ var e5ojs_media = {
                 }
                 function e5ojs_option_to_media() {
                     $(e5ojs_media.e5ojs_media_wrapper+" .media-options .option").each(function(key,element){
-                        if( $(this).hasClass("current") ) {
-                            $(this).removeClass("current");
-                        } else {
+                        $(this).removeClass("current");
+                        if( $(this).attr("data-option") == "media" ) {
                             $(this).addClass("current");
                             $(e5ojs_media.e5ojs_media_wrapper+" .container-fluid .media-wrapper").show();
                             $(e5ojs_media.e5ojs_media_wrapper+" .container-fluid .upload-wrapper").hide();
@@ -198,6 +204,8 @@ var e5ojs_media = {
                 function e5ojs_select_item() {
                     $(e5ojs_media.e5ojs_media_wrapper+" .media-wrapper .media-items .card-image").unbind();
                     $(e5ojs_media.e5ojs_media_wrapper+" .media-wrapper .media-items .card-image").on("click",function(){
+                        $(e5ojs_media.e5ojs_media_wrapper).find(".media-items").find(".card-image").removeClass("current");
+                        $(this).addClass("current");
                         e5ojs_media.e5ojs_media_element_selected.media_id = $(this).find("img").attr("data-media-id");
                         e5ojs_media.e5ojs_media_element_selected.media_url = $(this).find("img").attr("src");
                         e5ojs_media.e5ojs_media_element_selected.media_name = $(this).find("img").attr("data-media-name");
@@ -210,7 +218,9 @@ var e5ojs_media = {
                     });
                 }
                 // init all
-                e5ojs_open_media();
+                e5ojs_open_media_popup();
+                e5ojs_option_to_media();
+
 
                 // return callback event with data object
                 return {

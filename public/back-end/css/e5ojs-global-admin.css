@@ -1,12 +1,17 @@
 /* start global components */
 html {
     font-family: GillSans, Calibri, Trebuchet, sans-serif;
+    -webkit-font-smoothing: antialiased;
 }
 body {
     background-color: #EDECEC;
 }
-a {
+body a {
     text-decoration: none !important;
+    cursor: pointer !important;
+}
+body .waves-effect {
+    cursor: pointer !important;
 }
 .e5ojs-btn {
     outline: none;
@@ -53,13 +58,15 @@ input:not([type]).valid, input:not([type]):focus.valid, input[type=text].valid, 
     border: 2px solid #0085d2;
     background-color: #0085d2;
 }
-
+.z-depth-1, nav, .card-panel, .card, .toast, .btn, .btn-large, .btn-floating, .dropdown-content, .collapsible, .side-nav, .custom-collection, .e5ojs-menu-left-wrapper {
+    box-shadow: 0 2px 5px rgba(0,0,0,.16);
+}
 
 
 /* start collection-item  checkbox position */
-.custom-collection {
+/*.custom-collection {
     box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
-}
+}*/
 .custom-collection .collection-item {
     transition-duration: .3s;
 }
@@ -442,7 +449,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     text-transform: uppercase;
     padding-left: 15px;
     padding-right: 15px;
-    padding-top: 25px;
+    padding-top: 15px;
 }
 .e5ojs-content-right-wrapper .page-description {
     display: block;
@@ -502,7 +509,6 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 /* start menu left wrapper */
 .e5ojs-menu-left-wrapper {
     position: fixed;
-    box-shadow: 0 0 10px rgba(51, 51, 51, 0.38);
     width: 250px;
     background-color: #FFF;
     height: 100%;
@@ -693,7 +699,10 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 }
 .top-page-options a {
     color: #777;
-    margin-right: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 5px;
+    padding-bottom: 0px;
 }
 .top-page-options a.current {
     border-bottom: 2px solid #0085d2;
@@ -725,17 +734,36 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     line-height: 1.5 !important;
     height: inherit !important;
     text-transform: inherit !important;
+    border: 0px !important;
 }
 .summernote-wrapper .btn i {
     font-size: 12px !important;
 }
 .summernote-wrapper .note-editor.note-frame {
-    border: 1px solid #a9a9a9 !important;
+    border: 0px solid #a9a9a9 !important;
     border-radius: 2px !important;
 }
 .summernote-wrapper .panel-default>.panel-heading {
     background-color: #FFF !important;
     text-align: center;
+}
+.summernote-wrapper .note-editor.note-frame .note-statusbar .note-resizebar {
+    height: 1px;
+}
+.summernote-wrapper .note-editor.note-frame .note-statusbar {
+    background-color: #9e9e9e;
+    border-radius: 0px;
+}
+.summernote-wrapper .note-editor.note-frame .note-editing-area .note-editable {
+    transition: .3s;
+    border-bottom: 2px solid #9e9e9e !important;
+}
+.summernote-wrapper .note-editor.note-frame .note-editing-area .note-editable:focus {
+    border-bottom: 2px solid #0085d2 !important;
+    box-shadow: 0 1px 0 0 #0085d2 !important;
+}
+.summernote-wrapper:focus label {
+    color: #0085d2 !important;
 }
 /* end posts new post - summernote override */
 
@@ -781,6 +809,19 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 
 
 
+/* start edit post and new post*/
+#e5ojs-post-form-wrapper .e5ojs-open-media{
+    cursor: pointer;
+}
+#e5ojs-post-form-wrapper .btn-floating.add-new {
+    position: absolute;
+    right: 15px;
+    top: -30px;
+}
+#e5ojs-post-form-wrapper .card-content {
+    position: relative;
+}
+/* end edit post and new post*/
 
 
 
@@ -788,7 +829,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 /* start e5ojs media */
 .e5ojs-media-popup-wrapper {
     position: fixed;
-    z-index: 20;
+    z-index: 200;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
@@ -815,7 +856,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     width: 200%;
     left: -50%;
     top: 0;
-    background-color: #EDECEC;
+    background-color: #FFF;
     position: absolute;
     height: 150%;
     top: -50%;
@@ -829,6 +870,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     padding-right: 15px;
     padding-top: 10px;
     padding-bottom: 10px;
+    transition: 0s;
 }
 .e5ojs-media-popup-wrapper .container-fluid .card .media-options .option.current {
     border-bottom: 2px solid #0085d2;
@@ -857,13 +899,17 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     max-width: 100px;
 }
 .e5ojs-media-popup-wrapper .container-fluid .card .card-content .media-info .img-responsive {
-    max-width: 100%;
+    max-width: 100px;
 }
 .e5ojs-media-popup-wrapper .container-fluid .card .card-content .media-info .data {
     padding-left: 10px;
 }
 .e5ojs-media-popup-wrapper .container-fluid .no-padding {
     padding: 0;
+}
+.e5ojs-media-popup-wrapper .container-fluid .media-info .no-padding {
+    display: inline-table;
+    vertical-align: middle;
 }
 .e5ojs-media-popup-wrapper .container-fluid .card .card-content .media-info .data .title {
     font-size: 16px;
@@ -874,7 +920,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 }
 
 .e5ojs-media-popup-wrapper .container-fluid #e5ojs-close-media {
-    color: #5b5b5b;
+    color: #7b7b7b;
     position: absolute;
     right: 0;
     top: 0;
@@ -898,7 +944,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     text-transform: uppercase;
     text-align: center;
     font-size: 18px;
-    font-weight: 100;
+    font-weight: 300;
     border-radius: 2px;
     position: absolute;
     top: -36px;
@@ -942,7 +988,8 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     height: 25px;
     width: 50%;
     margin: auto;
-    bottom: 50px;
+    top: 0;
+    bottom: 0;
     position: absolute;
     left: 0;
     right: 0;
@@ -963,7 +1010,24 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     text-align: center;
     width: 100%;
 }
-#e5ojs-post-form-wrapper .e5ojs-open-media{
-    cursor: pointer;
+.e5ojs-media-popup-wrapper .media-items .card-image:before {
+    content: "";
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    margin: auto;
+    background-color: rgba(0, 0, 0, 0);
+    z-index: 1;
+    transition: .3s;
+}
+.e5ojs-media-popup-wrapper .media-items .card-image.current:before {
+    content: "";
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    margin: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+    transition: .3s;
 }
 /* end e5ojs media */

@@ -51,11 +51,11 @@ html
                                         div(class="media-items")
                                 div(class="col-xs-12 col-md-12 content-media-bottom")
                                     div(class="media-info")
-                                        div(class="col-xs-12 col-md-1 no-padding")
+                                        div(class="no-padding")
                                             img(src="https://placeholdit.imgix.net/~text?txtsize=50&bg=a7a7a7&txtclr=FFFFFF&txt=Preview&w=200&h=200&txttrack=0" class="img-responsive")
-                                        div(class="col-xs-12 col-md-11 no-padding")
+                                        div(class="no-padding")
                                             div(class="data")
-                                                p(class="title")='Info: '
+                                                p(class="title")=''
                                                 p(class="title-info")=''
                                                 p(class="extra")=''
                                 div(class="col-xs-12 aling-right")
@@ -66,20 +66,20 @@ html
                         div(class="search-bar-content")
                             div(class="container")
                                 div(class="col-xs-12")
-                                    form(action="#", method="get")
+                                    form(method="get")
                                         i(class="material-icons")='search'
                                         input(id="header_bar_search" class="header_bar_search" type="text" name="header_bar_search" placeholder="Search")
                         div(class="col-xs-12")
                             ul(class="content")
                                 li(class="content-left")
-                                    a(href="#" class="e5ojs-btn open-menu")
+                                    a(class="e5ojs-btn open-menu")
                                         i(class="material-icons icon-menu")='menu'
                                         i(class="material-icons icon-arrow")='arrow_back'
                                     h1='E5OJS'
                                 li(class="content-right")
                                     ul(class="options")
                                         li
-                                            a(href="#" class="e5ojs-btn search-btn")
+                                            a(class="e5ojs-btn search-btn")
                                                 i(class="material-icons")='search'
                                         li
                                             a(href=e5ojs_global_data.e5ojs_base_url+"/admin/log-out/" class="e5ojs-btn log-out-btn")

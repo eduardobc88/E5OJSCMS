@@ -548,7 +548,7 @@ router.get('/posts/action/edit-post/:post_id/', function(req, res, next) {
                         e5ojs_get_media(parseInt(post_data_object.post_media_attachment),function(media_result){
                             if( media_result == false ) {
                                 post_data_object.post_media_attachment_id = "";
-                                post_data_object.post_media_attachment_url = "https://placeholdit.imgix.net/~text?txtsize=50&bg=818181&txtclr=FFFFFF&txt=IMAGE&w=800&h=200&txttrack=0";
+                                post_data_object.post_media_attachment_url = e5ojs_global_data.e5ojs_base_url+"/back-end/assets/default-post-img.png";
                             } else {
                                 var media_url = e5ojs_global_data.e5ojs_media_url_sizes+media_result[0].media_file_name_clean+"-800x200."+(media_result[0].media_mime_type.split("/"))[1];
                                 post_data_object.post_media_attachment_id = media_result[0].media_id;
@@ -561,7 +561,7 @@ router.get('/posts/action/edit-post/:post_id/', function(req, res, next) {
                     } else {
                         // no media id
                         post_data_object.post_media_attachment_id = "";
-                        post_data_object.post_media_attachment_url = "https://placeholdit.imgix.net/~text?txtsize=50&bg=818181&txtclr=FFFFFF&txt=IMAGE&w=800&h=200&txttrack=0";
+                        post_data_object.post_media_attachment_url = e5ojs_global_data.e5ojs_base_url+"/back-end/assets/default-post-img.png";
                         // render with post data
                         res.render('back-end/e5ojs-admin-edit-post', { title: "EDIT POST", e5ojs_global_data:e5ojs_global_data, result_data:user_data.result_data, result_query_data:post_data_object, e5ojs_message:e5ojs_message });
                     }
