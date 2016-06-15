@@ -89,8 +89,8 @@ html
                     img(src=e5ojs_global_data.e5ojs_base_url+"/back-end/assets/profile-menu.png" class="img-bkg")
                     img(src=e5ojs_global_data.e5ojs_base_url+"/back-end/assets/default-profile-image.jpg" class="img-profile")
                     div(class="user-data-wrapper")
-                        p(class="user-data")=result_data[0].user_name
-                        p(class="user-data")=result_data[0].user_last_name
+                        p(class="user-data")=e5ojs_user_data.user_name
+                        p(class="user-data")=e5ojs_user_data.user_last_name
                 ul(class="options")
                     li
                         a(href=e5ojs_global_data.e5ojs_base_url+"/admin/" class="e5ojs-btn option-btn waves-effect waves-dark")='Dashboard'

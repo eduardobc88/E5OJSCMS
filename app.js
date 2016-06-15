@@ -32,7 +32,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(session({resave: true, saveUninitialized: true, secret: 'E5OA5A', cookie: { maxAge: 600000 }})); // express session
+app.use(session({resave: false, saveUninitialized: true, secret: 'E5OA5A', cookie: { secure: false, maxAge: 600000 }})); // express session
 app.use(express.static(path.join(__dirname, 'public')));
 
 //  root routes for different access
