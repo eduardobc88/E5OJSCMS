@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 // MD5
-//var md5 = require('md5');
+var md5 = require('md5');
 // mongojs
 var mongojs = require('mongojs');
 var db = mongojs("e5ojs_db");
@@ -27,18 +27,34 @@ var getSlug = require('speakingurl');
 
 
 /* start global data var */
-var e5ojs_global_data = {
-    'e5ojs_base_url':'',
-    'e5ojs_current_url':'',
-    'e5ojs_current_date':date_format(current_date,'dd-mm-yyyy'),
-};
+var e5ojs_global_data = {};
 function e5ojs_global_data_generate(req) {
-    // outputs hello world
+    // get global info
     e5ojs_global_data.e5ojs_base_url = req.protocol+"://"+req.get('host');
     e5ojs_global_data.e5ojs_current_url = req.protocol+"://"+req.get('host')+req.originalUrl;
     e5ojs_global_data.e5ojs_media_url = req.protocol+"://"+req.get('host')+"/uploads/";
     e5ojs_global_data.e5ojs_media_url_sizes = req.protocol+"://"+req.get('host')+"/uploads/sizes/";
     e5ojs_global_data.e5ojs_all_media_url = req.protocol+"://"+req.get('host')+"/admin/all-media/";
+    e5ojs_global_data.e5ojs_default_media_url = req.protocol+"://"+req.get('host')+"/back-end/assets/default-post-img.png";
+    e5ojs_global_data.e5ojs_post_status = new Array('publish','pending','trash');
+    e5ojs_global_data.e5ojs_current_date = date_format(current_date,'dd-mm-yyyy')
+    e5ojs_global_data.e5ojs_admin_page_url = {
+        admin: {title:"dashboard",url:req.protocol+"://"+req.get('host')+"/"},
+        dashboard: {title:"dashboard",url:req.protocol+"://"+req.get('host')+"/admin/dashboard/"},
+        posts: {title:"posts",url:req.protocol+"://"+req.get('host')+"/admin/posts/"},
+        media: {title:"media",url:req.protocol+"://"+req.get('host')+"/admin/media/"},
+        settings: {title:"settings",url:req.protocol+"://"+req.get('host')+"/admin/settings/"},
+    };
+    e5ojs_global_data.e5ojs_admin_action_url = {
+        logout : req.protocol+"://"+req.get('host')+"/admin/log-out/",
+        new_post: req.protocol+"://"+req.get('host')+"/admin/posts/action/new-post/",
+        edit_post: req.protocol+"://"+req.get('host')+"/admin/posts/action/edit-post/",// pass the /post_id/ : /23/ or /post_id/status/ : /23/publish/
+        edit_post_bulk_action: req.protocol+"://"+req.get('host')+"/admin/posts/action/",// pass /status/post_ids/ : /publish/23,1,23,4
+    };
+    e5ojs_global_data.e5ojs_api_get_url = {
+        get_all_media: req.protocol+"://"+req.get('host')+"/admin/all-media/",
+    }
+    //console.log(" == e5ojs_global_data == ",e5ojs_global_data);
 }
 /* end global data var */
 
@@ -519,7 +535,7 @@ router.get('/posts/action/edit-post/:post_id/', function(req, res, next) {
                 e5ojs_get_media(parseInt(post_data_object.post_media_attachment),function(media_result){
                     if( media_result == false ) {
                         post_data_object.post_media_attachment_id = "";
-                        post_data_object.post_media_attachment_url = e5ojs_global_data.e5ojs_base_url+"/back-end/assets/default-post-img.png";
+                        post_data_object.post_media_attachment_url = e5ojs_global_data.e5ojs_default_media_url;
                     } else {
                         var media_url = e5ojs_global_data.e5ojs_media_url_sizes+media_result[0].media_file_name_clean+"-800x200."+(media_result[0].media_mime_type.split("/"))[1];
                         post_data_object.post_media_attachment_id = media_result[0].media_id;
@@ -531,7 +547,7 @@ router.get('/posts/action/edit-post/:post_id/', function(req, res, next) {
             } else {
                 // no media id
                 post_data_object.post_media_attachment_id = "";
-                post_data_object.post_media_attachment_url = e5ojs_global_data.e5ojs_base_url+"/back-end/assets/default-post-img.png";
+                post_data_object.post_media_attachment_url = e5ojs_global_data.e5ojs_default_media_url;
                 // render with post data
                 res.render('back-end/e5ojs-admin-edit-post', { title: 'EDIT POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:post_data_object, e5ojs_message:e5ojs_message });
             }
@@ -914,8 +930,9 @@ function e5ojs_validate_admin_session_callback(req, res, callback) {
         var user_login = e5ojs_session.e5ojs_user_data.user_login;
         var user_pass = e5ojs_session.e5ojs_user_data.user_pass;
         // ask to DB for this user credentials
-        e5ojs_get_user_info_callback(user_login,user_pass,function(user_data){
+        e5ojs_get_user_info_callback(user_login,user_pass,use_md5=false,function(user_data){
             // validate request user db result
+            console.log("e5ojs_validate_admin_session_callback",user_data);
             if( user_data.result_login ) {
                 // user credentials are ok
                 // save user data on session var
@@ -941,7 +958,7 @@ function e5ojs_validate_admin_session_callback(req, res, callback) {
         // validate for empty vars on body = {}
         if( req.body != null ) {
             // ask to DB for this user credentials
-            e5ojs_get_user_info_callback(user_login,user_pass,function(user_data){
+            e5ojs_get_user_info_callback(user_login,user_pass,use_md5=true,function(user_data){
                 // validate request user db result
                 if( user_data.result_login ) {
                     // user credentials are ok
@@ -971,12 +988,12 @@ function e5ojs_validate_admin_session_callback(req, res, callback) {
     }
 }
 
-function e5ojs_get_user_info_callback(user_login,user_pass,callback) {
+function e5ojs_get_user_info_callback(user_login,user_pass,use_md5,callback) {
     // get post user data
-    var user_name = user_login;
-    var user_pass = user_pass;
+    var user_login = user_login;
+    var user_pass = ((use_md5)?md5(user_pass):user_pass); // admin = 21232f297a57a5a743894a0e4a801fc3
     // request user on DB
-    db.e5ojs_user.find({'user_login':user_name,'user_pass':user_pass}, function(err, user){
+    db.e5ojs_user.find({'user_login':user_login,'user_pass':user_pass}, function(err, user){
         if( err ) {
             callback({ result_login:0, error:err });
         } else {
