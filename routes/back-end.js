@@ -54,7 +54,7 @@ function e5ojs_global_data_generate(req) {
     e5ojs_global_data.e5ojs_api_get_url = {
         get_all_media: req.protocol+"://"+req.get('host')+"/admin/all-media/",
     }
-    //console.log(" == e5ojs_global_data == ",e5ojs_global_data);
+    console.log(" == e5ojs_global_data == ",e5ojs_global_data);
 }
 /* end global data var */
 
@@ -488,6 +488,11 @@ router.get('/posts/:post_status/page/:page/', function(req, res, next) {
         });
         // query with skip page
         db.e5ojs_post.find({'post_status':{$in:post_status_array}}).sort({"post_date":-1}).skip(skip_posts).limit(limit_post, function(err, posts){
+            // check if has message session
+            // get session message
+            var e5ojs_message = e5ojs_get_session_message(req);
+            // remove session message
+            e5ojs_clear_session_message(req);
             // validate error
             res.render('back-end/e5ojs-admin-posts', { title: 'POSTS', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:posts, total_pages:total_pages+1, current_page:current_page, total_post:total_post, e5ojs_message:e5ojs_message, post_status:post_status });
             //res.render('back-end/e5ojs-admin-posts', { title: 'POSTS', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.result_data, result_query_db:1, result_query_data:posts, total_pages:total_pages+1, current_page:current_page, total_post:total_post, post_status:post_status });

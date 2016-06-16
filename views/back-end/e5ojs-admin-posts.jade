@@ -4,10 +4,10 @@ block e5ojs_block_content
     div(class="row top-page-options")
         div(class="col-xs-12 no-padding")
             div(class="")
-                a(href=e5ojs_global_data.e5ojs_base_url+"/admin/posts/all/" class="waves-effect waves-dark "+(( post_status == "all" )?" current":""))='All'
-                a(href=e5ojs_global_data.e5ojs_base_url+"/admin/posts/publish/" class="waves-effect waves-dark "+(( post_status == "publish" )?" current":""))='Publish'
-                a(href=e5ojs_global_data.e5ojs_base_url+"/admin/posts/pending/" class="waves-effect waves-dark "+(( post_status == "pending" )?" current":""))='Pending'
-                a(href=e5ojs_global_data.e5ojs_base_url+"/admin/posts/trash/" class="waves-effect waves-dark "+(( post_status == "trash" )?" current":""))='Trash'
+                a(href=e5ojs_global_data.e5ojs_admin_page_url.posts.url+"all/" class="waves-effect waves-dark "+(( post_status == "all" )?" current":""))='All'
+                a(href=e5ojs_global_data.e5ojs_admin_page_url.posts.url+"publish/" class="waves-effect waves-dark "+(( post_status == "publish" )?" current":""))='Publish'
+                a(href=e5ojs_global_data.e5ojs_admin_page_url.posts.url+"pending/" class="waves-effect waves-dark "+(( post_status == "pending" )?" current":""))='Pending'
+                a(href=e5ojs_global_data.e5ojs_admin_page_url.posts.url+"trash/" class="waves-effect waves-dark "+(( post_status == "trash" )?" current":""))='Trash'
     div(class="row")
         - var e5ojs_posts = result_query_data;
         div(class="col-xs-12")
@@ -17,14 +17,14 @@ block e5ojs_block_content
                     label(for='select-all' class="checkbox-center")
                     ul(id="dropdown2" class="dropdown-content bulk-actions")
                         li
-                            a(href=e5ojs_global_data.e5ojs_base_url+"/admin/posts/action/publish/")="Publish"
+                            a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"publish/")="Publish"
                         li
-                            a(href=e5ojs_global_data.e5ojs_base_url+"/admin/posts/action/pending/")="Pending"
+                            a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"pending/")="Pending"
                         li
-                            a(href=e5ojs_global_data.e5ojs_base_url+"/admin/posts/action/delete/")="Trash"
+                            a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"delete/")="Trash"
                     a.btn.dropdown-button(href='#!', data-activates='dropdown2')='Bulk action'
                       i.mdi-navigation-arrow-drop-down.right
-                    a(href=e5ojs_global_data.e5ojs_base_url+"/admin/posts/action/new-post/" class="waves-effect waves-dark")='Add new'
+                    a(href=e5ojs_global_data.e5ojs_admin_action_url.new_post class="waves-effect waves-dark")='Add new'
                         i(class="material-icons")='add'
                 each post, index in e5ojs_posts
                     - var letter = post.post_title.charAt(0).toUpperCase();
@@ -38,13 +38,13 @@ block e5ojs_block_content
                         //- p(class="badge")=post.post_status
                         span(class="badge")=post.post_date
                         div(class="secondary-content")
-                            a(href=e5ojs_global_data.e5ojs_base_url+"/admin/posts/action/edit-post/"+post.post_id)
+                            a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"edit-post/"+post.post_id)
                                 i(class="material-icons")='mode_edit'
-                            a(href=e5ojs_global_data.e5ojs_base_url+"/admin/posts/action/publish/"+post.post_id)
+                            a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"publish/"+post.post_id)
                                 i(class="material-icons")='public'
-                            a(href=e5ojs_global_data.e5ojs_base_url+"/admin/posts/action/pending/"+post.post_id)
+                            a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"pending/"+post.post_id)
                                 i(class="material-icons")='archive'
-                            a(href=e5ojs_global_data.e5ojs_base_url+"/admin/posts/action/delete/"+post.post_id)
+                            a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"delete/"+post.post_id)
                                 i(class="material-icons")='delete'
                 li(class="collection-footer")
                     ul(class="e5ojs-pagination")
@@ -53,7 +53,7 @@ block e5ojs_block_content
                         - if( total_pages > 1 ) {
                             - for (var i = 1; i <= total_pages; ++i) {
                                 if i >= (curr_page-range) && i <= (curr_page+range)
-                                    a(href=e5ojs_global_data.e5ojs_base_url+'/admin/posts/'+post_status+'/page/'+i class=((i==curr_page)?"current":""))
+                                    a(href=e5ojs_global_data.e5ojs_admin_page_url.posts.url+post_status+'/page/'+i class=((i==curr_page)?"current":""))
                                         li(class="item")
                                             span=i
                             - }
