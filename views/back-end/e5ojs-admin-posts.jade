@@ -1,5 +1,7 @@
 extends e5ojs-base-layout-admin
 block e5ojs_block_local_css_script
+    script(type='text/javascript', src=e5ojs_global_data.e5ojs_base_url+'/back-end/js/summernote.js')
+    script(type='text/javascript', src=e5ojs_global_data.e5ojs_base_url+'/back-end/js/e5ojs-new-edit-post.js')
 block e5ojs_block_content
     div(class="row top-page-options")
         div(class="col-xs-12 no-padding")
@@ -8,11 +10,61 @@ block e5ojs_block_content
                 a(href=e5ojs_global_data.e5ojs_admin_page_url.posts.url+"publish/" class="waves-effect waves-dark "+(( post_status == "publish" )?" current":""))='Publish'
                 a(href=e5ojs_global_data.e5ojs_admin_page_url.posts.url+"pending/" class="waves-effect waves-dark "+(( post_status == "pending" )?" current":""))='Pending'
                 a(href=e5ojs_global_data.e5ojs_admin_page_url.posts.url+"trash/" class="waves-effect waves-dark "+(( post_status == "trash" )?" current":""))='Trash'
+    //- div(class="row")
+    //-     div(class="col-xs-12")
+    //-         ul(class="collection custom-collection")
+    //-             li(class="collection-header")
+    //-                 input(id="select-all" class="filled-in" type="checkbox" )
+    //-                 label(for='select-all' class="checkbox-center")
+    //-                 ul(id="dropdown2" class="dropdown-content bulk-actions")
+    //-                     li
+    //-                         a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"publish/")="Publish"
+    //-                     li
+    //-                         a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"pending/")="Pending"
+    //-                     li
+    //-                         a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"delete/")="Trash"
+    //-                 a.btn.dropdown-button(href='#!', data-activates='dropdown2')='Bulk action'
+    //-                   i.mdi-navigation-arrow-drop-down.right
+    //-                 a(href=e5ojs_global_data.e5ojs_admin_action_url.new_post class="waves-effect waves-dark")='Add new'
+    //-                     i(class="material-icons")='add'
+    //-             - var e5ojs_posts = result_query_data;
+    //-             each post, index in e5ojs_posts
+    //-                 - var letter = post.post_title.charAt(0).toUpperCase();
+    //-                 - var color_hex = (( post.post_status == "publish" )?"4CAF50": ((post.post_status == "pending")?"FDD835":"F44336") );
+    //-                 li(class="collection-item avatar waves-effect waves-dark" data-collection-id=post.post_id)
+    //-                     input(id="checkbox-"+post.post_id class="filled-in row-checkbox" type="checkbox")
+    //-                     label(for='checkbox-'+post.post_id class="checkbox-center")
+    //-                     img(src="https://placeholdit.imgix.net/~text?txtsize=50&bg="+color_hex+"&txtclr=FFFFFF&txt="+letter+"&w=100&h=100&txttrack=0" alt="" class="circle")
+    //-                     p(class="title")=post.post_title
+    //-                     p(class="truncate")=post.post_excerpt
+    //-                     //- p(class="badge")=post.post_status
+    //-                     span(class="badge")=post.post_date
+    //-                     div(class="secondary-content")
+    //-                         a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"edit-post/"+post.post_id)
+    //-                             i(class="material-icons")='mode_edit'
+    //-                         a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"publish/"+post.post_id)
+    //-                             i(class="material-icons")='public'
+    //-                         a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"pending/"+post.post_id)
+    //-                             i(class="material-icons")='archive'
+    //-                         a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"delete/"+post.post_id)
+    //-                             i(class="material-icons")='delete'
+    //-             li(class="collection-footer")
+    //-                 ul(class="e5ojs-pagination")
+    //-                     - var range = 2
+    //-                     - var curr_page = parseInt(current_page)
+    //-                     - if( total_pages > 1 ) {
+    //-                         - for (var i = 1; i <= total_pages; ++i) {
+    //-                             if i >= (curr_page-range) && i <= (curr_page+range)
+    //-                                 a(href=e5ojs_global_data.e5ojs_admin_page_url.posts.url+post_status+'/page/'+i class=((i==curr_page)?"current":""))
+    //-                                     li(class="item")
+    //-                                         span=i
+    //-                         - }
+    //-                     - }
+                        
     div(class="row")
-        - var e5ojs_posts = result_query_data;
         div(class="col-xs-12")
-            ul(class="collection custom-collection")
-                li(class="collection-header")
+            ul(class="collapsible popout custom-collapsible" data-collapsible="accordion")
+                li(class="custom-collapsible-header")
                     input(id="select-all" class="filled-in" type="checkbox" )
                     label(for='select-all' class="checkbox-center")
                     ul(id="dropdown2" class="dropdown-content bulk-actions")
@@ -26,27 +78,30 @@ block e5ojs_block_content
                       i.mdi-navigation-arrow-drop-down.right
                     a(href=e5ojs_global_data.e5ojs_admin_action_url.new_post class="waves-effect waves-dark")='Add new'
                         i(class="material-icons")='add'
+                - var e5ojs_posts = result_query_data;
                 each post, index in e5ojs_posts
                     - var letter = post.post_title.charAt(0).toUpperCase();
                     - var color_hex = (( post.post_status == "publish" )?"4CAF50": ((post.post_status == "pending")?"FDD835":"F44336") );
-                    li(class="collection-item avatar waves-effect waves-dark" data-collection-id=post.post_id)
-                        input(id="checkbox-"+post.post_id class="filled-in row-checkbox" type="checkbox")
-                        label(for='checkbox-'+post.post_id class="checkbox-center")
-                        img(src="https://placeholdit.imgix.net/~text?txtsize=50&bg="+color_hex+"&txtclr=FFFFFF&txt="+letter+"&w=100&h=100&txttrack=0" alt="" class="circle")
-                        p(class="title")=post.post_title
-                        p(class="truncate")=post.post_excerpt
-                        //- p(class="badge")=post.post_status
-                        span(class="badge")=post.post_date
-                        div(class="secondary-content")
-                            a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"edit-post/"+post.post_id)
-                                i(class="material-icons")='mode_edit'
-                            a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"publish/"+post.post_id)
-                                i(class="material-icons")='public'
-                            a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"pending/"+post.post_id)
-                                i(class="material-icons")='archive'
-                            a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"delete/"+post.post_id)
-                                i(class="material-icons")='delete'
-                li(class="collection-footer")
+                    li(class="custom-collapsible-item" data-collection-id=post.post_id)
+                        div(class="collapsible-header")
+                            input(id="checkbox-"+post.post_id class="filled-in row-checkbox" type="checkbox")
+                            label(for='checkbox-'+post.post_id class="checkbox-center")
+                            img(src="https://placeholdit.imgix.net/~text?txtsize=50&bg="+color_hex+"&txtclr=FFFFFF&txt="+letter+"&w=100&h=100&txttrack=0" alt="" class="circle")    
+                            p(class="title")
+                                span()=post.post_title
+                                span(class="excerpt")=post.post_excerpt
+                            div(class="secondary-content")
+                                a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"edit-post/"+post.post_id)
+                                    i(class="material-icons")='mode_edit'
+                                a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"publish/"+post.post_id)
+                                    i(class="material-icons")='public'
+                                a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"pending/"+post.post_id)
+                                    i(class="material-icons")='archive'
+                                a(href=e5ojs_global_data.e5ojs_admin_action_url.edit_post_bulk_action+"delete/"+post.post_id)
+                                    i(class="material-icons")='delete'
+                        div(class="collapsible-body")
+                            div(class="post-content")=post.post_content
+                li(class="custom-collapsible-footer")
                     ul(class="e5ojs-pagination")
                         - var range = 2
                         - var curr_page = parseInt(current_page)

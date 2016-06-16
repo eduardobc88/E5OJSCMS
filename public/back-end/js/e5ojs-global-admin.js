@@ -2,11 +2,20 @@ $(document).ready(function(){
     console.log("E5OJS - ADMIN","e5ojs-global-admin-js");
     e5ojs_header_menu();
     e5ojs_collection_header_select_all();
+    e5ojs_custom_collapsible_header_select_all();
     materialize_functions();
     e5ojs_header_options_action();
     e5ojs_custom_collection();
     e5ojs_custom_post_actions();
 });
+$(window).load(function(){
+    e5ojs_summernote();
+});
+function e5ojs_summernote() {
+    $(".custom-collapsible .collapsible-body .post-content").each(function(key,element){
+        $(this).html($(this).text());
+    });
+}
 
 function e5ojs_custom_post_actions() {
     var base_url = $("#e5ojs-post-form-wrapper").attr("action");
@@ -46,6 +55,60 @@ function materialize_functions() {
     });
 }
 
+function e5ojs_custom_collapsible_header_select_all() {
+    // set base url as attr
+    $(".custom-collapsible .custom-collapsible-header .bulk-actions").find("li").each(function(key,element){
+        var action_element = $(this).find("a");
+        var current_link = $(action_element).attr("href");
+        action_element.attr("base-url",current_link);
+    });
+
+    var collection_ids = Array();
+    $(".custom-collapsible .custom-collapsible-header").find("#select-all").on("click",function(){
+        var parent_checkbox = $(this);
+        collection_ids = Array();
+        $(".row-checkbox").each(function(key,element){
+            if( $(parent_checkbox).prop('checked') ) {
+                $(this).prop( "checked", true );
+                // get all post ids
+                collection_ids.push( $(this).closest(".custom-collapsible-item").attr("data-collection-id") );
+            } else {
+                $(this).prop( "checked", false );
+                collection_ids = Array();
+            }
+        });
+        // set collection_ids on element bulk actions
+        //console.log( "custom-collapsible",collection_ids.join() );
+        $(".custom-collapsible .custom-collapsible-header .bulk-actions").find("li").each(function(key,element){
+            var action_element = $(this).find("a");
+            var current_link = $(action_element).attr("base-url");
+            action_element.attr("href",current_link+collection_ids.join());
+        });
+    });
+    // for individual collection row
+    $(".custom-collapsible .row-checkbox").on('click',function(){
+        $(this).closest(".custom-collapsible-item").stop().dequeue();
+        if( $(this).prop('checked') ) {
+            $(this).prop( "checked", true );
+            // get all post ids
+            collection_ids.push( $(this).closest(".custom-collapsible-item").attr("data-collection-id") );
+        } else {
+            $(this).prop( "checked", false );
+            collection_ids.splice(collection_ids.indexOf( $(this).parent().attr("data-collection-id") ), 1);
+        }
+        // set collection_ids on element bulk actions
+        //console.log("checkbox",collection_ids.join() );
+        $(".custom-collapsible .custom-collapsible-header .bulk-actions").find("li").each(function(key,element){
+            var action_element = $(this).find("a");
+            var current_link = $(action_element).attr("base-url");
+            action_element.attr("href",current_link+collection_ids.join());
+        });
+    });
+    $(".custom-collapsible .secondary-content a").on('click',function(event) {
+        window.location = $(this).prop("href");
+        return false;
+    });
+}
 function e5ojs_collection_header_select_all() {
     // set base url as attr
     $(".collection-header .bulk-actions").find("li").each(function(key,element){
@@ -62,7 +125,7 @@ function e5ojs_collection_header_select_all() {
             if( $(parent_checkbox).prop('checked') ) {
                 $(this).prop( "checked", true );
                 // get all post ids
-                collection_ids.push( $(this).parent().attr("data-collection-id") );
+                collection_ids.push( $(this).closest(".collection-item").attr("data-collection-id") );
             } else {
                 $(this).prop( "checked", false );
                 collection_ids = Array();
@@ -81,7 +144,7 @@ function e5ojs_collection_header_select_all() {
         if( $(this).prop('checked') ) {
             $(this).prop( "checked", true );
             // get all post ids
-            collection_ids.push( $(this).parent().attr("data-collection-id") );
+            collection_ids.push( $(this).closest(".collection-item").attr("data-collection-id") );
         } else {
             $(this).prop( "checked", false );
             collection_ids.splice(collection_ids.indexOf( $(this).parent().attr("data-collection-id") ), 1);

@@ -17,6 +17,9 @@ body .waves-effect {
     outline: none;
     transition-duration: .3s;
 }
+.aling-right {
+    text-align: right;
+}
 
 /* end global components */
 
@@ -243,6 +246,126 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 .input-field label {
     font-size: 12px;
 }
+
+
+
+
+
+
+
+
+
+/* start custom collapsible */
+.custom-collapsible .custom-collapsible-header, .custom-collapsible .custom-collapsible-footer {
+    padding: 15px;
+    background-color: #FFF;
+}
+.custom-collapsible .custom-collapsible-header a {
+    color: #616161;
+    font-size: 12px;
+    line-height: 12px;
+    position: relative;
+    padding-right: 30px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 15px;
+}
+.custom-collapsible .custom-collapsible-header a i {
+    font-size: 20px;
+    position: absolute;
+    margin: auto;
+    z-index: 2;
+    right: 5px;
+    top: 0;
+    bottom: 0;
+    display: table;
+}
+.custom-collapsible .custom-collapsible-header .checkbox-center {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    margin: auto;
+    top: 2px;
+    bottom: 0;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+.custom-collapsible .custom-collapsible-header .dropdown-button {
+    color: #FFF;
+    padding: 10px;
+    line-height: 18px;
+}
+.custom-collapsible.popout>li {
+    margin: 0 0px;
+}
+
+.custom-collapsible .custom-collapsible-item {
+    background-color: #FFF;
+}
+.custom-collapsible .custom-collapsible-item .collapsible-header {
+    position: relative;
+}
+.custom-collapsible .custom-collapsible-item .checkbox-center {
+    display: inline-block;
+    vertical-align: middle;
+    top: 5px;
+}
+.custom-collapsible .custom-collapsible-item .circle {
+    max-width: 40px;
+    display: inline-block;
+    position: relative;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.custom-collapsible .custom-collapsible-item .title {
+    display: inline-block;
+    padding-left: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+    width: 60%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 100%;
+    vertical-align: middle;
+}
+.custom-collapsible .custom-collapsible-item .title .excerpt {
+    color: #7b7b7b;
+    font-weight: 500;
+    margin-left: 15px;
+}
+.custom-collapsible .custom-collapsible-item .secondary-content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #FFF;
+    display: none;
+    transition-duration: .3s;
+    bottom: 0;
+    margin: auto;
+    height: 44px;
+}
+.custom-collapsible .custom-collapsible-item:hover .secondary-content {
+    display: block;
+}
+.custom-collapsible .custom-collapsible-item .secondary-content a i {
+    font-size: 18px;
+    color: #666666;
+    width: 18px;
+}
+.custom-collapsible.popout>li.active {
+    margin: 30px -15px !important;
+}
+.custom-collapsible.popout>li.active .secondary-content {
+    display: block;
+}
+.custom-collapsible .collapsible-body {
+    padding-left: 15px;
+    padding-right: 15px;
+    max-height: 300px;
+    overflow: scroll;
+    border-bottom: none;
+}
+/* end custom collapsible */
 
 
 /* end override materialize elements */
@@ -1031,3 +1154,21 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     transition: .3s;
 }
 /* end e5ojs media */
+
+
+
+
+
+
+
+
+
+
+
+
+/* start post type new form */
+#e5ojs-post-type-form-wrapper {
+
+}
+
+/* end post type new form */

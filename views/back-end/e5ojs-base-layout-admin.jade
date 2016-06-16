@@ -92,21 +92,11 @@ html
                         p(class="user-data")=e5ojs_user_data.user_name
                         p(class="user-data")=e5ojs_user_data.user_last_name
                 ul(class="options")
-                    li
-                        a(href=e5ojs_global_data.e5ojs_base_url+"/admin/" class="e5ojs-btn option-btn waves-effect waves-dark")='Dashboard'
-                            i(class="material-icons")='dashboard'
-                    li
-                        a(href=e5ojs_global_data.e5ojs_base_url+"/admin/pages/" class="e5ojs-btn option-btn waves-effect waves-dark")='Pages'
-                            i(class="material-icons")='filter_none'
-                    li
-                        a(href=e5ojs_global_data.e5ojs_base_url+"/admin/posts/all/" class="e5ojs-btn option-btn waves-effect waves-dark")='Posts'
-                            i(class="material-icons")='insert_drive_file'
-                    li
-                        a(href=e5ojs_global_data.e5ojs_base_url+"/admin/media/" class="e5ojs-btn option-btn waves-effect waves-dark")='Media'
-                            i(class="material-icons")='collections'
-                    li
-                        a(href=e5ojs_global_data.e5ojs_base_url+"/admin/settings/" class="e5ojs-btn option-btn waves-effect waves-dark")='Settings'
-                            i(class="material-icons")='settings'
+                    - for (var property_key in e5ojs_global_data.e5ojs_admin_page_url) {
+                        li
+                            a(href=e5ojs_global_data.e5ojs_admin_page_url[property_key].url class="e5ojs-btn option-btn waves-effect waves-dark")=e5ojs_global_data.e5ojs_admin_page_url[property_key].title
+                                i(class="material-icons")=e5ojs_global_data.e5ojs_admin_page_url[property_key].icon_name
+                    - }
             div(class="container e5ojs-content-right-wrapper")
                 - if( typeof(e5ojs_message) !== 'undefined' && e5ojs_message.status )
                     div(class="e5ojs-message "+e5ojs_message.type+"-message")

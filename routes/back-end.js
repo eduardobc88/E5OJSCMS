@@ -39,22 +39,24 @@ function e5ojs_global_data_generate(req) {
     e5ojs_global_data.e5ojs_post_status = new Array('publish','pending','trash');
     e5ojs_global_data.e5ojs_current_date = date_format(current_date,'dd-mm-yyyy')
     e5ojs_global_data.e5ojs_admin_page_url = {
-        admin: {title:"dashboard",url:req.protocol+"://"+req.get('host')+"/"},
-        dashboard: {title:"dashboard",url:req.protocol+"://"+req.get('host')+"/admin/dashboard/"},
-        posts: {title:"posts",url:req.protocol+"://"+req.get('host')+"/admin/posts/"},
-        media: {title:"media",url:req.protocol+"://"+req.get('host')+"/admin/media/"},
-        settings: {title:"settings",url:req.protocol+"://"+req.get('host')+"/admin/settings/"},
+        dashboard: {title:"dashboard",url:req.protocol+"://"+req.get('host')+"/admin/", icon_name:"dashboard"},
+        pages: {title:"pages",url:req.protocol+"://"+req.get('host')+"/admin/pages/", icon_name:"filter_none"},
+        posts: {title:"posts",url:req.protocol+"://"+req.get('host')+"/admin/posts/", icon_name:"insert_drive_file"},
+        media: {title:"media",url:req.protocol+"://"+req.get('host')+"/admin/media/", icon_name:"collections"},
+        post_type: {title:"post types",url:req.protocol+"://"+req.get('host')+"/admin/post-type/", icon_name:"settings"},
+        settings: {title:"settings",url:req.protocol+"://"+req.get('host')+"/admin/settings/", icon_name:"settings"},
     };
     e5ojs_global_data.e5ojs_admin_action_url = {
         logout : req.protocol+"://"+req.get('host')+"/admin/log-out/",
         new_post: req.protocol+"://"+req.get('host')+"/admin/posts/action/new-post/",
         edit_post: req.protocol+"://"+req.get('host')+"/admin/posts/action/edit-post/",// pass the /post_id/ : /23/ or /post_id/status/ : /23/publish/
         edit_post_bulk_action: req.protocol+"://"+req.get('host')+"/admin/posts/action/",// pass /status/post_ids/ : /publish/23,1,23,4
+        post_type_action: req.protocol+"://"+req.get('host')+"/admin/post-type/action/",
     };
     e5ojs_global_data.e5ojs_api_get_url = {
         get_all_media: req.protocol+"://"+req.get('host')+"/admin/all-media/",
     }
-    console.log(" == e5ojs_global_data == ",e5ojs_global_data);
+    //console.log(" == e5ojs_global_data == ",e5ojs_global_data);
 }
 /* end global data var */
 
@@ -393,9 +395,25 @@ router.get('/settings/', function(req, res, next) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 /* ============== start e5ojs post functions =============== */
 
-
+router.get('/posts/', function(req, res, next) {
+    // redirect to post/all
+    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/posts/all/");
+    });
+});
 router.get('/posts/:post_status/', function(req, res, next) {
     /*
     get all posts with status passed in URL example: posts/post_status or all will be all status
@@ -718,6 +736,65 @@ router.get('/posts/action/:post_status/:post_id/', function(req, res, next) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============== start e5ojs post type functions =============== */
+
+router.get('/post-type/', function(req, res, next) {
+    // get page with validate session
+    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        // return template with user data
+        // e5ojs_global_data  and e5ojs_user_data default
+        // request for all posts types on DB
+        e5ojs_post_type_get_all(function(post_types){
+            // get session message
+            var e5ojs_message = e5ojs_get_session_message(req);
+            // remove session message
+            e5ojs_clear_session_message(req);
+            // render post type page
+            res.render('back-end/e5ojs-admin-post-type', { title: 'POST TYPE', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], e5ojs_message:e5ojs_message, post_types:post_types });
+        });
+    });
+});
+router.post('/post-type/action/:post_type_action/', function(req, res, next) {
+
+    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        // return template with user data
+        // e5ojs_global_data  and e5ojs_user_data default
+        // get page with validate session
+        var post_type_action = req.params.post_type_action;
+        var post_type_name = req.body.post_type_name;
+        var post_type_description = req.body.post_type_description;
+        var post_type_slug = getSlug(remove_diacritics( post_type_name ));
+        // save new post type
+        e5ojs_post_type_insert_new({'post_type_id':'','post_type_name':post_type_name,'post_type_description':post_type_description,'post_type_slug':post_type_slug},function(post_type_data){
+            // create session message
+            var e5ojs_message = null;
+            // show notification
+            e5ojs_message = {'status':1,'type':'done','text':'Successfully - Post Type created'};
+            // save message on session var
+            e5ojs_push_session_message(req,e5ojs_message);
+            // redirect to de same page
+            res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/");
+        });
+    });
+});
+
+/* ============== end e5ojs post type functions =============== */
+
+
 /* end admin pages */
 
 
@@ -898,6 +975,32 @@ function e5ojs_get_media(media_id,callback) {
 }
 /* end media DB function */
 
+
+
+
+
+
+
+
+
+/* start post type DB function */
+function e5ojs_post_type_get_all(callback) {
+    db.e5ojs_post_type.find({},function(err,result_data){
+        callback(result_data[0]);
+    });
+}
+function e5ojs_post_type_insert_new(post_type_data,callback) {
+    // get increment e5ojs_media
+    e5ojs_get_next_id('post_type',function(data){
+        // increment post_type counter
+        var next_id = data.seq;
+        post_type_data.post_type_id = next_id;
+        db.e5ojs_post_type.insert(post_type_data,function(err, result_data){
+            callback(result_data);
+        });
+    });
+}
+/* end post type DB function */
 /* ============== end e5ojs mongodb functions =============== */
 
 
@@ -937,7 +1040,7 @@ function e5ojs_validate_admin_session_callback(req, res, callback) {
         // ask to DB for this user credentials
         e5ojs_get_user_info_callback(user_login,user_pass,use_md5=false,function(user_data){
             // validate request user db result
-            console.log("e5ojs_validate_admin_session_callback",user_data);
+            //console.log("e5ojs_validate_admin_session_callback",user_data);
             if( user_data.result_login ) {
                 // user credentials are ok
                 // save user data on session var
