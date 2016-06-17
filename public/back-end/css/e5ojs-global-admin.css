@@ -261,14 +261,22 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     background-color: #FFF;
 }
 .custom-collapsible .custom-collapsible-header a {
-    color: #616161;
     font-size: 12px;
-    line-height: 12px;
     position: relative;
     padding-right: 30px;
     padding-top: 10px;
     padding-bottom: 10px;
     padding-left: 15px;
+    margin-right: 15px;
+    color: #FFF;
+    line-height: 18px;
+    font-weight: 500;
+}
+.custom-collapsible .custom-collapsible-header .dropdown-content li {
+    min-height: auto;
+}
+.custom-collapsible .custom-collapsible-header .dropdown-content li>a, .dropdown-content li>span {
+    color: #0085d2;
 }
 .custom-collapsible .custom-collapsible-header a i {
     font-size: 20px;
@@ -826,6 +834,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     padding-right: 15px;
     padding-top: 5px;
     padding-bottom: 0px;
+    font-weight: 500;
 }
 .top-page-options a.current {
     border-bottom: 2px solid #0085d2;
@@ -994,6 +1003,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     padding-top: 10px;
     padding-bottom: 10px;
     transition: 0s;
+    font-weight: 500;
 }
 .e5ojs-media-popup-wrapper .container-fluid .card .media-options .option.current {
     border-bottom: 2px solid #0085d2;
@@ -1067,7 +1077,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     text-transform: uppercase;
     text-align: center;
     font-size: 18px;
-    font-weight: 300;
+    font-weight: 500;
     border-radius: 2px;
     position: absolute;
     top: -36px;
