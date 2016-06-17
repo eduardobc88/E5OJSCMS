@@ -24,10 +24,23 @@ var getSlug = require('speakingurl');
 
 
 
-
-
 /* start global data var */
 var e5ojs_global_data = {};
+function e5ojs_init() {
+    // load all post types
+    e5ojs_global_data.e5ojs_post_types = new Array();
+    e5ojs_post_type_get_all(function(post_types){
+        e5ojs_global_data.e5ojs_post_types = post_types;
+        // set router for each post type
+        for( var key in post_types ) {
+            var post_type = post_types[key];
+            //console.log("POST TYPE",post_type.post_type_title+" GET REQUEST");
+            e5ojs_add_post_type_router(post_type);
+        }
+    });
+}
+e5ojs_init();
+
 function e5ojs_global_data_generate(req) {
     // get global info
     e5ojs_global_data.e5ojs_base_url = req.protocol+"://"+req.get('host');
@@ -37,29 +50,36 @@ function e5ojs_global_data_generate(req) {
     e5ojs_global_data.e5ojs_all_media_url = req.protocol+"://"+req.get('host')+"/admin/all-media/";
     e5ojs_global_data.e5ojs_default_media_url = req.protocol+"://"+req.get('host')+"/back-end/assets/default-post-img.png";
     e5ojs_global_data.e5ojs_post_status = new Array('publish','pending','trash');
-    e5ojs_global_data.e5ojs_current_date = date_format(current_date,'dd-mm-yyyy')
+    e5ojs_global_data.e5ojs_current_date = date_format(current_date,'dd-mm-yyyy');
+
+    
+    //e5ojs_global_data.e5ojs_current_post_type = "admin/";
     e5ojs_global_data.e5ojs_admin_page_url = {
         dashboard: {title:"dashboard",url:req.protocol+"://"+req.get('host')+"/admin/", icon_name:"dashboard"},
         pages: {title:"pages",url:req.protocol+"://"+req.get('host')+"/admin/pages/", icon_name:"filter_none"},
-        posts: {title:"posts",url:req.protocol+"://"+req.get('host')+"/admin/posts/", icon_name:"insert_drive_file"},
-        media: {title:"media",url:req.protocol+"://"+req.get('host')+"/admin/media/", icon_name:"collections"},
-        post_type: {title:"post types",url:req.protocol+"://"+req.get('host')+"/admin/post-type/", icon_name:"settings"},
-        settings: {title:"settings",url:req.protocol+"://"+req.get('host')+"/admin/settings/", icon_name:"settings"},
     };
+    // loop for post types
+    for( var key in e5ojs_global_data.e5ojs_post_types ) {
+        var post_type = e5ojs_global_data.e5ojs_post_types[key];
+        e5ojs_global_data.e5ojs_admin_page_url[post_type.post_type_name] = {post_type_id:post_type.post_type_id,title:post_type.post_type_title,url:req.protocol+"://"+req.get('host')+"/admin/post-type/"+post_type.post_type_name+"/", icon_name:"insert_drive_file"};
+    }
+    e5ojs_global_data.e5ojs_admin_page_url['media'] = {title:"media",url:req.protocol+"://"+req.get('host')+"/admin/media/", icon_name:"collections"};
+    e5ojs_global_data.e5ojs_admin_page_url['post_type'] = {title:"post types",url:req.protocol+"://"+req.get('host')+"/admin/post-type/", icon_name:"settings"};
+    e5ojs_global_data.e5ojs_admin_page_url['settings'] = {title:"settings",url:req.protocol+"://"+req.get('host')+"/admin/settings/", icon_name:"settings"};
+
+
     e5ojs_global_data.e5ojs_admin_action_url = {
         logout : req.protocol+"://"+req.get('host')+"/admin/log-out/",
-        new_post: req.protocol+"://"+req.get('host')+"/admin/posts/action/new-post/",
-        edit_post: req.protocol+"://"+req.get('host')+"/admin/posts/action/edit-post/",// pass the /post_id/ : /23/ or /post_id/status/ : /23/publish/
-        edit_post_bulk_action: req.protocol+"://"+req.get('host')+"/admin/posts/action/",// pass /status/post_ids/ : /publish/23,1,23,4
-        post_type_action: req.protocol+"://"+req.get('host')+"/admin/post-type/action/",
+        post_type_new_post: "action/new-post/",
+        post_type_edit_post: "action/edit-post/",// pass the /post_id/ : /23/ or /post_id/status/ : /23/publish/
+        post_type_post_bulk_action: "action/",// pass /status/post_ids/ : /publish/23,1,23,4
     };
     e5ojs_global_data.e5ojs_api_get_url = {
         get_all_media: req.protocol+"://"+req.get('host')+"/admin/all-media/",
     }
-    //console.log(" == e5ojs_global_data == ",e5ojs_global_data);
+    console.log(" =========== e5ojs_global_data =========== ",e5ojs_global_data);
 }
 /* end global data var */
-
 
 
 
@@ -217,6 +237,355 @@ function e5ojs_crop_image(image_path,image_path_to_save,image_size,callback) {
 
 
 
+
+
+
+/* start post type routers */
+function e5ojs_add_post_type_router(post_type_data) {
+    // start routers
+    router.get('/post-type/'+post_type_data.post_type_name+'/', function(req, res, next) {
+        // redirect to post/all
+        e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+            res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/"+post_type_data.post_type_name+"/all/");
+        });
+    });
+    router.get('/post-type/'+post_type_data.post_type_name+'/:post_status/', function(req, res, next) {
+        /*
+        get all posts with status passed in URL example: posts/post_status or all will be all status
+        http://nodejs.dev/admin/posts/all/
+        */
+
+        // get page with validate session
+        e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+            // set current page
+            e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
+            // get post type id
+            var post_post_type_id = e5ojs_global_data.e5ojs_admin_page_url[e5ojs_global_data.e5ojs_current_post_type].post_type_id;
+            // return template with user data
+            // e5ojs_global_data  and e5ojs_user_data default
+
+            // put here the query post
+            // get post status
+            var post_status = req.params.post_status;
+            var post_status_array = Array();
+            if( post_status == "all" ) {
+                post_status_array = Array('publish','pending','trash');
+            } else {
+                if( post_status == 'publish' )
+                    post_status_array.push("publish");
+                if( post_status == 'pending' )
+                    post_status_array.push("pending");
+                if( post_status == 'trash' )
+                    post_status_array.push("trash");
+            }
+
+            // get posts
+            var limit_post = 12;
+            var skip_posts = 0;
+            var total_pages = 0;
+            var current_page = 1;
+            var total_post = 0;
+            // total pages
+            db.e5ojs_post.find({'post_status':{$in:post_status_array},'post_post_type_id':post_post_type_id}).sort({'post_date':-1}).count(function(q_req, q_res, q_next){
+                total_post = parseInt(q_res);
+                total_pages = parseInt(total_post/limit_post);
+            });
+            // query with skip page
+            db.e5ojs_post.find({'post_status':{$in:post_status_array},'post_post_type_id':post_post_type_id}).sort({'post_date':-1}).skip(skip_posts).limit(limit_post, function(err, posts){
+                // check if has message session
+                // get session message
+                var e5ojs_message = e5ojs_get_session_message(req);
+                // remove session message
+                e5ojs_clear_session_message(req);
+                // validate error
+                res.render('back-end/e5ojs-admin-posts', { title: 'POSTS', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:posts, total_pages:total_pages+1, current_page:current_page, total_post:total_post, e5ojs_message:e5ojs_message, post_status:post_status });
+            });
+        });
+    });
+    router.get('/post-type/'+post_type_data.post_type_name+'/:post_status/page/:page/', function(req, res, next) {
+        /*
+        get all posts with post status and paginated
+        */
+
+        // get page with validate session
+        e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+            // set current page
+            e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
+            // get post type id
+            var post_post_type_id = e5ojs_global_data.e5ojs_admin_page_url[e5ojs_global_data.e5ojs_current_post_type].post_type_id;
+            // return template with user data
+            // e5ojs_global_data  and e5ojs_user_data default
+            // get post status
+            var post_status = req.params.post_status;
+            var post_status_array = Array();
+            if( post_status == "all" ) {
+                post_status_array = Array('publish','pending','trash');
+            } else {
+                if( post_status == 'publish' )
+                    post_status_array.push("publish");
+                if( post_status == 'pending' )
+                    post_status_array.push("pending");
+                if( post_status == 'trash' )
+                    post_status_array.push("trash");
+            }
+
+            // get posts
+            // get total pages
+            var limit_post = 12;
+            var skip_posts = 0;
+            var total_post = 0;
+            if( parseInt(req.params.page) == 1 ) {
+                skip_posts = 0;
+            } else {
+                skip_posts = (parseInt(req.params.page)-1)*limit_post;
+            }
+            var total_pages = 0;
+            var current_page = req.params.page;
+            // total pages
+            db.e5ojs_post.find({'post_status':{$in:post_status_array},'post_post_type_id':post_post_type_id}).count(function(q_req, q_res, q_next){
+                total_post = parseInt(q_res);
+                total_pages = parseInt(total_post/limit_post);
+            });
+            // query with skip page
+            db.e5ojs_post.find({'post_status':{$in:post_status_array},'post_post_type_id':post_post_type_id}).sort({"post_date":-1}).skip(skip_posts).limit(limit_post, function(err, posts){
+                // check if has message session
+                // get session message
+                var e5ojs_message = e5ojs_get_session_message(req);
+                // remove session message
+                e5ojs_clear_session_message(req);
+                // validate error
+                res.render('back-end/e5ojs-admin-posts', { title: 'POSTS', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:posts, total_pages:total_pages+1, current_page:current_page, total_post:total_post, e5ojs_message:e5ojs_message, post_status:post_status });
+                //res.render('back-end/e5ojs-admin-posts', { title: 'POSTS', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.result_data, result_query_db:1, result_query_data:posts, total_pages:total_pages+1, current_page:current_page, total_post:total_post, post_status:post_status });
+            });
+        });
+    });
+    router.get('/post-type/'+post_type_data.post_type_name+'/action/new-post/', function(req, res, next) {
+        /*
+        get template for add new post
+        */
+        // get page with validate session
+        e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+            // set current page
+            e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
+            // return template with user data
+            // e5ojs_global_data  and e5ojs_user_data default
+            res.render('back-end/e5ojs-admin-new-post', { title: 'NEW POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
+        });
+    });
+    router.get('/post-type/'+post_type_data.post_type_name+'/action/edit-post/:post_id/', function(req, res, next) {
+        /*
+        get template with post data it will be edited
+        */
+        // get post data to show and edit
+        e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+            // set current page
+            e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
+            // return template with user data
+            // e5ojs_global_data  and e5ojs_user_data default
+
+            // show post data
+            var post_id = req.params.post_id; // get url parm post_id
+            // get post data with id
+            e5ojs_get_post(post_id,function(post_data){
+                // validate error
+                // check if has message session
+                // get session message
+                var e5ojs_message = e5ojs_get_session_message(req);
+                // remove session message
+                e5ojs_clear_session_message(req);
+                var post_data_object = post_data[0];
+                // validate post_media_attachment
+                if( post_data_object.post_media_attachment.length ) {
+                    // get image from DB
+                    e5ojs_get_media(parseInt(post_data_object.post_media_attachment),function(media_result){
+                        if( media_result == false ) {
+                            post_data_object.post_media_attachment_id = "";
+                            post_data_object.post_media_attachment_url = e5ojs_global_data.e5ojs_default_media_url;
+                        } else {
+                            var media_url = e5ojs_global_data.e5ojs_media_url_sizes+media_result[0].media_file_name_clean+"-800x200."+(media_result[0].media_mime_type.split("/"))[1];
+                            post_data_object.post_media_attachment_id = media_result[0].media_id;
+                            post_data_object.post_media_attachment_url = media_url;
+                        }
+                        // render with post data
+                        res.render('back-end/e5ojs-admin-edit-post', { title: 'EDIT POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:post_data_object, e5ojs_message:e5ojs_message });
+                    });
+                } else {
+                    // no media id
+                    post_data_object.post_media_attachment_id = "";
+                    post_data_object.post_media_attachment_url = e5ojs_global_data.e5ojs_default_media_url;
+                    // render with post data
+                    res.render('back-end/e5ojs-admin-edit-post', { title: 'EDIT POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:post_data_object, e5ojs_message:e5ojs_message });
+                }
+            });
+
+        });
+
+    });
+    router.post('/post-type/'+post_type_data.post_type_name+'/action/edit-post/:post_id/:post_status', function(req, res, next) {
+        /*
+        update post data with post id and post status passed by URL
+        */
+        // update post data
+        // get page with validate session
+        e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+            // set current page
+            e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
+            // get post type id
+            var post_post_type_id = e5ojs_global_data.e5ojs_admin_page_url[e5ojs_global_data.e5ojs_current_post_type].post_type_id;
+            // return template with user data
+            // e5ojs_global_data  and e5ojs_user_data default
+
+            // get post status
+            var post_status_req = req.params.post_status; // get url parm post_id
+            var post_status = "publish";
+            // validate post_status
+            if( post_status_req == 'publish' )
+                post_status = "publish";
+            if( post_status_req == 'pending' )
+                post_status = "pending";
+            if( post_status_req == 'trash' )
+                post_status = "trash";
+
+
+            // get post id
+            var post_id = req.params.post_id; // get url parm post_id
+
+            // get post data
+            var post_title = req.body.post_title;
+            var post_content = req.body.post_content;
+            var post_format_date = req.body.post_date;
+            var post_date = req.body.post_date_submit;
+            var post_excerpt = req.body.post_excerpt;
+            var post_media_attachment = req.body.post_media_id;
+            //var post_post_type_id = post_post_type_id;
+
+            // update post on DB
+            // generate post name
+            var post_name = post_title.replace(/\s+/g, '-').toLowerCase();
+            var post_name = getSlug(remove_diacritics(post_name));
+            e5ojs_update_post( {post_id:parseInt(post_id),post_title:post_title,post_content:post_content,post_excerpt:post_excerpt,post_date:post_date,post_name:post_name,post_media_attachment:post_media_attachment,post_status:post_status,post_post_type_id:post_post_type_id},function(result_data){
+                // validate result
+
+                // create session message
+                var e5ojs_message = null;
+                // show notification
+                e5ojs_message = {'status':1,'type':'done','text':'Successfully - Post edited'};
+                // save message on session var
+                e5ojs_push_session_message(req,e5ojs_message);
+
+                // redirect to edit post with ID
+                res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/"+post_type_data.post_type_name+"/action/edit-post/"+result_data.post_id);
+            });
+        });
+    });
+    router.post('/post-type/'+post_type_data.post_type_name+'/action/new-post/:post_status', function(req, res, next) {
+        /*
+        insert a new post with post status passed by URL
+        */
+        // get page with validate session
+        e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+            // set current page
+            e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
+            // get post type id
+            var post_post_type_id = e5ojs_global_data.e5ojs_admin_page_url[e5ojs_global_data.e5ojs_current_post_type].post_type_id;
+
+            // return template with user data
+            // e5ojs_global_data  and e5ojs_user_data default
+            //res.render('back-end/e5ojs-admin-new-post', { title: 'NEW POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
+
+            // save post data
+            // get post status
+            var post_status_req = req.params.post_status; // get url parm post_id
+            var post_status = "publish";
+            // validate post_status
+            if( post_status_req == 'publish' )
+                post_status = "publish";
+            if( post_status_req == 'pending' )
+                post_status = "pending";
+            if( post_status_req == 'trash' )
+                post_status = "trash";
+
+            // get post data
+            var post_title = req.body.post_title;
+            var post_content = req.body.post_content;
+            var post_format_date = req.body.post_date;
+            var post_date = req.body.post_date_submit;
+            var post_excerpt = req.body.post_excerpt;
+            var post_media_attachment = req.body.post_media_id;
+
+            // save new post on DB
+            //db.e5ojs_post.insert({post_id:});
+            e5ojs_get_next_id('post',function(data){
+                var next_id = data.seq;
+                // insert post data
+                var post_name = post_title.replace(/\s+/g, '-').toLowerCase();
+                var post_name = getSlug(remove_diacritics(post_name));
+                e5ojs_insert_new_post({post_id:next_id,post_title:post_title,post_content:post_content,post_excerpt:post_excerpt,post_date:post_date,post_name:post_name,post_media_attachment:post_media_attachment,post_status:post_status,post_post_type_id:post_post_type_id},function(result_data){
+                    // validate result
+                    // create session message
+                    var e5ojs_message = null;
+                    // show notification
+                    e5ojs_message = {'status':1,'type':'done','text':'Successfully - New post created'};
+                    // save message on session var
+                    e5ojs_push_session_message(req,e5ojs_message);
+                    // redirect to edit post with ID
+                    res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/"+post_type_data.post_type_name+"/action/edit-post/"+result_data.post_id);
+                });
+            });
+        });
+    });
+    router.get('/post-type/'+post_type_data.post_type_name+'/action/:post_status/:post_id/', function(req, res, next) {
+        /*
+        update one choose post status from multiple posts ids
+        only change post status passed from url example: post_status/post_id
+        http://nodejs.dev/admin/posts/action/delete/79
+        */
+
+        // change post status to dynamically
+        // get page with validate session
+        e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+            // set current page
+            e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
+            // return template with user data
+            // e5ojs_global_data  and e5ojs_user_data default
+            // get action
+            var request_action = req.params.post_status;
+            // get post id param
+            var post_id = req.params.post_id; // get url parm post_id
+            // check if has multiples ids
+            var post_ids = post_id.split(",");
+
+            // validate post status
+            var post_set_status = "pending";
+            if( request_action == "publish" ) {
+                post_set_status = "publish";
+            } else if( request_action == "pending" ) {
+                post_set_status = "pending";
+            } else if( request_action == "delete" ) {
+                post_set_status = "trash";
+            }
+            //console.log("post_set_status : ",post_set_status);
+            // multiple post ids
+            // update posts
+            e5ojs_change_post_status_multiple(post_ids,post_set_status,function(data){
+                // create session message
+                // validate result
+                var e5ojs_message = null;
+                if( data.status ) {
+                    // show notification
+                    e5ojs_message = {'status':1,'type':'done','text':'Successfully - Moved to '+post_set_status};
+                } else {
+                    e5ojs_message = {'status':1,'type':'error','text':'Error - Tried to move to '+post_set_status};
+                }
+                // save message on session var
+                e5ojs_push_session_message(req,e5ojs_message);
+                // redirect to posts archive
+                res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/"+post_type_data.post_type_name+"/all/");
+            });
+        });
+    });
+}
+/* end post type routers */
 
 
 
@@ -407,329 +776,325 @@ router.get('/settings/', function(req, res, next) {
 
 
 /* ============== start e5ojs post functions =============== */
-
-router.get('/posts/', function(req, res, next) {
-    // redirect to post/all
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-        res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/posts/all/");
-    });
-});
-router.get('/posts/:post_status/', function(req, res, next) {
-    /*
-    get all posts with status passed in URL example: posts/post_status or all will be all status
-    http://nodejs.dev/admin/posts/all/
-    */
-
-    // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-        // return template with user data
-        // e5ojs_global_data  and e5ojs_user_data default
-
-        // put here the query post
-        // get post status
-        var post_status = req.params.post_status;
-        var post_status_array = Array();
-        if( post_status == "all" ) {
-            post_status_array = Array('publish','pending','trash');
-        } else {
-            if( post_status == 'publish' )
-                post_status_array.push("publish");
-            if( post_status == 'pending' )
-                post_status_array.push("pending");
-            if( post_status == 'trash' )
-                post_status_array.push("trash");
-        }
-
-        // get posts
-        var limit_post = 12;
-        var skip_posts = 0;
-        var total_pages = 0;
-        var current_page = 1;
-        var total_post = 0;
-        // total pages
-        db.e5ojs_post.find({'post_status':{$in:post_status_array}}).sort({'post_date':-1}).count(function(q_req, q_res, q_next){
-            total_post = parseInt(q_res);
-            total_pages = parseInt(total_post/limit_post);
-        });
-        // query with skip page
-        db.e5ojs_post.find({'post_status':{$in:post_status_array}}).sort({'post_date':-1}).skip(skip_posts).limit(limit_post, function(err, posts){
-            // check if has message session
-            // get session message
-            var e5ojs_message = e5ojs_get_session_message(req);
-            // remove session message
-            e5ojs_clear_session_message(req);
-            // validate error
-            res.render('back-end/e5ojs-admin-posts', { title: 'POSTS', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:posts, total_pages:total_pages+1, current_page:current_page, total_post:total_post, e5ojs_message:e5ojs_message, post_status:post_status });
-        });
-    });
-});
-
-router.get('/posts/:post_status/page/:page/', function(req, res, next) {
-    /*
-    get all posts with post status and paginated
-    */
-
-    // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-        // return template with user data
-        // e5ojs_global_data  and e5ojs_user_data default
-        // get post status
-        var post_status = req.params.post_status;
-        var post_status_array = Array();
-        if( post_status == "all" ) {
-            post_status_array = Array('publish','pending','trash');
-        } else {
-            if( post_status == 'publish' )
-                post_status_array.push("publish");
-            if( post_status == 'pending' )
-                post_status_array.push("pending");
-            if( post_status == 'trash' )
-                post_status_array.push("trash");
-        }
-
-        // get posts
-        // get total pages
-        var limit_post = 12;
-        var skip_posts = 0;
-        var total_post = 0;
-        if( parseInt(req.params.page) == 1 ) {
-            skip_posts = 0;
-        } else {
-            skip_posts = (parseInt(req.params.page)-1)*limit_post;
-        }
-        var total_pages = 0;
-        var current_page = req.params.page;
-        // total pages
-        db.e5ojs_post.find({'post_status':{$in:post_status_array}}).count(function(q_req, q_res, q_next){
-            total_post = parseInt(q_res);
-            total_pages = parseInt(total_post/limit_post);
-        });
-        // query with skip page
-        db.e5ojs_post.find({'post_status':{$in:post_status_array}}).sort({"post_date":-1}).skip(skip_posts).limit(limit_post, function(err, posts){
-            // check if has message session
-            // get session message
-            var e5ojs_message = e5ojs_get_session_message(req);
-            // remove session message
-            e5ojs_clear_session_message(req);
-            // validate error
-            res.render('back-end/e5ojs-admin-posts', { title: 'POSTS', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:posts, total_pages:total_pages+1, current_page:current_page, total_post:total_post, e5ojs_message:e5ojs_message, post_status:post_status });
-            //res.render('back-end/e5ojs-admin-posts', { title: 'POSTS', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.result_data, result_query_db:1, result_query_data:posts, total_pages:total_pages+1, current_page:current_page, total_post:total_post, post_status:post_status });
-        });
-    });
-
-
-
-
-});
-router.get('/posts/action/new-post/', function(req, res, next) {
-    /*
-    get template for add new post
-    */
-    // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-        // return template with user data
-        // e5ojs_global_data  and e5ojs_user_data default
-        res.render('back-end/e5ojs-admin-new-post', { title: 'NEW POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
-    });
-});
-router.get('/posts/action/edit-post/:post_id/', function(req, res, next) {
-    /*
-    get template with post data it will be edited
-    */
-    // get post data to show and edit
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-        // return template with user data
-        // e5ojs_global_data  and e5ojs_user_data default
-
-        // show post data
-        var post_id = req.params.post_id; // get url parm post_id
-        // get post data with id
-        e5ojs_get_post(post_id,function(post_data){
-            // validate error
-            // check if has message session
-            // get session message
-            var e5ojs_message = e5ojs_get_session_message(req);
-            // remove session message
-            e5ojs_clear_session_message(req);
-            var post_data_object = post_data[0];
-            // validate post_media_attachment
-            if( post_data_object.post_media_attachment.length ) {
-                // get image from DB
-                e5ojs_get_media(parseInt(post_data_object.post_media_attachment),function(media_result){
-                    if( media_result == false ) {
-                        post_data_object.post_media_attachment_id = "";
-                        post_data_object.post_media_attachment_url = e5ojs_global_data.e5ojs_default_media_url;
-                    } else {
-                        var media_url = e5ojs_global_data.e5ojs_media_url_sizes+media_result[0].media_file_name_clean+"-800x200."+(media_result[0].media_mime_type.split("/"))[1];
-                        post_data_object.post_media_attachment_id = media_result[0].media_id;
-                        post_data_object.post_media_attachment_url = media_url;
-                    }
-                    // render with post data
-                    res.render('back-end/e5ojs-admin-edit-post', { title: 'EDIT POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:post_data_object, e5ojs_message:e5ojs_message });
-                });
-            } else {
-                // no media id
-                post_data_object.post_media_attachment_id = "";
-                post_data_object.post_media_attachment_url = e5ojs_global_data.e5ojs_default_media_url;
-                // render with post data
-                res.render('back-end/e5ojs-admin-edit-post', { title: 'EDIT POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:post_data_object, e5ojs_message:e5ojs_message });
-            }
-        });
-
-    });
-
-});
-router.post('/posts/action/edit-post/:post_id/:post_status', function(req, res, next) {
-    /*
-    update post data with post id and post status passed by URL
-    */
-    // update post data
-    // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-        // return template with user data
-        // e5ojs_global_data  and e5ojs_user_data default
-
-        // get post status
-        var post_status_req = req.params.post_status; // get url parm post_id
-        var post_status = "publish";
-        // validate post_status
-        if( post_status_req == 'publish' )
-            post_status = "publish";
-        if( post_status_req == 'pending' )
-            post_status = "pending";
-        if( post_status_req == 'trash' )
-            post_status = "trash";
-
-
-        // get post id
-        var post_id = req.params.post_id; // get url parm post_id
-
-        // get post data
-        var post_title = req.body.post_title;
-        var post_content = req.body.post_content;
-        var post_format_date = req.body.post_date;
-        var post_date = req.body.post_date_submit;
-        var post_excerpt = req.body.post_excerpt;
-        var post_media_attachment = req.body.post_media_id;
-
-        // update post on DB
-        // generate post name
-        var post_name = post_title.replace(/\s+/g, '-').toLowerCase();
-        var post_name = getSlug(remove_diacritics(post_name));
-        e5ojs_update_post( {post_id:parseInt(post_id),post_title:post_title,post_content:post_content,post_excerpt:post_excerpt,post_date:post_date,post_name:post_name,post_media_attachment:post_media_attachment,post_status:post_status},function(result_data){
-            // validate result
-
-            // create session message
-            var e5ojs_message = null;
-            // show notification
-            e5ojs_message = {'status':1,'type':'done','text':'Successfully - Post edited'};
-            // save message on session var
-            e5ojs_push_session_message(req,e5ojs_message);
-
-            // redirect to edit post with ID
-            res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/posts/action/edit-post/"+result_data.post_id);
-        });
-    });
-});
-router.post('/posts/action/new-post/:post_status', function(req, res, next) {
-    /*
-    insert a new post with post status passed by URL
-    */
-    // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-        // return template with user data
-        // e5ojs_global_data  and e5ojs_user_data default
-        //res.render('back-end/e5ojs-admin-new-post', { title: 'NEW POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
-
-        // save post data
-        // get post status
-        var post_status_req = req.params.post_status; // get url parm post_id
-        var post_status = "publish";
-        // validate post_status
-        if( post_status_req == 'publish' )
-            post_status = "publish";
-        if( post_status_req == 'pending' )
-            post_status = "pending";
-        if( post_status_req == 'trash' )
-            post_status = "trash";
-
-        // get post data
-        var post_title = req.body.post_title;
-        var post_content = req.body.post_content;
-        var post_format_date = req.body.post_date;
-        var post_date = req.body.post_date_submit;
-        var post_excerpt = req.body.post_excerpt;
-        var post_media_attachment = req.body.post_media_id;
-
-        // save new post on DB
-        //db.e5ojs_post.insert({post_id:});
-        e5ojs_get_next_id('post',function(data){
-            var next_id = data.seq;
-            // insert post data
-            var post_name = post_title.replace(/\s+/g, '-').toLowerCase();
-            var post_name = getSlug(remove_diacritics(post_name));
-            e5ojs_insert_new_post({post_id:next_id,post_title:post_title,post_content:post_content,post_excerpt:post_excerpt,post_date:post_date,post_name:post_name,post_media_attachment:post_media_attachment,post_status:post_status},function(result_data){
-                // validate result
-                // create session message
-                var e5ojs_message = null;
-                // show notification
-                e5ojs_message = {'status':1,'type':'done','text':'Successfully - New post created'};
-                // save message on session var
-                e5ojs_push_session_message(req,e5ojs_message);
-                // redirect to edit post with ID
-                res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/posts/action/edit-post/"+result_data.post_id);
-            });
-        });
-    });
-});
-router.get('/posts/action/:post_status/:post_id/', function(req, res, next) {
-    /*
-    update one choose post status from multiple posts ids
-    only change post status passed from url example: post_status/post_id
-    http://nodejs.dev/admin/posts/action/delete/79
-    */
-
-    // change post status to dynamically
-    // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-        // return template with user data
-        // e5ojs_global_data  and e5ojs_user_data default
-        // get action
-        var request_action = req.params.post_status;
-        // get post id param
-        var post_id = req.params.post_id; // get url parm post_id
-        // check if has multiples ids
-        var post_ids = post_id.split(",");
-
-        // validate post status
-        var post_set_status = "pending";
-        if( request_action == "publish" ) {
-            post_set_status = "publish";
-        } else if( request_action == "pending" ) {
-            post_set_status = "pending";
-        } else if( request_action == "delete" ) {
-            post_set_status = "trash";
-        }
-        //console.log("post_set_status : ",post_set_status);
-        // multiple post ids
-        // update posts
-        e5ojs_change_post_status_multiple(post_ids,post_set_status,function(data){
-            // create session message
-            // validate result
-            var e5ojs_message = null;
-            if( data.status ) {
-                // show notification
-                e5ojs_message = {'status':1,'type':'done','text':'Successfully - Moved to '+post_set_status};
-            } else {
-                e5ojs_message = {'status':1,'type':'error','text':'Error - Tried to move to '+post_set_status};
-            }
-            // save message on session var
-            e5ojs_push_session_message(req,e5ojs_message);
-            // redirect to posts archive
-            res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/posts/all/");
-        });
-    });
-});
+//
+// router.get('/posts/', function(req, res, next) {
+//     // redirect to post/all
+//     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+//         res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/posts/all/");
+//     });
+// });
+// router.get('/posts/:post_status/', function(req, res, next) {
+//     /*
+//     get all posts with status passed in URL example: posts/post_status or all will be all status
+//     http://nodejs.dev/admin/posts/all/
+//     */
+//
+//     // get page with validate session
+//     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+//         // return template with user data
+//         // e5ojs_global_data  and e5ojs_user_data default
+//
+//         // put here the query post
+//         // get post status
+//         var post_status = req.params.post_status;
+//         var post_status_array = Array();
+//         if( post_status == "all" ) {
+//             post_status_array = Array('publish','pending','trash');
+//         } else {
+//             if( post_status == 'publish' )
+//                 post_status_array.push("publish");
+//             if( post_status == 'pending' )
+//                 post_status_array.push("pending");
+//             if( post_status == 'trash' )
+//                 post_status_array.push("trash");
+//         }
+//
+//         // get posts
+//         var limit_post = 12;
+//         var skip_posts = 0;
+//         var total_pages = 0;
+//         var current_page = 1;
+//         var total_post = 0;
+//         // total pages
+//         db.e5ojs_post.find({'post_status':{$in:post_status_array}}).sort({'post_date':-1}).count(function(q_req, q_res, q_next){
+//             total_post = parseInt(q_res);
+//             total_pages = parseInt(total_post/limit_post);
+//         });
+//         // query with skip page
+//         db.e5ojs_post.find({'post_status':{$in:post_status_array}}).sort({'post_date':-1}).skip(skip_posts).limit(limit_post, function(err, posts){
+//             // check if has message session
+//             // get session message
+//             var e5ojs_message = e5ojs_get_session_message(req);
+//             // remove session message
+//             e5ojs_clear_session_message(req);
+//             // validate error
+//             res.render('back-end/e5ojs-admin-posts', { title: 'POSTS', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:posts, total_pages:total_pages+1, current_page:current_page, total_post:total_post, e5ojs_message:e5ojs_message, post_status:post_status });
+//         });
+//     });
+// });
+//
+// router.get('/posts/:post_status/page/:page/', function(req, res, next) {
+//     /*
+//     get all posts with post status and paginated
+//     */
+//
+//     // get page with validate session
+//     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+//         // return template with user data
+//         // e5ojs_global_data  and e5ojs_user_data default
+//         // get post status
+//         var post_status = req.params.post_status;
+//         var post_status_array = Array();
+//         if( post_status == "all" ) {
+//             post_status_array = Array('publish','pending','trash');
+//         } else {
+//             if( post_status == 'publish' )
+//                 post_status_array.push("publish");
+//             if( post_status == 'pending' )
+//                 post_status_array.push("pending");
+//             if( post_status == 'trash' )
+//                 post_status_array.push("trash");
+//         }
+//
+//         // get posts
+//         // get total pages
+//         var limit_post = 12;
+//         var skip_posts = 0;
+//         var total_post = 0;
+//         if( parseInt(req.params.page) == 1 ) {
+//             skip_posts = 0;
+//         } else {
+//             skip_posts = (parseInt(req.params.page)-1)*limit_post;
+//         }
+//         var total_pages = 0;
+//         var current_page = req.params.page;
+//         // total pages
+//         db.e5ojs_post.find({'post_status':{$in:post_status_array}}).count(function(q_req, q_res, q_next){
+//             total_post = parseInt(q_res);
+//             total_pages = parseInt(total_post/limit_post);
+//         });
+//         // query with skip page
+//         db.e5ojs_post.find({'post_status':{$in:post_status_array}}).sort({"post_date":-1}).skip(skip_posts).limit(limit_post, function(err, posts){
+//             // check if has message session
+//             // get session message
+//             var e5ojs_message = e5ojs_get_session_message(req);
+//             // remove session message
+//             e5ojs_clear_session_message(req);
+//             // validate error
+//             res.render('back-end/e5ojs-admin-posts', { title: 'POSTS', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:posts, total_pages:total_pages+1, current_page:current_page, total_post:total_post, e5ojs_message:e5ojs_message, post_status:post_status });
+//             //res.render('back-end/e5ojs-admin-posts', { title: 'POSTS', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.result_data, result_query_db:1, result_query_data:posts, total_pages:total_pages+1, current_page:current_page, total_post:total_post, post_status:post_status });
+//         });
+//     });
+// });
+// router.get('/posts/action/new-post/', function(req, res, next) {
+//     /*
+//     get template for add new post
+//     */
+//     // get page with validate session
+//     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+//         // return template with user data
+//         // e5ojs_global_data  and e5ojs_user_data default
+//         res.render('back-end/e5ojs-admin-new-post', { title: 'NEW POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
+//     });
+// });
+// router.get('/posts/action/edit-post/:post_id/', function(req, res, next) {
+//     /*
+//     get template with post data it will be edited
+//     */
+//     // get post data to show and edit
+//     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+//         // return template with user data
+//         // e5ojs_global_data  and e5ojs_user_data default
+//
+//         // show post data
+//         var post_id = req.params.post_id; // get url parm post_id
+//         // get post data with id
+//         e5ojs_get_post(post_id,function(post_data){
+//             // validate error
+//             // check if has message session
+//             // get session message
+//             var e5ojs_message = e5ojs_get_session_message(req);
+//             // remove session message
+//             e5ojs_clear_session_message(req);
+//             var post_data_object = post_data[0];
+//             // validate post_media_attachment
+//             if( post_data_object.post_media_attachment.length ) {
+//                 // get image from DB
+//                 e5ojs_get_media(parseInt(post_data_object.post_media_attachment),function(media_result){
+//                     if( media_result == false ) {
+//                         post_data_object.post_media_attachment_id = "";
+//                         post_data_object.post_media_attachment_url = e5ojs_global_data.e5ojs_default_media_url;
+//                     } else {
+//                         var media_url = e5ojs_global_data.e5ojs_media_url_sizes+media_result[0].media_file_name_clean+"-800x200."+(media_result[0].media_mime_type.split("/"))[1];
+//                         post_data_object.post_media_attachment_id = media_result[0].media_id;
+//                         post_data_object.post_media_attachment_url = media_url;
+//                     }
+//                     // render with post data
+//                     res.render('back-end/e5ojs-admin-edit-post', { title: 'EDIT POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:post_data_object, e5ojs_message:e5ojs_message });
+//                 });
+//             } else {
+//                 // no media id
+//                 post_data_object.post_media_attachment_id = "";
+//                 post_data_object.post_media_attachment_url = e5ojs_global_data.e5ojs_default_media_url;
+//                 // render with post data
+//                 res.render('back-end/e5ojs-admin-edit-post', { title: 'EDIT POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:post_data_object, e5ojs_message:e5ojs_message });
+//             }
+//         });
+//
+//     });
+//
+// });
+// router.post('/posts/action/edit-post/:post_id/:post_status', function(req, res, next) {
+//     /*
+//     update post data with post id and post status passed by URL
+//     */
+//     // update post data
+//     // get page with validate session
+//     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+//         // return template with user data
+//         // e5ojs_global_data  and e5ojs_user_data default
+//
+//         // get post status
+//         var post_status_req = req.params.post_status; // get url parm post_id
+//         var post_status = "publish";
+//         // validate post_status
+//         if( post_status_req == 'publish' )
+//             post_status = "publish";
+//         if( post_status_req == 'pending' )
+//             post_status = "pending";
+//         if( post_status_req == 'trash' )
+//             post_status = "trash";
+//
+//
+//         // get post id
+//         var post_id = req.params.post_id; // get url parm post_id
+//
+//         // get post data
+//         var post_title = req.body.post_title;
+//         var post_content = req.body.post_content;
+//         var post_format_date = req.body.post_date;
+//         var post_date = req.body.post_date_submit;
+//         var post_excerpt = req.body.post_excerpt;
+//         var post_media_attachment = req.body.post_media_id;
+//
+//         // update post on DB
+//         // generate post name
+//         var post_name = post_title.replace(/\s+/g, '-').toLowerCase();
+//         var post_name = getSlug(remove_diacritics(post_name));
+//         e5ojs_update_post( {post_id:parseInt(post_id),post_title:post_title,post_content:post_content,post_excerpt:post_excerpt,post_date:post_date,post_name:post_name,post_media_attachment:post_media_attachment,post_status:post_status},function(result_data){
+//             // validate result
+//
+//             // create session message
+//             var e5ojs_message = null;
+//             // show notification
+//             e5ojs_message = {'status':1,'type':'done','text':'Successfully - Post edited'};
+//             // save message on session var
+//             e5ojs_push_session_message(req,e5ojs_message);
+//
+//             // redirect to edit post with ID
+//             res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/posts/action/edit-post/"+result_data.post_id);
+//         });
+//     });
+// });
+// router.post('/posts/action/new-post/:post_status', function(req, res, next) {
+//     /*
+//     insert a new post with post status passed by URL
+//     */
+//     // get page with validate session
+//     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+//         // return template with user data
+//         // e5ojs_global_data  and e5ojs_user_data default
+//         //res.render('back-end/e5ojs-admin-new-post', { title: 'NEW POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
+//
+//         // save post data
+//         // get post status
+//         var post_status_req = req.params.post_status; // get url parm post_id
+//         var post_status = "publish";
+//         // validate post_status
+//         if( post_status_req == 'publish' )
+//             post_status = "publish";
+//         if( post_status_req == 'pending' )
+//             post_status = "pending";
+//         if( post_status_req == 'trash' )
+//             post_status = "trash";
+//
+//         // get post data
+//         var post_title = req.body.post_title;
+//         var post_content = req.body.post_content;
+//         var post_format_date = req.body.post_date;
+//         var post_date = req.body.post_date_submit;
+//         var post_excerpt = req.body.post_excerpt;
+//         var post_media_attachment = req.body.post_media_id;
+//
+//         // save new post on DB
+//         //db.e5ojs_post.insert({post_id:});
+//         e5ojs_get_next_id('post',function(data){
+//             var next_id = data.seq;
+//             // insert post data
+//             var post_name = post_title.replace(/\s+/g, '-').toLowerCase();
+//             var post_name = getSlug(remove_diacritics(post_name));
+//             e5ojs_insert_new_post({post_id:next_id,post_title:post_title,post_content:post_content,post_excerpt:post_excerpt,post_date:post_date,post_name:post_name,post_media_attachment:post_media_attachment,post_status:post_status},function(result_data){
+//                 // validate result
+//                 // create session message
+//                 var e5ojs_message = null;
+//                 // show notification
+//                 e5ojs_message = {'status':1,'type':'done','text':'Successfully - New post created'};
+//                 // save message on session var
+//                 e5ojs_push_session_message(req,e5ojs_message);
+//                 // redirect to edit post with ID
+//                 res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/posts/action/edit-post/"+result_data.post_id);
+//             });
+//         });
+//     });
+// });
+// router.get('/posts/action/:post_status/:post_id/', function(req, res, next) {
+//     /*
+//     update one choose post status from multiple posts ids
+//     only change post status passed from url example: post_status/post_id
+//     http://nodejs.dev/admin/posts/action/delete/79
+//     */
+//
+//     // change post status to dynamically
+//     // get page with validate session
+//     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+//         // return template with user data
+//         // e5ojs_global_data  and e5ojs_user_data default
+//         // get action
+//         var request_action = req.params.post_status;
+//         // get post id param
+//         var post_id = req.params.post_id; // get url parm post_id
+//         // check if has multiples ids
+//         var post_ids = post_id.split(",");
+//
+//         // validate post status
+//         var post_set_status = "pending";
+//         if( request_action == "publish" ) {
+//             post_set_status = "publish";
+//         } else if( request_action == "pending" ) {
+//             post_set_status = "pending";
+//         } else if( request_action == "delete" ) {
+//             post_set_status = "trash";
+//         }
+//         //console.log("post_set_status : ",post_set_status);
+//         // multiple post ids
+//         // update posts
+//         e5ojs_change_post_status_multiple(post_ids,post_set_status,function(data){
+//             // create session message
+//             // validate result
+//             var e5ojs_message = null;
+//             if( data.status ) {
+//                 // show notification
+//                 e5ojs_message = {'status':1,'type':'done','text':'Successfully - Moved to '+post_set_status};
+//             } else {
+//                 e5ojs_message = {'status':1,'type':'error','text':'Error - Tried to move to '+post_set_status};
+//             }
+//             // save message on session var
+//             e5ojs_push_session_message(req,e5ojs_message);
+//             // redirect to posts archive
+//             res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/posts/all/");
+//         });
+//     });
+// });
 
 /* ============== end e5ojs post functions =============== */
 
@@ -775,11 +1140,12 @@ router.post('/post-type/action/:post_type_action/', function(req, res, next) {
         // e5ojs_global_data  and e5ojs_user_data default
         // get page with validate session
         var post_type_action = req.params.post_type_action;
+        var post_type_title = req.body.post_type_title;
         var post_type_name = req.body.post_type_name;
         var post_type_description = req.body.post_type_description;
         var post_type_slug = getSlug(remove_diacritics( post_type_name ));
         // save new post type
-        e5ojs_post_type_insert_new({'post_type_id':'','post_type_name':post_type_name,'post_type_description':post_type_description,'post_type_slug':post_type_slug},function(post_type_data){
+        e5ojs_post_type_insert_new({'post_type_id':'','post_type_title':post_type_title,'post_type_name':post_type_name,'post_type_description':post_type_description,'post_type_slug':post_type_slug},function(post_type_data){
             // create session message
             var e5ojs_message = null;
             // show notification
@@ -986,7 +1352,7 @@ function e5ojs_get_media(media_id,callback) {
 /* start post type DB function */
 function e5ojs_post_type_get_all(callback) {
     db.e5ojs_post_type.find({},function(err,result_data){
-        callback(result_data[0]);
+        callback(result_data);
     });
 }
 function e5ojs_post_type_insert_new(post_type_data,callback) {
@@ -996,6 +1362,7 @@ function e5ojs_post_type_insert_new(post_type_data,callback) {
         var next_id = data.seq;
         post_type_data.post_type_id = next_id;
         db.e5ojs_post_type.insert(post_type_data,function(err, result_data){
+            e5ojs_init();
             callback(result_data);
         });
     });
