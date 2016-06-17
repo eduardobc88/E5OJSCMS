@@ -52,20 +52,20 @@ function e5ojs_global_data_generate(req) {
     e5ojs_global_data.e5ojs_post_status = new Array('publish','pending','trash');
     e5ojs_global_data.e5ojs_current_date = date_format(current_date,'dd-mm-yyyy');
 
-    
+
     //e5ojs_global_data.e5ojs_current_post_type = "admin/";
     e5ojs_global_data.e5ojs_admin_page_url = {
-        dashboard: {title:"dashboard",url:req.protocol+"://"+req.get('host')+"/admin/", icon_name:"dashboard"},
-        pages: {title:"pages",url:req.protocol+"://"+req.get('host')+"/admin/pages/", icon_name:"filter_none"},
+        dashboard: {title:"dashboard",description:"Lorem ipsum...",url:req.protocol+"://"+req.get('host')+"/admin/", icon_name:"dashboard"},
+        pages: {title:"pages",description:"Lorem ipsum...",url:req.protocol+"://"+req.get('host')+"/admin/pages/", icon_name:"filter_none"},
     };
     // loop for post types
     for( var key in e5ojs_global_data.e5ojs_post_types ) {
         var post_type = e5ojs_global_data.e5ojs_post_types[key];
-        e5ojs_global_data.e5ojs_admin_page_url[post_type.post_type_name] = {post_type_id:post_type.post_type_id,title:post_type.post_type_title,url:req.protocol+"://"+req.get('host')+"/admin/post-type/"+post_type.post_type_name+"/", icon_name:"insert_drive_file"};
+        e5ojs_global_data.e5ojs_admin_page_url[post_type.post_type_name] = {post_type_id:post_type.post_type_id,title:post_type.post_type_title,description:post_type.post_type_description,url:req.protocol+"://"+req.get('host')+"/admin/post-type/"+post_type.post_type_name+"/", icon_name:"insert_drive_file"};
     }
-    e5ojs_global_data.e5ojs_admin_page_url['media'] = {title:"media",url:req.protocol+"://"+req.get('host')+"/admin/media/", icon_name:"collections"};
-    e5ojs_global_data.e5ojs_admin_page_url['post_type'] = {title:"post types",url:req.protocol+"://"+req.get('host')+"/admin/post-type/", icon_name:"settings"};
-    e5ojs_global_data.e5ojs_admin_page_url['settings'] = {title:"settings",url:req.protocol+"://"+req.get('host')+"/admin/settings/", icon_name:"settings"};
+    e5ojs_global_data.e5ojs_admin_page_url['media'] = {title:"media",description:"Lorem ipsum...",url:req.protocol+"://"+req.get('host')+"/admin/media/", icon_name:"collections"};
+    e5ojs_global_data.e5ojs_admin_page_url['post_type'] = {title:"Post types",description:"Lorem ipsum...",url:req.protocol+"://"+req.get('host')+"/admin/post-type/", icon_name:"settings"};
+    e5ojs_global_data.e5ojs_admin_page_url['settings'] = {title:"Settings",description:"Lorem ipsum...",url:req.protocol+"://"+req.get('host')+"/admin/settings/", icon_name:"settings"};
 
 
     e5ojs_global_data.e5ojs_admin_action_url = {
@@ -259,8 +259,9 @@ function e5ojs_add_post_type_router(post_type_data) {
         e5ojs_validate_admin_session_callback(req, res, function(user_data) {
             // set current page
             e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
-            // get post type id
-            var post_post_type_id = e5ojs_global_data.e5ojs_admin_page_url[e5ojs_global_data.e5ojs_current_post_type].post_type_id;
+            // get post type info
+            var post_type_info = e5ojs_global_data.e5ojs_admin_page_url[e5ojs_global_data.e5ojs_current_post_type];
+            var post_post_type_id = post_type_info.post_type_id;
             // return template with user data
             // e5ojs_global_data  and e5ojs_user_data default
 
@@ -298,7 +299,7 @@ function e5ojs_add_post_type_router(post_type_data) {
                 // remove session message
                 e5ojs_clear_session_message(req);
                 // validate error
-                res.render('back-end/e5ojs-admin-posts', { title: 'POSTS', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:posts, total_pages:total_pages+1, current_page:current_page, total_post:total_post, e5ojs_message:e5ojs_message, post_status:post_status });
+                res.render('back-end/e5ojs-admin-posts', { title: post_type_info.title, description: post_type_info.description, e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:posts, total_pages:total_pages+1, current_page:current_page, total_post:total_post, e5ojs_message:e5ojs_message, post_status:post_status });
             });
         });
     });
@@ -311,8 +312,9 @@ function e5ojs_add_post_type_router(post_type_data) {
         e5ojs_validate_admin_session_callback(req, res, function(user_data) {
             // set current page
             e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
-            // get post type id
-            var post_post_type_id = e5ojs_global_data.e5ojs_admin_page_url[e5ojs_global_data.e5ojs_current_post_type].post_type_id;
+            // get post type info
+            var post_type_info = e5ojs_global_data.e5ojs_admin_page_url[e5ojs_global_data.e5ojs_current_post_type];
+            var post_post_type_id = post_type_info.post_type_id;
             // return template with user data
             // e5ojs_global_data  and e5ojs_user_data default
             // get post status
@@ -354,7 +356,7 @@ function e5ojs_add_post_type_router(post_type_data) {
                 // remove session message
                 e5ojs_clear_session_message(req);
                 // validate error
-                res.render('back-end/e5ojs-admin-posts', { title: 'POSTS', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:posts, total_pages:total_pages+1, current_page:current_page, total_post:total_post, e5ojs_message:e5ojs_message, post_status:post_status });
+                res.render('back-end/e5ojs-admin-posts', { title: post_type_info.title, description: post_type_info.description, e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:posts, total_pages:total_pages+1, current_page:current_page, total_post:total_post, e5ojs_message:e5ojs_message, post_status:post_status });
                 //res.render('back-end/e5ojs-admin-posts', { title: 'POSTS', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.result_data, result_query_db:1, result_query_data:posts, total_pages:total_pages+1, current_page:current_page, total_post:total_post, post_status:post_status });
             });
         });
@@ -430,8 +432,9 @@ function e5ojs_add_post_type_router(post_type_data) {
         e5ojs_validate_admin_session_callback(req, res, function(user_data) {
             // set current page
             e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
-            // get post type id
-            var post_post_type_id = e5ojs_global_data.e5ojs_admin_page_url[e5ojs_global_data.e5ojs_current_post_type].post_type_id;
+            // get post type info
+            var post_type_info = e5ojs_global_data.e5ojs_admin_page_url[e5ojs_global_data.e5ojs_current_post_type];
+            var post_post_type_id = post_type_info.post_type_id;
             // return template with user data
             // e5ojs_global_data  and e5ojs_user_data default
 
@@ -486,8 +489,9 @@ function e5ojs_add_post_type_router(post_type_data) {
         e5ojs_validate_admin_session_callback(req, res, function(user_data) {
             // set current page
             e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
-            // get post type id
-            var post_post_type_id = e5ojs_global_data.e5ojs_admin_page_url[e5ojs_global_data.e5ojs_current_post_type].post_type_id;
+            // get post type info
+            var post_type_info = e5ojs_global_data.e5ojs_admin_page_url[e5ojs_global_data.e5ojs_current_post_type];
+            var post_post_type_id = post_type_info.post_type_id;
 
             // return template with user data
             // e5ojs_global_data  and e5ojs_user_data default
