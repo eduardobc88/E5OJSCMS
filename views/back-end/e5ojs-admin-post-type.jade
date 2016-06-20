@@ -1,22 +1,59 @@
 extends e5ojs-base-layout-admin
 block e5ojs_block_local_css_script
 block e5ojs_block_content
-    form(id="e5ojs-post-type-form-wrapper" action=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+"action/new/" method="post")
-        div(class="row")
-            div(class="col-xs-12")
-                div(class="card")
-                    div(class="card-content")
-                        span(class="card-title")='NEW'
-                        div(class="input-field")
-                            input(id="post_type_title" type="text" class="validate" name="post_type_title")
-                            label(for="post_type_title")='Title'
-                        div(class="input-field")
-                            input(id="post_type_name" type="text" class="validate" name="post_type_name")
-                            label(for="post_type_name")='Name'
-                        div(class="input-field")
-                            input(id="post_type_description" type="text" class="validate" name="post_type_description")
-                            label(for="post_type_description")='Description'
-                        div(class="aling-right")
-                            button( type="submit" class="waves-effect waves-dark btn")='SAVE'
-                            
-                
+    div(class="row top-page-options no-padding")
+        div(class="col-xs-12 no-padding")
+            a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+"all/page/1/" class="waves-effect waves-dark "+(( post_status == "all" )?" current":""))='All'
+            a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+"active/page/1/" class="waves-effect waves-dark "+(( post_status == "active" )?" current":""))='Active'
+            a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+"deactive/page/1/" class="waves-effect waves-dark "+(( post_status == "deactive" )?" current":""))='Deactive'
+    div(class="row")
+        div(class="col-xs-12 no-padding")
+                - var post_type_name = e5ojs_global_data.e5ojs_current_post_type;
+                ul(class="collection custom-collection")
+                    li(class="collection-header")
+                        input(id="select-all" class="filled-in" type="checkbox" )
+                        label(for='select-all' class="checkbox-center")
+                        ul(id="dropdown2" class="dropdown-content bulk-actions")
+                            li
+                                a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+e5ojs_global_data.e5ojs_admin_post_type_action_url.post_type_bulk_action+"1/")="Active"
+                            li
+                                a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+e5ojs_global_data.e5ojs_admin_post_type_action_url.post_type_bulk_action+"0/")="Desactive"
+                            li
+                                a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+e5ojs_global_data.e5ojs_admin_post_type_action_url.post_type_bulk_action+"-1/")="Delete"
+                        a.btn.dropdown-button(href='#!', data-activates='dropdown2')='Bulk action'
+                          i.mdi-navigation-arrow-drop-down.right
+                        a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+e5ojs_global_data.e5ojs_admin_post_type_action_url.post_type_new class="waves-effect waves-dark btn")='Add new'
+                            i(class="material-icons")='add'
+                    - var e5ojs_posts = post_types;
+                    each post, index in e5ojs_posts
+                        - var letter = post.post_type_title.charAt(0).toUpperCase();
+                        - var color_hex = (( post.post_type_status == 1 )?"4CAF50": "F44336");
+                        li(class="collection-item avatar waves-effect waves-dark" data-collection-id=post.post_type_id)
+                            input(id="checkbox-"+post.post_type_id class="filled-in row-checkbox" type="checkbox")
+                            label(for='checkbox-'+post.post_type_id class="checkbox-center")
+                            img(src="https://placeholdit.imgix.net/~text?txtsize=50&bg="+color_hex+"&txtclr=FFFFFF&txt="+letter+"&w=100&h=100&txttrack=0" alt="" class="circle")
+                            p(class="title")
+                                span()=post.post_type_title
+                                span(class="excerpt")=post.post_type_description
+                            //- p(class="badge")=post.post_status
+                            div(class="secondary-content")
+                                a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+e5ojs_global_data.e5ojs_admin_post_type_action_url.post_type_edit+post.post_type_id+"/")
+                                    i(class="material-icons")='mode_edit'
+                                a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+e5ojs_global_data.e5ojs_admin_post_type_action_url.post_type_bulk_action+"1/"+post.post_type_id+"/")
+                                    i(class="material-icons")='public'
+                                a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+e5ojs_global_data.e5ojs_admin_post_type_action_url.post_type_bulk_action+"0/"+post.post_type_id+"/")
+                                    i(class="material-icons")='archive'
+                                a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+e5ojs_global_data.e5ojs_admin_post_type_action_url.post_type_bulk_action+"-1/"+post.post_type_id+"/")
+                                    i(class="material-icons")='delete_forever'
+                    li(class="collection-footer")
+                        ul(class="e5ojs-pagination")
+                            - var range = 2
+                            - var curr_page = parseInt(current_page)
+                            - if( total_pages > 1 ) {
+                                - for (var i = 1; i <= total_pages; ++i) {
+                                    if i >= (curr_page-range) && i <= (curr_page+range)
+                                        a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+post_status+'/page/'+i+'/' class=((i==curr_page)?"current":""))
+                                            li(class="item")
+                                                span=i
+                                - }
+                            - }

@@ -8,21 +8,21 @@ block e5ojs_block_content
     - console.log("update ", e5ojs_global_data.e5ojs_admin_page_url[post_type_name].url+e5ojs_global_data.e5ojs_admin_action_url.post_type_edit_post );
     - var post_data = result_query_data;
     form(id="e5ojs-post-form-wrapper" action=e5ojs_global_data.e5ojs_admin_page_url[post_type_name].url+e5ojs_global_data.e5ojs_admin_action_url.post_type_edit_post+post_data.post_id+"/" method="post")
-        div(class="row top-page-options")
+        div(class="row top-page-options no-padding")
             div(class="col-xs-12 no-padding")
                 div(class="post-actions")
                     a(data-status="publish" class="waves-effect waves-dark "+(( post_data.post_status == "publish" )?" current":""))='Publish'
                     a(data-status="pending" class="waves-effect waves-dark "+(( post_data.post_status == "pending" )?" current":""))='Pending'
                     a(data-status="trash" class="waves-effect waves-dark "+(( post_data.post_status == "trash" )?" current":""))='Trash'
         div(class="row")
-            div(class="col-xs-12 col-md-12")
+            div(class="col-xs-12 col-md-12 no-padding")
                 div(class="card")
                     div(class="card-image")
                         img(class="e5ojs-open-media"  src=post_data.post_media_attachment_url+"")
                         span(class="card-title")='Post Info'
                         input(type="hidden" name="post_media_id" class="post_media_id" value=post_data.post_media_attachment_id)
                     div(class="card-content")
-                        a(href=e5ojs_global_data.e5ojs_base_url+"/admin/posts/action/new-post/" class="btn-floating btn-large waves-effect waves-dark add-new")
+                        a(href=e5ojs_global_data.e5ojs_admin_page_url[post_type_name].url+e5ojs_global_data.e5ojs_admin_action_url.post_type_new_post class="btn-floating btn-large waves-effect waves-dark add-new")
                             i(class="material-icons")='add'
                         div(class="input-field")
                             input(id="post_title" type="text" class="validate" name="post_title" value=post_data.post_title+"")
