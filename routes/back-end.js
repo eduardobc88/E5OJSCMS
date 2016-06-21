@@ -72,14 +72,14 @@ function e5ojs_global_data_generate(req) {
     // post post type actions
     e5ojs_global_data.e5ojs_admin_action_url = {
         logout : req.protocol+"://"+req.get('host')+"/admin/log-out/",
-        post_type_new_post: "action/new-post/",
-        post_type_edit_post: "action/edit-post/",// pass the /post_id/ : /23/ or /post_id/status/ : /23/publish/
+        post_type_new_post: "action/new/",
+        post_type_edit_post: "action/edit/",// pass the /post_id/ : /23/ or /post_id/status/ : /23/publish/
         post_type_post_bulk_action: "action/",// pass /status/post_ids/ : /publish/23,1,23,4
     };
     // post type actions
     e5ojs_global_data.e5ojs_admin_post_type_action_url = {
-        post_type_new: "new/",
-        post_type_edit: "edit/", // :post_type_id
+        post_type_new: "action/new/",
+        post_type_edit: "action/edit/", // :post_type_id
         post_type_bulk_action: "action/", // :post_type_id/:action = -1,1,0
     }
 
@@ -89,6 +89,27 @@ function e5ojs_global_data_generate(req) {
         get_all_media: req.protocol+"://"+req.get('host')+"/admin/all-media/",
     }
     //console.log(" =========== e5ojs_global_data =========== ",e5ojs_global_data);
+}
+
+function e5ojs_global_data_init(req) {
+    var host_url = req.protocol+"://"+req.get('host');
+    //  three sections
+    e5ojs_global_data.admin_pages = {
+        dashboard: {title:"dashboard",description:"Lorem ipsum...",url:host_url+"/admin/", icon_name:"dashboard",position:1},
+        pages: {title:"pages",description:"Lorem ipsum...",url:host_url+"/pages/", icon_name:"filter_none",position:2},
+        media: {title:"media",description:"Lorem ipsum...",url:host_url+"/media/", icon_name:"collections",position:3},
+        post_type: {title:"post types",description:"Lorem ipsum...",url:host_url+"/post-type/", icon_name:"settings",position:4},
+        settings: {title:"settings",description:"Lorem ipsum...",url:host_url+"/settings/", icon_name:"settings",position:5},
+    };
+    e5ojs_global_data.admin_actions = {
+
+    }
+    e5ojs_global_data.admin_res = {
+
+    }
+    e5ojs_global_data.admin_api = {
+
+    }
 }
 /* end global data var */
 
@@ -318,7 +339,7 @@ function e5ojs_add_post_type_router(post_type_data) {
             });
         });
     });
-    router.get('/post-type/'+post_type_data.post_type_name+'/action/new-post/', function(req, res, next) {
+    router.get('/post-type/'+post_type_data.post_type_name+'/action/new/', function(req, res, next) {
         /*
         get template for add new post
         */
@@ -331,7 +352,7 @@ function e5ojs_add_post_type_router(post_type_data) {
             res.render('back-end/e5ojs-admin-new-post', { title: 'NEW POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
         });
     });
-    router.get('/post-type/'+post_type_data.post_type_name+'/action/edit-post/:post_id/', function(req, res, next) {
+    router.get('/post-type/'+post_type_data.post_type_name+'/action/edit/:post_id/', function(req, res, next) {
         /*
         get template with post data it will be edited
         */
@@ -380,7 +401,7 @@ function e5ojs_add_post_type_router(post_type_data) {
         });
 
     });
-    router.post('/post-type/'+post_type_data.post_type_name+'/action/edit-post/:post_id/:post_status', function(req, res, next) {
+    router.post('/post-type/'+post_type_data.post_type_name+'/action/edit/:post_id/:post_status', function(req, res, next) {
         /*
         update post data with post id and post status passed by URL
         */
@@ -434,11 +455,11 @@ function e5ojs_add_post_type_router(post_type_data) {
                 e5ojs_push_session_message(req,e5ojs_message);
 
                 // redirect to edit post with ID
-                res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/"+post_type_data.post_type_name+"/action/edit-post/"+result_data.post_id);
+                res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/"+post_type_data.post_type_name+"/action/edit/"+result_data.post_id);
             });
         });
     });
-    router.post('/post-type/'+post_type_data.post_type_name+'/action/new-post/:post_status', function(req, res, next) {
+    router.post('/post-type/'+post_type_data.post_type_name+'/action/new/:post_status', function(req, res, next) {
         /*
         insert a new post with post status passed by URL
         */
@@ -490,7 +511,7 @@ function e5ojs_add_post_type_router(post_type_data) {
                     // save message on session var
                     e5ojs_push_session_message(req,e5ojs_message);
                     // redirect to edit post with ID
-                    res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/"+post_type_data.post_type_name+"/action/edit-post/"+result_data.post_id);
+                    res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/"+post_type_data.post_type_name+"/action/edit/"+result_data.post_id);
                 });
             });
         });
@@ -766,7 +787,7 @@ router.get('/settings/', function(req, res, next) {
 
 
 /* ============== start e5ojs post type functions =============== */
-router.get('/post-type/new/', function(req, res, next) {
+router.get('/post-type/action/new/', function(req, res, next) {
     // get page with validate session
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         e5ojs_post_type_get_all(function(post_types){
@@ -780,7 +801,7 @@ router.get('/post-type/new/', function(req, res, next) {
         });
     });
 });
-router.post('/post-type/edit/', function(req, res, next) {
+router.post('/post-type/action/edit/', function(req, res, next) {
     // save the new post type
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
@@ -801,11 +822,11 @@ router.post('/post-type/edit/', function(req, res, next) {
             // save message on session var
             e5ojs_push_session_message(req,e5ojs_message);
             // redirect to de same page
-            res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/edit/"+post_type_data.post_type_id);
+            res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/action/edit/"+post_type_data.post_type_id);
         });
     });
 });
-router.get('/post-type/edit/:post_type_id/', function(req, res, next) {
+router.get('/post-type/action/edit/:post_type_id/', function(req, res, next) {
     // get the current post
     var post_type_id = req.params.post_type_id;
     // get page with validate session
@@ -821,7 +842,7 @@ router.get('/post-type/edit/:post_type_id/', function(req, res, next) {
         });
     });
 });
-router.post('/post-type/edit/:post_type_id/', function(req, res, next) {
+router.post('/post-type/action/edit/:post_type_id/', function(req, res, next) {
     // save the current post type
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
@@ -844,7 +865,7 @@ router.post('/post-type/edit/:post_type_id/', function(req, res, next) {
                 // save message on session var
                 e5ojs_push_session_message(req,e5ojs_message);
                 // redirect to de same page
-                res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/edit/"+post_type_id);
+                res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/action/edit/"+post_type_id);
             });
         } else {
             // remove post type
