@@ -28,89 +28,79 @@ var getSlug = require('speakingurl');
 var e5ojs_global_data = {};
 function e5ojs_init(callback) {
     // load all post types
-    e5ojs_global_data.e5ojs_post_types = new Array();
+    e5ojs_global_data.admin_pages.admin_post_types = new Array();
     e5ojs_post_type_get_all(function(post_types){
-        e5ojs_global_data.e5ojs_post_types = post_types;
+        // fix post type info
+        for( var post_type_key in post_types ) {
+            var post_type = post_types[post_type_key];
+            e5ojs_global_data.admin_pages.admin_post_types[post_type.post_type_name] = {post_type_id:post_type.post_type_id,title:post_type.post_type_title,description:post_type.post_type_description,url:e5ojs_global_data.admin_res.base_url+"/admin/post-type/"+post_type.post_type_name+"/", icon_name:"insert_drive_file"};
+        }
         // set router for each post type
         for( var key in post_types ) {
             var post_type = post_types[key];
-            //console.log("POST TYPE",post_type.post_type_title+" GET REQUEST");
             e5ojs_add_post_type_router(post_type);
         }
-        //console.log("====== e5ojs_init =======",post_types);
         callback();
     });
 }
-e5ojs_init(function(){});
 
-function e5ojs_global_data_generate(req) {
-    // get global info
-    e5ojs_global_data.e5ojs_base_url = req.protocol+"://"+req.get('host');
-    e5ojs_global_data.e5ojs_current_url = req.protocol+"://"+req.get('host')+req.originalUrl;
-    e5ojs_global_data.e5ojs_media_url = req.protocol+"://"+req.get('host')+"/uploads/";
-    e5ojs_global_data.e5ojs_media_url_sizes = req.protocol+"://"+req.get('host')+"/uploads/sizes/";
-    e5ojs_global_data.e5ojs_all_media_url = req.protocol+"://"+req.get('host')+"/admin/all-media/";
-    e5ojs_global_data.e5ojs_default_media_url = req.protocol+"://"+req.get('host')+"/back-end/assets/default-post-img.png";
-    e5ojs_global_data.e5ojs_post_status = new Array('publish','pending','trash');
-    e5ojs_global_data.e5ojs_current_date = date_format(current_date,'dd-mm-yyyy');
-
-
-    //e5ojs_global_data.e5ojs_current_post_type = "admin/";
-    e5ojs_global_data.e5ojs_admin_page_url = {
-        dashboard: {title:"dashboard",description:"Lorem ipsum...",url:req.protocol+"://"+req.get('host')+"/admin/", icon_name:"dashboard"},
-        pages: {title:"pages",description:"Lorem ipsum...",url:req.protocol+"://"+req.get('host')+"/admin/pages/", icon_name:"filter_none"},
-    };
-    // loop for post types
-    for( var key in e5ojs_global_data.e5ojs_post_types ) {
-        var post_type = e5ojs_global_data.e5ojs_post_types[key];
-        e5ojs_global_data.e5ojs_admin_page_url[post_type.post_type_name] = {post_type_id:post_type.post_type_id,title:post_type.post_type_title,description:post_type.post_type_description,url:req.protocol+"://"+req.get('host')+"/admin/post-type/"+post_type.post_type_name+"/", icon_name:"insert_drive_file"};
-    }
-    e5ojs_global_data.e5ojs_admin_page_url['media'] = {title:"media",description:"Lorem ipsum...",url:req.protocol+"://"+req.get('host')+"/admin/media/", icon_name:"collections"};
-    e5ojs_global_data.e5ojs_admin_page_url['post_type'] = {title:"Post types",description:"Lorem ipsum...",url:req.protocol+"://"+req.get('host')+"/admin/post-type/", icon_name:"settings"};
-    e5ojs_global_data.e5ojs_admin_page_url['settings'] = {title:"Settings",description:"Lorem ipsum...",url:req.protocol+"://"+req.get('host')+"/admin/settings/", icon_name:"settings"};
-
-    // post post type actions
-    e5ojs_global_data.e5ojs_admin_action_url = {
-        logout : req.protocol+"://"+req.get('host')+"/admin/log-out/",
-        post_type_new_post: "action/new/",
-        post_type_edit_post: "action/edit/",// pass the /post_id/ : /23/ or /post_id/status/ : /23/publish/
-        post_type_post_bulk_action: "action/",// pass /status/post_ids/ : /publish/23,1,23,4
-    };
-    // post type actions
-    e5ojs_global_data.e5ojs_admin_post_type_action_url = {
-        post_type_new: "action/new/",
-        post_type_edit: "action/edit/", // :post_type_id
-        post_type_bulk_action: "action/", // :post_type_id/:action = -1,1,0
-    }
-
-
-
-    e5ojs_global_data.e5ojs_api_get_url = {
-        get_all_media: req.protocol+"://"+req.get('host')+"/admin/all-media/",
-    }
-    //console.log(" =========== e5ojs_global_data =========== ",e5ojs_global_data);
-}
-
-function e5ojs_global_data_init(req) {
-    var host_url = req.protocol+"://"+req.get('host');
+function e5ojs_global_data_init() {
+    //var host_url = req.protocol+"://"+req.get('host');
+    var host_url = "http://nodejs.dev";
     //  three sections
     e5ojs_global_data.admin_pages = {
         dashboard: {title:"dashboard",description:"Lorem ipsum...",url:host_url+"/admin/", icon_name:"dashboard",position:1},
-        pages: {title:"pages",description:"Lorem ipsum...",url:host_url+"/pages/", icon_name:"filter_none",position:2},
-        media: {title:"media",description:"Lorem ipsum...",url:host_url+"/media/", icon_name:"collections",position:3},
-        post_type: {title:"post types",description:"Lorem ipsum...",url:host_url+"/post-type/", icon_name:"settings",position:4},
-        settings: {title:"settings",description:"Lorem ipsum...",url:host_url+"/settings/", icon_name:"settings",position:5},
+        pages: {title:"pages",description:"Lorem ipsum...",url:host_url+"/admin/pages/", icon_name:"filter_none",position:2},
+        admin_post_types: {},
+        media: {title:"media",description:"Lorem ipsum...",url:host_url+"/admin/media/", icon_name:"collections",position:3},
+        post_type: {title:"post types",description:"Lorem ipsum...",url:host_url+"/admin/post-type/", icon_name:"settings",position:4},
+        settings: {title:"settings",description:"Lorem ipsum...",url:host_url+"/admin/settings/", icon_name:"settings",position:5},
+    };
+    e5ojs_global_data.admin_other_pages = {
+        login: {title:"Login",description:"Lorem ipsum...",url:host_url+"/admin/login/", icon_name:"dashboard",position:1},
+        new_post: {title:"New post",description:"Lorem ipsum...",url:host_url+"/admin/", icon_name:"dashboard",position:1},
+        edit_post: {title:"Edit post",description:"Lorem ipsum...",url:host_url+"/admin/", icon_name:"dashboard",position:1},
+        new_post_type: {title:"New post type",description:"Lorem ipsum...",url:host_url+"/admin/", icon_name:"dashboard",position:1},
+        edit_post_type: {title:"Edit post type",description:"Lorem ipsum...",url:host_url+"/admin/", icon_name:"dashboard",position:1},
     };
     e5ojs_global_data.admin_actions = {
-
-    }
+        post_types: {
+            action: 'action/',
+            new: 'action/new/',
+            edit: 'action/edit/',
+            delete: 'action/delete/',
+            pagination_all: 'all/page/',
+            pagination_active: 'active/page/',
+            pagination_deactive: 'deactive/page/',
+        },
+        post_type: {
+            action: 'action/',
+            new: 'action/new/',
+            edit: 'action/edit/',
+            trash: 'action/trash/',
+            delete: 'action/delete/',
+            pagination_all: 'all/page/',
+            pagination_publish: 'publish/page/',
+            pagintaion_pending: 'pending/page/',
+            pagination_trash: 'trash/page/',
+        }
+    };
     e5ojs_global_data.admin_res = {
-
-    }
+        base_url: host_url,
+        current_url: host_url,
+        media_uploads_url: host_url+'/uploads/',
+        media_uploads_sizes_url: host_url+'/uploads/sizes/',
+        media_default_image_url: host_url+'/back-end/assets/default-post-img.png',
+        current_date: date_format(current_date,'dd-mm-yyyy'),
+    };
     e5ojs_global_data.admin_api = {
-
-    }
+        get_all_media: host_url+"/admin/all-media/",
+    };
+    // get post types
+    e5ojs_init(function(){});
 }
+e5ojs_global_data_init();
+
 /* end global data var */
 
 
@@ -171,7 +161,7 @@ var upload = multer({
                 //console.log(file_data);
                 e5ojs_insert_new_media(file_data,function(result_data){
                     // validate error
-                    result_data.media_file_name = e5ojs_global_data.e5ojs_media_url+result_data.media_file_name;
+                    result_data.media_file_name = e5ojs_global_data.admin_res.media_uploads_url+result_data.media_file_name;
                     // get image data and send as part of req and get it on router function
                     req.e5ojs_file_validation_error = false;
                     req.e5ojs_file_data = result_data; // pass data to request
@@ -203,7 +193,7 @@ function e5ojs_generate_image_file(img_object_data,callback) {
 
     // generate array to return with sizes to attach on req json
     var size_string = e5ojs_image_sizes[image_sizes_pointer].width+"x"+e5ojs_image_sizes[image_sizes_pointer].height;
-    var file_size_name = e5ojs_global_data.e5ojs_media_url_sizes+media_file_name+"-"+e5ojs_image_sizes[image_sizes_pointer].width+"x"+e5ojs_image_sizes[image_sizes_pointer].height+"."+file_ext;
+    var file_size_name = e5ojs_global_data.admin_res.media_uploads_sizes_url+media_file_name+"-"+e5ojs_image_sizes[image_sizes_pointer].width+"x"+e5ojs_image_sizes[image_sizes_pointer].height+"."+file_ext;
     e5ojs_sizes_return[size_string] = file_size_name;
 
 
@@ -278,7 +268,7 @@ function e5ojs_add_post_type_router(post_type_data) {
     router.get('/post-type/'+post_type_data.post_type_name+'/', function(req, res, next) {
         // redirect to post/all
         e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-            res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/"+post_type_data.post_type_name+"/all/page/1/");
+            res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/"+post_type_data.post_type_name+"/all/page/1/");
         });
     });
     router.get('/post-type/'+post_type_data.post_type_name+'/:post_status/page/:page/', function(req, res, next) {
@@ -291,7 +281,7 @@ function e5ojs_add_post_type_router(post_type_data) {
             // set current page
             e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
             // get post type info
-            var post_type_info = e5ojs_global_data.e5ojs_admin_page_url[e5ojs_global_data.e5ojs_current_post_type];
+            var post_type_info = e5ojs_global_data.admin_pages.admin_post_types[e5ojs_global_data.e5ojs_current_post_type];
             var post_post_type_id = post_type_info.post_type_id;
             // return template with user data
             // e5ojs_global_data  and e5ojs_user_data default
@@ -334,7 +324,7 @@ function e5ojs_add_post_type_router(post_type_data) {
                 // remove session message
                 e5ojs_clear_session_message(req);
                 // validate error
-                res.render('back-end/e5ojs-admin-posts', { title: post_type_info.title, description: post_type_info.description, e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:posts, total_pages:total_pages+1, current_page:current_page, total_post:total_post, e5ojs_message:e5ojs_message, post_status:post_status });
+                res.render('back-end/e5ojs-admin-posts', { page_data: {title:post_type_info.title,description: post_type_info.description}, e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:posts, total_pages:total_pages+1, current_page:current_page, total_post:total_post, e5ojs_message:e5ojs_message, post_status:post_status });
                 //res.render('back-end/e5ojs-admin-posts', { title: 'POSTS', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.result_data, result_query_db:1, result_query_data:posts, total_pages:total_pages+1, current_page:current_page, total_post:total_post, post_status:post_status });
             });
         });
@@ -349,7 +339,7 @@ function e5ojs_add_post_type_router(post_type_data) {
             e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
             // return template with user data
             // e5ojs_global_data  and e5ojs_user_data default
-            res.render('back-end/e5ojs-admin-new-post', { title: 'NEW POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
+            res.render('back-end/e5ojs-admin-new-post', { page_data: e5ojs_global_data.admin_other_pages['new_post'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
         });
     });
     router.get('/post-type/'+post_type_data.post_type_name+'/action/edit/:post_id/', function(req, res, next) {
@@ -380,21 +370,21 @@ function e5ojs_add_post_type_router(post_type_data) {
                     e5ojs_get_media(parseInt(post_data_object.post_media_attachment),function(media_result){
                         if( media_result == false ) {
                             post_data_object.post_media_attachment_id = "";
-                            post_data_object.post_media_attachment_url = e5ojs_global_data.e5ojs_default_media_url;
+                            post_data_object.post_media_attachment_url = e5ojs_global_data.admin_res.media_default_image_url;
                         } else {
-                            var media_url = e5ojs_global_data.e5ojs_media_url_sizes+media_result[0].media_file_name_clean+"-800x200."+(media_result[0].media_mime_type.split("/"))[1];
+                            var media_url = e5ojs_global_data.admin_res.media_uploads_sizes_url+media_result[0].media_file_name_clean+"-800x200."+(media_result[0].media_mime_type.split("/"))[1];
                             post_data_object.post_media_attachment_id = media_result[0].media_id;
                             post_data_object.post_media_attachment_url = media_url;
                         }
                         // render with post data
-                        res.render('back-end/e5ojs-admin-edit-post', { title: 'EDIT POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:post_data_object, e5ojs_message:e5ojs_message });
+                        res.render('back-end/e5ojs-admin-edit-post', { page_data: e5ojs_global_data.admin_other_pages['edit_post'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:post_data_object, e5ojs_message:e5ojs_message });
                     });
                 } else {
                     // no media id
                     post_data_object.post_media_attachment_id = "";
-                    post_data_object.post_media_attachment_url = e5ojs_global_data.e5ojs_default_media_url;
+                    post_data_object.post_media_attachment_url = e5ojs_global_data.admin_res.media_default_image_url;
                     // render with post data
-                    res.render('back-end/e5ojs-admin-edit-post', { title: 'EDIT POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:post_data_object, e5ojs_message:e5ojs_message });
+                    res.render('back-end/e5ojs-admin-edit-post', { page_data: e5ojs_global_data.admin_other_pages['edit_post'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_query_data:post_data_object, e5ojs_message:e5ojs_message });
                 }
             });
 
@@ -411,7 +401,7 @@ function e5ojs_add_post_type_router(post_type_data) {
             // set current page
             e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
             // get post type info
-            var post_type_info = e5ojs_global_data.e5ojs_admin_page_url[e5ojs_global_data.e5ojs_current_post_type];
+            var post_type_info = e5ojs_global_data.admin_pages.admin_post_types[e5ojs_global_data.e5ojs_current_post_type];
             var post_post_type_id = post_type_info.post_type_id;
             // return template with user data
             // e5ojs_global_data  and e5ojs_user_data default
@@ -455,7 +445,7 @@ function e5ojs_add_post_type_router(post_type_data) {
                 e5ojs_push_session_message(req,e5ojs_message);
 
                 // redirect to edit post with ID
-                res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/"+post_type_data.post_type_name+"/action/edit/"+result_data.post_id);
+                res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/"+post_type_data.post_type_name+"/action/edit/"+result_data.post_id);
             });
         });
     });
@@ -468,7 +458,7 @@ function e5ojs_add_post_type_router(post_type_data) {
             // set current page
             e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
             // get post type info
-            var post_type_info = e5ojs_global_data.e5ojs_admin_page_url[e5ojs_global_data.e5ojs_current_post_type];
+            var post_type_info = e5ojs_global_data.admin_pages.admin_post_types[e5ojs_global_data.e5ojs_current_post_type];
             var post_post_type_id = post_type_info.post_type_id;
 
             // return template with user data
@@ -511,7 +501,7 @@ function e5ojs_add_post_type_router(post_type_data) {
                     // save message on session var
                     e5ojs_push_session_message(req,e5ojs_message);
                     // redirect to edit post with ID
-                    res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/"+post_type_data.post_type_name+"/action/edit/"+result_data.post_id);
+                    res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/"+post_type_data.post_type_name+"/action/edit/"+result_data.post_id);
                 });
             });
         });
@@ -564,7 +554,7 @@ function e5ojs_add_post_type_router(post_type_data) {
                     // save message on session var
                     e5ojs_push_session_message(req,e5ojs_message);
                     // redirect to posts archive
-                    res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/"+post_type_data.post_type_name+"/all/page/1/");
+                    res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/"+post_type_data.post_type_name+"/all/page/1/");
                 });
             } else {
                 //console.log("post_set_status : ",post_set_status);
@@ -583,7 +573,7 @@ function e5ojs_add_post_type_router(post_type_data) {
                     // save message on session var
                     e5ojs_push_session_message(req,e5ojs_message);
                     // redirect to posts archive
-                    res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/"+post_type_data.post_type_name+"/all/page/1/");
+                    res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/"+post_type_data.post_type_name+"/all/page/1/");
                 });
             }
 
@@ -620,7 +610,7 @@ router.get('/', function(req, res, next) {
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
-        res.render('back-end/e5ojs-admin', { title: 'DASHBOARD', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
+        res.render('back-end/e5ojs-admin', { page_data: e5ojs_global_data.admin_pages['dashboard'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
     });
 });
 router.post('/', function(req, res, next) {
@@ -628,7 +618,7 @@ router.post('/', function(req, res, next) {
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
-        res.render('back-end/e5ojs-admin', { title: 'DASHBOARD', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
+        res.render('back-end/e5ojs-admin', { page_data: e5ojs_global_data.admin_pages['dashboard'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
     });
 });
 router.get('/admin/', function(req, res, next) {
@@ -636,17 +626,18 @@ router.get('/admin/', function(req, res, next) {
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
-        res.render('back-end/e5ojs-admin', { title: 'DASHBOARD', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
+        console.log("e5ojs_global_data",e5ojs_global_data);
+        res.render('back-end/e5ojs-admin', { page_data: e5ojs_global_data.admin_pages['dashboard'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
     });
 });
 router.get('/log-out/', function(req, res, next) {
-    e5ojs_global_data_generate(req);
+    e5ojs_global_data_init();
     // clear session data
     var e5ojs_session = req.session;
     e5ojs_session.e5ojs_user_data = null;
     e5ojs_session.destroy();
     // return log-in page
-    res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:null });
+    res.render('back-end/e5ojs-login', { page_data: e5ojs_global_data.admin_other_pages['login'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:null });
 });
 /* start login session */
 
@@ -741,7 +732,8 @@ router.get('/pages/', function(req, res, next) {
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
-        res.render('back-end/e5ojs-admin-pages', { title: 'PAGES', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
+        console.log("ADMIN",e5ojs_global_data.admin_pages.admin_post_types);
+        res.render('back-end/e5ojs-admin-pages', { page_data: e5ojs_global_data.admin_pages['pages'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
     });
 });
 router.get('/media/', function(req, res, next) {
@@ -749,7 +741,8 @@ router.get('/media/', function(req, res, next) {
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
-        res.render('back-end/e5ojs-admin-media', { title: 'MEDIA', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
+        console.log("ADMIN",e5ojs_global_data.admin_pages.admin_post_types);
+        res.render('back-end/e5ojs-admin-media', { page_data: e5ojs_global_data.admin_pages['media'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
     });
 });
 router.get('/settings/', function(req, res, next) {
@@ -757,7 +750,8 @@ router.get('/settings/', function(req, res, next) {
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
-        res.render('back-end/e5ojs-admin-settings', { title: 'SETTINGS', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
+        console.log("ADMIN",e5ojs_global_data.admin_pages.admin_post_types);
+        res.render('back-end/e5ojs-admin-settings', { page_data: e5ojs_global_data.admin_pages['settings'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
     });
 });
 
@@ -797,7 +791,7 @@ router.get('/post-type/action/new/', function(req, res, next) {
             e5ojs_clear_session_message(req);
             //console.log("post_types",post_types);
             // render post type page
-            res.render('back-end/e5ojs-admin-post-type-edit', { title: 'NEW POST TYPE', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], e5ojs_message:e5ojs_message, post_types:post_types });
+            res.render('back-end/e5ojs-admin-post-type-edit', { page_data: e5ojs_global_data.admin_other_pages['new_post_type'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], e5ojs_message:e5ojs_message, post_types:post_types });
         });
     });
 });
@@ -822,7 +816,7 @@ router.post('/post-type/action/edit/', function(req, res, next) {
             // save message on session var
             e5ojs_push_session_message(req,e5ojs_message);
             // redirect to de same page
-            res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/action/edit/"+post_type_data.post_type_id);
+            res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/action/edit/"+post_type_data.post_type_id);
         });
     });
 });
@@ -836,9 +830,8 @@ router.get('/post-type/action/edit/:post_type_id/', function(req, res, next) {
             var e5ojs_message = e5ojs_get_session_message(req);
             // remove session message
             e5ojs_clear_session_message(req);
-            //console.log("post_types",post_types);
             // render post type page
-            res.render('back-end/e5ojs-admin-post-type-edit', { title: 'EDIT POST TYPE', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], e5ojs_message:e5ojs_message, post_type:post_type });
+            res.render('back-end/e5ojs-admin-post-type-edit', {  post_type_info:post_type[0] ,page_data: e5ojs_global_data.admin_other_pages['edit_post_type'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], e5ojs_message:e5ojs_message });
         });
     });
 });
@@ -865,7 +858,7 @@ router.post('/post-type/action/edit/:post_type_id/', function(req, res, next) {
                 // save message on session var
                 e5ojs_push_session_message(req,e5ojs_message);
                 // redirect to de same page
-                res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/action/edit/"+post_type_id);
+                res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/action/edit/"+post_type_id);
             });
         } else {
             // remove post type
@@ -877,7 +870,7 @@ router.post('/post-type/action/edit/:post_type_id/', function(req, res, next) {
                 // save message on session var
                 e5ojs_push_session_message(req,e5ojs_message);
                 // redirect to de same page
-                res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/");
+                res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/");
             });
         }
     });
@@ -898,7 +891,7 @@ router.get('/post-type/action/:post_type_action/:post_type_id/', function(req, r
                 // save message on session var
                 e5ojs_push_session_message(req,e5ojs_message);
                 // redirect to de same page
-                res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/all/page/1/");
+                res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/all/page/1/");
             });
         } else {
             // remove post types
@@ -910,7 +903,7 @@ router.get('/post-type/action/:post_type_action/:post_type_id/', function(req, r
                 // save message on session var
                 e5ojs_push_session_message(req,e5ojs_message);
                 // redirect to de same page
-                res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/all/page/1/");
+                res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/all/page/1/");
             });
         }
     });
@@ -919,7 +912,7 @@ router.get('/post-type/', function(req, res, next) {
     // get page with validate session
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // redirect to de same page
-        res.redirect(e5ojs_global_data.e5ojs_base_url+"/admin/post-type/all/page/1/");
+        res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/all/page/1/");
     });
 });
 router.get('/post-type/:post_type_status/page/:number_page/', function(req, res, next) {
@@ -964,7 +957,7 @@ router.get('/post-type/:post_type_status/page/:number_page/', function(req, res,
             e5ojs_clear_session_message(req);
             //console.log("post_types",post_types);
             // render post type page
-            res.render('back-end/e5ojs-admin-post-type', { title: 'POST TYPE', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], e5ojs_message:e5ojs_message, post_types:post_types, total_pages:total_pages+1, current_page:current_page, total_post:total_post, post_status:post_type_status });
+            res.render('back-end/e5ojs-admin-post-type', { page_data: e5ojs_global_data.admin_pages['post_type'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], e5ojs_message:e5ojs_message, post_types:post_types, total_pages:total_pages+1, current_page:current_page, total_post:total_post, post_status:post_type_status });
         });
     });
 });
@@ -1291,7 +1284,6 @@ function e5ojs_remove_post_type_status_multiple(post_ids,callback) {
 /* ============== start e5ojs validate session functions =============== */
 
 function e5ojs_validate_admin_session_callback(req, res, callback) {
-    e5ojs_global_data_generate(req);
     // get session vars
     var e5ojs_session = req.session;
     if( e5ojs_session !== 'undefined' && typeof e5ojs_session.e5ojs_user_data !== 'undefined' && e5ojs_session.e5ojs_user_data != null ) {
@@ -1302,23 +1294,28 @@ function e5ojs_validate_admin_session_callback(req, res, callback) {
         // ask to DB for this user credentials
         e5ojs_get_user_info_callback(user_login,user_pass,use_md5=false,function(user_data){
             // validate request user db result
-            //console.log("e5ojs_validate_admin_session_callback",user_data);
-            if( user_data.result_login ) {
-                // user credentials are ok
-                // save user data on session var
-                var e5ojs_session = req.session;
-                e5ojs_session.e5ojs_user_data = user_data.e5ojs_user_data[0];
-                // return status and user info
-                callback(user_data);
-            } else {
-                // user not found or user credentials not match
-                // clear session data
-                var e5ojs_session = req.session;
-                e5ojs_session.e5ojs_user_data = null;
-                e5ojs_session.destroy();
-                // render login page
-                res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:null });
-            }
+            // get menu data as post types data routers
+            e5ojs_global_data_init(); // init global object data
+            e5ojs_init(function(){
+
+                if( user_data.result_login ) {
+                    // user credentials are ok
+                    // save user data on session var
+                    var e5ojs_session = req.session;
+                    e5ojs_session.e5ojs_user_data = user_data.e5ojs_user_data[0];
+                    // return status and user info
+                    callback(user_data);
+                } else {
+                    // user not found or user credentials not match
+                    // clear session data
+                    var e5ojs_session = req.session;
+                    e5ojs_session.e5ojs_user_data = null;
+                    e5ojs_session.destroy();
+                    // render login page
+                    res.render('back-end/e5ojs-login', { page_data: e5ojs_global_data.admin_other_pages['login'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:null });
+                }
+
+            });
         });
     } else {
         // session vars does not exists
@@ -1344,7 +1341,7 @@ function e5ojs_validate_admin_session_callback(req, res, callback) {
                     e5ojs_session.e5ojs_user_data = null;
                     e5ojs_session.destroy();
                     // render login page
-                    res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:null });
+                    res.render('back-end/e5ojs-login', { page_data: e5ojs_global_data.admin_other_pages['login'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:null });
                 }
             });
         } else {
@@ -1353,7 +1350,7 @@ function e5ojs_validate_admin_session_callback(req, res, callback) {
             e5ojs_session.e5ojs_user_data = null;
             e5ojs_session.destroy();
             // render login page
-            res.render('back-end/e5ojs-login', { title: 'E5OJS - LOGIN', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:null });
+            res.render('back-end/e5ojs-login', { page_data: e5ojs_global_data.admin_other_pages['login'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:null });
         }
     }
 }

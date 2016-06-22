@@ -3,9 +3,9 @@ block e5ojs_block_local_css_script
 block e5ojs_block_content
     div(class="row top-page-options no-padding")
         div(class="col-xs-12 no-padding")
-            a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+"all/page/1/" class="waves-effect waves-dark "+(( post_status == "all" )?" current":""))='All'
-            a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+"active/page/1/" class="waves-effect waves-dark "+(( post_status == "active" )?" current":""))='Active'
-            a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+"deactive/page/1/" class="waves-effect waves-dark "+(( post_status == "deactive" )?" current":""))='Deactive'
+            a(href=e5ojs_global_data.admin_pages.post_type.url+e5ojs_global_data.admin_actions.post_types.pagination_all+"1/" class="waves-effect waves-dark "+(( post_status == "all" )?" current":""))='All'
+            a(href=e5ojs_global_data.admin_pages.post_type.url+e5ojs_global_data.admin_actions.post_types.pagination_active+"1/" class="waves-effect waves-dark "+(( post_status == "active" )?" current":""))='Active'
+            a(href=e5ojs_global_data.admin_pages.post_type.url+e5ojs_global_data.admin_actions.post_types.pagination_deactive+"1/" class="waves-effect waves-dark "+(( post_status == "deactive" )?" current":""))='Deactive'
     div(class="row")
         div(class="col-xs-12 no-padding")
                 - var post_type_name = e5ojs_global_data.e5ojs_current_post_type;
@@ -15,14 +15,14 @@ block e5ojs_block_content
                         label(for='select-all' class="checkbox-center")
                         ul(id="dropdown2" class="dropdown-content bulk-actions")
                             li
-                                a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+e5ojs_global_data.e5ojs_admin_post_type_action_url.post_type_bulk_action+"1/")="Active"
+                                a(href=e5ojs_global_data.admin_pages.post_type.url+e5ojs_global_data.admin_actions.post_types.action+"1/")="Active"
                             li
-                                a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+e5ojs_global_data.e5ojs_admin_post_type_action_url.post_type_bulk_action+"0/")="Desactive"
+                                a(href=e5ojs_global_data.admin_pages.post_type.url+e5ojs_global_data.admin_actions.post_types.action+"0/")="Desactive"
                             li
-                                a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+e5ojs_global_data.e5ojs_admin_post_type_action_url.post_type_bulk_action+"-1/")="Delete"
+                                a(href=e5ojs_global_data.admin_pages.post_type.url+e5ojs_global_data.admin_actions.post_types.action+"-1/")="Delete"
                         a.btn.dropdown-button(href='#!', data-activates='dropdown2')='Bulk action'
                           i.mdi-navigation-arrow-drop-down.right
-                        a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+e5ojs_global_data.e5ojs_admin_post_type_action_url.post_type_new class="waves-effect waves-dark btn")='Add new'
+                        a(href=e5ojs_global_data.admin_pages.post_type.url+e5ojs_global_data.admin_actions.post_types.new class="waves-effect waves-dark btn")='Add new'
                             i(class="material-icons")='add'
                     - var e5ojs_posts = post_types;
                     each post, index in e5ojs_posts
@@ -37,13 +37,13 @@ block e5ojs_block_content
                                 span(class="excerpt")=post.post_type_description
                             //- p(class="badge")=post.post_status
                             div(class="secondary-content")
-                                a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+e5ojs_global_data.e5ojs_admin_post_type_action_url.post_type_edit+post.post_type_id+"/")
+                                a(href=e5ojs_global_data.admin_pages.post_type.url+e5ojs_global_data.admin_actions.post_types.edit+post.post_type_id+"/")
                                     i(class="material-icons")='mode_edit'
-                                a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+e5ojs_global_data.e5ojs_admin_post_type_action_url.post_type_bulk_action+"1/"+post.post_type_id+"/")
+                                a(href=e5ojs_global_data.admin_pages.post_type.url+e5ojs_global_data.admin_actions.post_types.action+"1/"+post.post_type_id+"/")
                                     i(class="material-icons")='public'
-                                a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+e5ojs_global_data.e5ojs_admin_post_type_action_url.post_type_bulk_action+"0/"+post.post_type_id+"/")
+                                a(href=e5ojs_global_data.admin_pages.post_type.url+e5ojs_global_data.admin_actions.post_types.action+"0/"+post.post_type_id+"/")
                                     i(class="material-icons")='archive'
-                                a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+e5ojs_global_data.e5ojs_admin_post_type_action_url.post_type_bulk_action+"-1/"+post.post_type_id+"/")
+                                a(href=e5ojs_global_data.admin_pages.post_type.url+e5ojs_global_data.admin_actions.post_types.action+"-1/"+post.post_type_id+"/")
                                     i(class="material-icons")='delete_forever'
                     li(class="collection-footer")
                         ul(class="e5ojs-pagination")
@@ -52,7 +52,7 @@ block e5ojs_block_content
                             - if( total_pages > 1 ) {
                                 - for (var i = 1; i <= total_pages; ++i) {
                                     if i >= (curr_page-range) && i <= (curr_page+range)
-                                        a(href=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+post_status+'/page/'+i+'/' class=((i==curr_page)?"current":""))
+                                        a(href=e5ojs_global_data.admin_pages.post_type.url+post_status+'/page/'+i+'/' class=((i==curr_page)?"current":""))
                                             li(class="item")
                                                 span=i
                                 - }

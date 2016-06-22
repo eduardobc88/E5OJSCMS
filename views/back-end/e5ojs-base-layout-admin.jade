@@ -7,23 +7,23 @@ html
         block e5ojs_block_global_css_script
             // set data vars script
             script.
-                var e5ojs_all_media_url = "#{e5ojs_global_data.e5ojs_all_media_url}";
-                var e5ojs_media_sizes_url = "#{e5ojs_global_data.e5ojs_media_url_sizes}";
-            script(type='text/javascript', src=e5ojs_global_data.e5ojs_base_url+'/bower_components/jquery/dist/jquery.min.js')
-            link(rel='stylesheet', href=e5ojs_global_data.e5ojs_base_url+'/bower_components/bootstrap/dist/css/bootstrap.min.css')
-            script(type='text/javascript', src=e5ojs_global_data.e5ojs_base_url+'/bower_components/bootstrap/dist/js/bootstrap.min.js')
+                var e5ojs_all_media_url = "#{e5ojs_global_data.admin_api.get_all_media}";
+                var e5ojs_media_sizes_url = "#{e5ojs_global_data.admin_res.media_uploads_sizes_url}";
+            script(type='text/javascript', src=e5ojs_global_data.admin_res.base_url+'/bower_components/jquery/dist/jquery.min.js')
+            link(rel='stylesheet', href=e5ojs_global_data.admin_res.base_url+'/bower_components/bootstrap/dist/css/bootstrap.min.css')
+            script(type='text/javascript', src=e5ojs_global_data.admin_res.base_url+'/bower_components/bootstrap/dist/js/bootstrap.min.js')
             //-link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700italic,700,900,900italic')
             //- materialize framework
-            link(rel='stylesheet', href=e5ojs_global_data.e5ojs_base_url+'/back-end/css/materialize.min.css')
-            script(type='text/javascript', src=e5ojs_global_data.e5ojs_base_url+'/back-end/js/materialize.min.js')
+            link(rel='stylesheet', href=e5ojs_global_data.admin_res.base_url+'/back-end/css/materialize.min.css')
+            script(type='text/javascript', src=e5ojs_global_data.admin_res.base_url+'/back-end/js/materialize.min.js')
             //- google material icons
             link(rel='stylesheet', href='https://fonts.googleapis.com/icon?family=Material+Icons')
             //- global scripts css
-            link(rel='stylesheet', href=e5ojs_global_data.e5ojs_base_url+'/back-end/css/e5ojs-global-admin.css')
-            script(type='text/javascript', src=e5ojs_global_data.e5ojs_base_url+'/back-end/js/e5ojs-global-admin.js')
+            link(rel='stylesheet', href=e5ojs_global_data.admin_res.base_url+'/back-end/css/e5ojs-global-admin.css')
+            script(type='text/javascript', src=e5ojs_global_data.admin_res.base_url+'/back-end/js/e5ojs-global-admin.js')
             // e5ojs media
-            script(type='text/javascript', src=e5ojs_global_data.e5ojs_base_url+'/back-end/js/jquery-form.js')
-            script(type='text/javascript', src=e5ojs_global_data.e5ojs_base_url+'/back-end/js/e5ojs-media.js')
+            script(type='text/javascript', src=e5ojs_global_data.admin_res.base_url+'/back-end/js/jquery-form.js')
+            script(type='text/javascript', src=e5ojs_global_data.admin_res.base_url+'/back-end/js/e5ojs-media.js')
         block e5ojs_block_local_css_script
     body(class="body")
         div(class="e5ojs-media-popup-wrapper")
@@ -40,7 +40,7 @@ html
                             div(class="bottom")
                                 div(class="col-xs-12 content-media-middle")
                                     div(class="upload-wrapper")
-                                        form(id="e5ojs-upload-form" enctype="multipart/form-data" action=e5ojs_global_data.e5ojs_base_url+"/admin/upload/" method="post")
+                                        form(id="e5ojs-upload-form" enctype="multipart/form-data" action=e5ojs_global_data.admin_res.base_url+"/admin/upload/" method="post")
                                             p(class="upload-text")="UPLOAD A FILE"
                                             input(type="file" id="e5ojs_file_input" name="e5ojs_files_upload")
                                         span(id="e5ojs-upload-form-status")
@@ -82,30 +82,40 @@ html
                                             a(class="e5ojs-btn search-btn")
                                                 i(class="material-icons")='search'
                                         li
-                                            a(href=e5ojs_global_data.e5ojs_base_url+"/admin/log-out/" class="e5ojs-btn log-out-btn")
+                                            a(href=e5ojs_global_data.admin_res.base_url+"/admin/log-out/" class="e5ojs-btn log-out-btn")
                                                 i(class="material-icons")='exit_to_app'
             div(class="e5ojs-menu-left-wrapper")
                 div(class="user-info")
-                    img(src=e5ojs_global_data.e5ojs_base_url+"/back-end/assets/profile-menu.jpg" class="img-bkg")
-                    img(src=e5ojs_global_data.e5ojs_base_url+"/back-end/assets/default-profile-image.jpg" class="img-profile")
+                    img(src=e5ojs_global_data.admin_res.base_url+"/back-end/assets/profile-menu.jpg" class="img-bkg")
+                    img(src=e5ojs_global_data.admin_res.base_url+"/back-end/assets/default-profile-image.jpg" class="img-profile")
                     div(class="user-data-wrapper")
                         p(class="user-data")=e5ojs_user_data.user_name
                         p(class="user-data")=e5ojs_user_data.user_last_name
                 ul(class="options")
-                    - for (var property_key in e5ojs_global_data.e5ojs_admin_page_url) {
-                        li
-                            a(href=e5ojs_global_data.e5ojs_admin_page_url[property_key].url class="e5ojs-btn option-btn waves-effect waves-dark")=e5ojs_global_data.e5ojs_admin_page_url[property_key].title
-                                i(class="material-icons")=e5ojs_global_data.e5ojs_admin_page_url[property_key].icon_name
+                    - for (var property_key in e5ojs_global_data.admin_pages) {
+                        - if( property_key == "admin_post_types" ) {
+                            - for (var post_type_key in e5ojs_global_data.admin_pages.admin_post_types) {
+                                - var post_type = e5ojs_global_data.admin_pages.admin_post_types[post_type_key];
+                                li
+                                    a(href=post_type.url class="e5ojs-btn option-btn waves-effect waves-dark")=post_type.title
+                                        i(class="material-icons")=post_type.icon_name
+                            - }
+                        - } else {
+                            li
+                                a(href=e5ojs_global_data.admin_pages[property_key].url class="e5ojs-btn option-btn waves-effect waves-dark")=e5ojs_global_data.admin_pages[property_key].title
+                                    i(class="material-icons")=e5ojs_global_data.admin_pages[property_key].icon_name
+                        - }
                     - }
             div(class="container e5ojs-content-right-wrapper")
                 - if( typeof(e5ojs_message) !== 'undefined' && e5ojs_message.status )
-                    div(class="e5ojs-message "+e5ojs_message.type+"-message")
-                        i(class="material-icons")=e5ojs_message.type
-                        p(class="message")=e5ojs_message.text
+                    div(class="row no-padding")
+                        div(class="e5ojs-message "+e5ojs_message.type+"-message")
+                            i(class="material-icons")=e5ojs_message.type
+                            p(class="message")=e5ojs_message.text
                 div(class="row")
                     div(class="col-xs-12 no-padding")
-                        h2(class="page-title")=title
-                        p(class="page-description")=description
+                        h2(class="page-title")=page_data.title
+                        p(class="page-description")=page_data.description
                 block e5ojs_block_content
         div(class="e5o-admin-footer-wrapper")
             block e5ojs_block_footer

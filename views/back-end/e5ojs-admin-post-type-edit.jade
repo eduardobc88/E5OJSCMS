@@ -1,9 +1,8 @@
 extends e5ojs-base-layout-admin
 block e5ojs_block_local_css_script
 block e5ojs_block_content
-    
-    - if( typeof post_type === 'undefined' ) {
-        form(id="e5ojs-post-type-form-wrapper" action=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+e5ojs_global_data.e5ojs_admin_post_type_action_url.post_type_edit method="post")
+    - if( typeof post_type_info === 'undefined' ) {
+        form(id="e5ojs-post-type-form-wrapper" action=e5ojs_global_data.admin_pages.post_type.url+e5ojs_global_data.admin_actions.post_types.edit method="post")
             div(class="row")
                 div(class="col-xs-12 no-padding")
                     div(class="card")
@@ -27,25 +26,24 @@ block e5ojs_block_content
                             div(class="aling-right")
                                 button( type="submit" class="waves-effect waves-dark btn")='SAVE'
     - } else {
-        - console.log("TIENE DATOS",post_type[0].post_type_id);
-        form(id="e5ojs-post-type-form-wrapper" action=e5ojs_global_data.e5ojs_admin_page_url.post_type.url+e5ojs_global_data.e5ojs_admin_post_type_action_url.post_type_edit+post_type[0].post_type_id+"/" method="post")
+        form(id="e5ojs-post-type-form-wrapper" action=e5ojs_global_data.admin_pages.post_type.url+e5ojs_global_data.admin_actions.post_types.edit+post_type_info.post_type_id+"/" method="post")
             div(class="row")
                 div(class="col-xs-12 no-padding")
                     div(class="card")
                         div(class="card-content")
                             span(class="card-title")='NEW'
                             div(class="input-field")
-                                input(id="post_type_title" type="text" class="validate" name="post_type_title" value=post_type[0].post_type_title)
+                                input(id="post_type_title" type="text" class="validate" name="post_type_title" value=post_type_info.post_type_title)
                                 label(for="post_type_title")='Title'
                             div(class="input-field")
-                                input(id="post_type_name" type="text" class="validate" name="post_type_name" value=post_type[0].post_type_name)
+                                input(id="post_type_name" type="text" class="validate" name="post_type_name" value=post_type_info.post_type_name)
                                 label(for="post_type_name")='Name'
                             div(class="input-field")
-                                input(id="post_type_description" type="text" class="validate" name="post_type_description" value=post_type[0].post_type_description)
+                                input(id="post_type_description" type="text" class="validate" name="post_type_description" value=post_type_info.post_type_description)
                                 label(for="post_type_description")='Description'
                             div(class="switch")
-                                - var active = (( parseInt(post_type[0].post_type_status) == 1)?'checked':'');
-                                - if( parseInt(post_type[0].post_type_status) == 1 ) {
+                                - var active = (( parseInt(post_type_info.post_type_status) == 1)?'checked':'');
+                                - if( parseInt(post_type_info.post_type_status) == 1 ) {
                                     label
                                         !='Deactive'
                                         input(type="checkbox" name="post_type_status" checked)
@@ -58,7 +56,6 @@ block e5ojs_block_content
                                         span(class="lever")
                                         !='Active'
                                 - }
-                                
                             div(class="aling-right")
                                 button( type="submit" class="waves-effect waves-dark btn")='SAVE'
     -}
