@@ -29,8 +29,9 @@ app.set('view engine', 'jade');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use(bodyParser.json({limit: '1mb'}));
+app.use(bodyParser.urlencoded({ extended: false, limit: '2mb' }));
 app.use(cookieParser());
 app.use(session({resave: false, saveUninitialized: true, secret: 'E5OA5A', cookie: { secure: false, maxAge: 600000 }})); // express session
 app.use(express.static(path.join(__dirname, 'public')));
