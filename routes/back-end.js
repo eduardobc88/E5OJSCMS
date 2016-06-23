@@ -317,7 +317,7 @@ function e5ojs_add_post_type_router(post_type_data) {
                 total_pages = parseInt(total_post/limit_post);
             });
             // query with skip page
-            db.e5ojs_post.find({'post_status':{$in:post_status_array},'post_post_type_id':post_post_type_id}).sort({"post_date":-1}).skip(skip_posts).limit(limit_post, function(err, posts){
+            db.e5ojs_post.find({'post_status':{$in:post_status_array},'post_post_type_id':post_post_type_id}).sort({'post_date':-1,'post_id':-1}).skip(skip_posts).limit(limit_post, function(err, posts){
                 // check if has message session
                 // get session message
                 var e5ojs_message = e5ojs_get_session_message(req);

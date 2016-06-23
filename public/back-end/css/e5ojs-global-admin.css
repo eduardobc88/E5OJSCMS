@@ -359,6 +359,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     text-overflow: ellipsis;
     height: 100%;
     vertical-align: middle;
+    margin: auto;
 }
 .custom-collapsible .custom-collapsible-item .title .excerpt {
     color: #7b7b7b;
@@ -396,6 +397,10 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     max-height: 300px;
     overflow: scroll;
     border-bottom: none;
+}
+.custom-collapsible .collapsible-body p {
+    margin: auto;
+    padding: inherit;
 }
 /* end custom collapsible */
 
