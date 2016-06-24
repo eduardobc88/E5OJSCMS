@@ -56,6 +56,64 @@ block e5ojs_block_content
                                         span(class="lever")
                                         !='Active'
                                 - }
+            div(class="row")
+                div(class="col-xs-12 no-padding")
+                    div(class="card")
+                        div(class="card-content")
+                            span(class="card-title")='Post type Post-Meta'
+                            ul(class="tabs")
+                                li(class="tab")
+                                    a(href="#new_meta" class="active")='New meta'
+                                li(class="tab")
+                                    a(href="#current_metas" class="")='Current metas'
+                            div(id="new_meta" class="new-meta")
+                                - print_row_meta_data(NULL);
+                            div(id="current_metas" class="current-metas")="Current post metas"
+                                - for( var post_type_meta_key in post_type_info.post_type_meta ) {
+                                    - var meta_data = post_type_info.post_type_meta[post_type_meta_key];
+                                    div(clas="row no-padding")
+                                        - print_row_meta_data(meta_data);
+                                - }
                             div(class="aling-right")
                                 button( type="submit" class="waves-effect waves-dark btn")='SAVE'
     -}
+    
+    - function print_row_meta_data(meta_data) {
+        - var post_meta_data = {post_meta_title:"",post_meta_name:"",post_meta_type:"",};
+        - var post_type_meta_type = "";
+        - if( meta_data !== undefined ) {
+            - post_meta_data.post_meta_title = meta_data.post_meta_title;
+            - post_meta_data.post_meta_name = meta_data.post_meta_name;
+            - if( String(meta_data.post_type_meta_type) == "text" )
+                - post_type_meta_type = "text";
+            - else if( String(meta_data.post_type_meta_type) == "textarea" )
+                    - post_type_meta_type = "textarea";
+            - else if( String(meta_data.post_type_meta_type) == "image" )
+                    - post_type_meta_type = "image";
+            - else if( String(meta_data.post_type_meta_type) == "gallery" )
+                    - post_type_meta_type = "gallery";
+            - else if( String(meta_data.post_type_meta_type) == "calendar" )
+                    - post_type_meta_type = "calendar";
+        - }
+        div(class="input-field")
+            input(id="post_type_meta_title" type="text" class="validate" name="post_type_meta_title" value=post_meta_data.post_meta_title)
+            label(for="post_type_meta_title")='Title'
+        div(class="input-field")
+            input(id="post_type_meta_name" type="text" class="validate" name="post_type_meta_name" value=post_meta_data.post_meta_name)
+            label(for="post_type_meta_name")='Name (ID)'
+        p
+            input(name="post_type_meta_type" type="radio" id="text" value="text" checked=(( post_type_meta_type == "text" )?"checked":""))
+            label(for="text")='Text'
+        p
+            input(name="post_type_meta_type" type="radio" id="textarea" value="textarea" checked=(( post_type_meta_type == "textarea" )?"checked":""))
+            label(for="textarea")='Textarea'
+        p
+            input(name="post_type_meta_type" type="radio" id="image" value="image" checked=(( post_type_meta_type == "image" )?"checked":""))
+            label(for="image")='Image'
+        p
+            input(name="post_type_meta_type" type="radio" id="gallery" value="gallery" checked=(( post_type_meta_type == "gallery" )?"checked":""))
+            label(for="gallery")='Gallery'
+        p
+            input(name="post_type_meta_type" type="radio" id="calendar" value="calendar" checked=(( post_type_meta_type == "calendar" )?"checked":""))
+            label(for="calendar")='Calendar'
+    - }

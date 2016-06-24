@@ -848,9 +848,22 @@ router.post('/post-type/action/edit/:post_type_id/', function(req, res, next) {
         var post_type_description = req.body.post_type_description;
         var post_type_slug = getSlug(remove_diacritics( post_type_name ));
         var post_type_status = ((req.body.post_type_status=="on")?1:0);
+        console.log("POST TYPE SAVE ",req.body);
+        // check for the new post meta data
+        var post_type_meta_title = req.body.post_type_meta_title;
+        var post_type_meta_name = req.body.post_type_meta_name;
+        var post_type_meta_type = req.body.post_type_meta_type;
+        var post_type_meta = {
+            post_type_meta_title:post_type_meta_title,
+            post_type_meta_name:post_type_meta_name,
+            post_type_meta_type:post_type_meta_type,
+        };
+
+        // check for the edited current post meta
+
         if( post_type_status == 1 || post_type_status == 0 ) {
             // update post type
-            e5ojs_post_type_update({'post_type_id':parseInt(post_type_id),'post_type_title':post_type_title,'post_type_name':post_type_name,'post_type_description':post_type_description,'post_type_slug':post_type_slug,post_type_status:parseInt(post_type_status)},function(post_type_data){
+            e5ojs_post_type_update({'post_type_id':parseInt(post_type_id),'post_type_title':post_type_title,'post_type_name':post_type_name,'post_type_description':post_type_description,'post_type_slug':post_type_slug,post_type_status:parseInt(post_type_status),post_type_meta:post_type_meta},function(post_type_data){
                 // create session message
                 var e5ojs_message = null;
                 // show notification
@@ -1197,9 +1210,23 @@ function e5ojs_post_type_insert_new(post_type_data, callback) {
 }
 function e5ojs_post_type_update(post_type_data, callback) {
     // update post type data
-    db.e5ojs_post_type.update({'post_type_id':parseInt(post_type_data.post_type_id)},{$set:post_type_data},{new:false},function(err,result_data){
-        e5ojs_init(function(){
-            callback(result_data);
+    // get current post type metas
+    db.e5ojs_post_type.find({'post_type_id':parseInt(post_type_data.post_type_id)},function(err, current_post_type){
+        var current_post_type_data = current_post_type[0];
+
+        // for the current post metas update
+        // get all and rewrite all array and after inset the new
+
+        // for new post type
+        if( post_type_data.post_type_meta != null ) {
+            var current_post_type_metas = current_post_type_data.post_type_meta;
+            current_post_type_metas.push(post_type_data.post_type_meta);
+            post_type_data.post_type_meta = current_post_type_metas;
+        }
+        db.e5ojs_post_type.update({'post_type_id':parseInt(post_type_data.post_type_id)},{$set:post_type_data},{new:false},function(err,result_data){
+            e5ojs_init(function(){
+                callback(result_data);
+            });
         });
     });
 }

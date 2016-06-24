@@ -24,6 +24,15 @@ body .waves-effect {
 /* end global components */
 
 /* start override materialize elements */
+
+
+/* start container */
+.container {
+    margin: 0 auto;
+    max-width: 1360px;
+    width: 90%;
+}
+/* end container */
 *:focus {
     outline: 0 !important;
 }
@@ -405,6 +414,63 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 /* end custom collapsible */
 
 
+
+
+
+
+/* start tabs */
+.tabs {
+    position: relative;
+}
+.tabs:after {
+    content: "";
+    width: 100%;
+    border-bottom: 2px solid rgb(225, 225, 225);
+    bottom: 0px;
+    margin: auto;
+    left: 0;
+    right: 0;
+    position: absolute;
+}
+.tabs .tab a {
+    color: #0085d2;
+    font-size: 12px;
+    font-weight: 500;
+}
+.tabs .tab a:hover {
+    color: rgba(0, 133, 210, 0.55);
+}
+.tabs .indicator {
+    background-color: #0085d2;
+    z-index: 1;
+}
+/* end tabs */
+
+
+
+
+/* start switch */
+.switch label input[type=checkbox]:checked+.lever {
+    background-color: #68a2c3;
+}
+.switch label input[type=checkbox]:checked+.lever:after {
+    background-color: #0085d2;
+}
+/* end switch */
+
+
+
+
+
+/* start checkbox */
+[type="radio"]:checked+label:after, [type="radio"].with-gap:checked+label:after {
+    background-color: #0085d2;
+}
+[type="radio"]:checked+label:after, [type="radio"].with-gap:checked+label:before, [type="radio"].with-gap:checked+label:after {
+    border: 2px solid #0085d2;
+}
+/* end checkbox */
+
 /* end override materialize elements */
 
 
@@ -669,7 +735,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 /* start menu left wrapper */
 .e5ojs-menu-left-wrapper {
     position: fixed;
-    width: 250px;
+    width: 225px;
     background-color: #FFF;
     height: 100%;
     overflow: hidden;
@@ -739,7 +805,8 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     color: #616161;
     font-weight: 500;
     position: relative;
-    font-size: 13px;
+    font-size: 12px;
+    text-transform: uppercase;
 }
 .e5ojs-menu-left-wrapper ul.options li .option-btn i {
     position: absolute;
@@ -748,6 +815,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     bottom: 0;
     margin: auto;
     display: table;
+    font-size: 20px;
 }
 .e5ojs-menu-left-wrapper ul.options li .option-btn:hover {
     background-color: rgba(0, 0, 0, 0.1);
