@@ -32,24 +32,65 @@ block e5ojs_block_content
                         div(class="input-field")
                             textarea(id="post_excerpt" class="materialize-textarea" name="post_excerpt")=post_data.post_excerpt
                             label(for="post_excerpt")='Post excerpt'
-                        input(type="date" class="datepicker" name="post_date" value=post_data.post_date+"")
-    - if( post_data.post_type_meta.length ) {
-        div(class="row")
-            div(class="col-xs-12 col-md-12 no-padding")
-                div(class="card")
-                    div(class="card-content")
-                        span(class="card-title")='Post Meta'
-                        //- metas { meta_title: 'aaa', meta_name: 'aaa', meta_type: 'text' }
-                        - for( var meta_key in post_data.post_type_meta ) {
-                            - var meta = post_data.post_type_meta[meta_key];
-                            - if( meta.meta_type == "text" ) {
-                                - set_meta_text(meta);
+                        div(class="input-field")
+                            input(type="date" class="datepicker" name="post_date" value=post_data.post_date+"")
+                            label(for="post_date")='Post date'
+        - if( post_data.post_type_meta.length > 0 ) {
+            div(class="row")
+                div(class="col-xs-12 col-md-12 no-padding")
+                    div(class="card")
+                        div(class="card-content post-meta-content")
+                            span(class="card-title")='Post Meta'
+                            //- metas { meta_title: 'aaa', meta_name: 'aaa', meta_type: 'text' }
+                            - for( var meta_key in post_data.post_type_meta ) {
+                                - var meta = post_data.post_type_meta[meta_key];
+                                - if( meta.meta_type == "text" ) {
+                                    - set_meta_text(meta);
+                                - }
+                                - if( meta.meta_type == "textarea" ) {
+                                    - set_meta_textarea(meta);
+                                - }
+                                - if( meta.meta_type == "calendar" ) {
+                                    - set_meta_calendar(meta);
+                                - }
+                                - if( meta.meta_type == "image" ) {
+                                    - set_meta_image(meta);
+                                - }
+                                - if( meta.meta_type == "gallery" ) {
+                                    - set_meta_gallery(meta);
+                                - }
                             - }
-                        - }
-    - }
+        - }
 
-    - function set_meta_text(meta_data) {
-        div(class="input-field")
-            input(id=meta_data.meta_name type="text" class="validate" name=meta_data.meta_name)
-            label(for=meta_data.meta_name)=meta_data.meta_title
-    - }
+        - function set_meta_text(meta_data) {
+            div(class="input-field")
+                input(id="meta_"+meta_data.meta_name type="text" class="validate" name="meta_"+meta_data.meta_name value=meta_data.post_meta_value)
+                label(for="meta_"+meta_data.meta_name)=meta_data.meta_title
+        - }
+        - function set_meta_textarea(meta_data) {
+            div(class="input-field")
+                textarea(id="meta_"+meta_data.meta_name class="materialize-textarea" name="meta_"+meta_data.meta_name)=meta_data.post_meta_value
+                label(for="meta_"+meta_data.meta_name)=meta_data.meta_title
+        - }
+        - function set_meta_calendar(meta_data) {
+            div(class="input-field")
+                input(id="meta_"+meta_data.meta_name type="date" class="datepicker" name="meta_"+meta_data.meta_name value=meta_data.post_meta_value)
+                label(for="meta_"+meta_data.meta_name)=meta_data.meta_title
+        - }
+        - function set_meta_image(meta_data) {
+            div(class="input-field post-meta-image")
+                img(class="e5ojs-open-media-meta" src=e5ojs_global_data.admin_res.media_default_image_gallery update_media_id="0" post-meta-value-id="meta_"+meta_data.meta_name post-meta-value-type="")
+                input(id="meta_"+meta_data.meta_name class="meta-image-id" type="hidden" name="meta_"+meta_data.meta_name value=meta_data.post_meta_value)
+                label(for="meta_"+meta_data.meta_name)=meta_data.meta_title
+        - }
+        - function set_meta_gallery(meta_data) {
+            div(class="input-field post-meta-image")
+                div(class="post-meta-gallery")
+                    input(type="hidden" class="default-gallery-image-data" post-meta-image-url=e5ojs_global_data.admin_res.media_default_image_gallery post-meta-value-id="meta_"+meta_data.meta_name)
+                    a(class="btn-floating btn-large waves-effect waves-dark post-meta-gallery-add-new")
+                        i(class="material-icons")='add'
+                    - if( meta_data.post_meta_value == "" )
+                        img(class="e5ojs-open-media-meta" src=e5ojs_global_data.admin_res.media_default_image_gallery update_media_id="0" post-meta-value-id="meta_"+meta_data.meta_name post-meta-value-type="json")
+                input(id="meta_"+meta_data.meta_name class="meta-image-id" type="hidden" name="meta_"+meta_data.meta_name value=meta_data.post_meta_value)
+                label(for="meta_"+meta_data.meta_name)=meta_data.meta_title
+        - }

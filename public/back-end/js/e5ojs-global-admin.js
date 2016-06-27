@@ -166,18 +166,18 @@ function e5ojs_header_menu() {
     },1000);
 
     $(".e5ojs-header-bar ul.content li.content-left .open-menu").on("click",function(){
-        if( $(".e5ojs-menu-left-wrapper").hasClass("e5ojs-menu-left-wrapper-close") ) {
+        if( $(".e5ojs-menu-left-wrapper").hasClass("e5ojs-menu-left-wrapper-show") ) {
             // open
-            $(".e5ojs-menu-left-wrapper").removeClass("e5ojs-menu-left-wrapper-close");
+            $(".e5ojs-menu-left-wrapper").removeClass("e5ojs-menu-left-wrapper-show");
             // change menu icon by arrow back
-            $(".e5ojs-header-bar ul.content li.content-left .open-menu i.icon-arrow").css({"opacity":"1"});
-            $(".e5ojs-header-bar ul.content li.content-left .open-menu i.icon-menu").css({"opacity":"0"});
-        } else {
-            // close
-            $(".e5ojs-menu-left-wrapper").addClass("e5ojs-menu-left-wrapper-close");
-            // change arrow icon by menu
             $(".e5ojs-header-bar ul.content li.content-left .open-menu i.icon-arrow").css({"opacity":"0"});
             $(".e5ojs-header-bar ul.content li.content-left .open-menu i.icon-menu").css({"opacity":"1"});
+        } else {
+            // close
+            $(".e5ojs-menu-left-wrapper").addClass("e5ojs-menu-left-wrapper-show");
+            // change arrow icon by menu
+            $(".e5ojs-header-bar ul.content li.content-left .open-menu i.icon-arrow").css({"opacity":"1"});
+            $(".e5ojs-header-bar ul.content li.content-left .open-menu i.icon-menu").css({"opacity":"0"});
         }
     });
 
@@ -191,9 +191,15 @@ function e5ojs_auto_close_left_menu_wrapper() {
     var left_wrapper_width = $(".e5ojs-menu-left-wrapper").width();
     if( right_wrapper_position_left <= (left_wrapper_width+20) ) {
         // close
-        $(".e5ojs-menu-left-wrapper").addClass("e5ojs-menu-left-wrapper-close");
+        $(".e5ojs-menu-left-wrapper").removeClass("e5ojs-menu-left-wrapper-show");
         // change arrow icon by menu
         $(".e5ojs-header-bar ul.content li.content-left .open-menu i.icon-arrow").css({"opacity":"0"});
         $(".e5ojs-header-bar ul.content li.content-left .open-menu i.icon-menu").css({"opacity":"1"});
+    } else {
+        // show
+        $(".e5ojs-menu-left-wrapper").addClass("e5ojs-menu-left-wrapper-show");
+        // change arrow icon by menu
+        $(".e5ojs-header-bar ul.content li.content-left .open-menu i.icon-arrow").css({"opacity":"1"});
+        $(".e5ojs-header-bar ul.content li.content-left .open-menu i.icon-menu").css({"opacity":"0"});
     }
 }

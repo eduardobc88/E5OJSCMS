@@ -66,10 +66,10 @@ block e5ojs_block_content
                                     a(href="#new_meta" class="active")='New meta'
                                 li(class="tab")
                                     a(href="#current_metas" class="")='Current metas'
-                            div(id="new_meta" class="new-meta")
+                            div(id="new_meta" class="new-meta content-tab")
                                 div(class="col-xs-12")
                                     - print_row_meta_data();
-                            div(id="current_metas" class="current-metas")
+                            div(id="current_metas" class="current-metas content-tab")
                                 - var post_type_total_metas = -1;
                                 - for( var post_type_meta_key in post_type_info.post_type_meta ) {
                                     - post_type_total_metas = post_type_total_metas + 1;
@@ -80,7 +80,7 @@ block e5ojs_block_content
                                 input(type="hidden" name="update_finish" value=post_type_total_metas)
                             div(class="aling-right")
                                 button( type="submit" class="waves-effect waves-dark btn")='SAVE'
-    -}
+    - }
     
     - function print_row_meta_data() {
         div(class="input-field")
@@ -107,7 +107,6 @@ block e5ojs_block_content
     - }
     
     - function print_row_meta_data_update(post_type_meta_key,meta_data) {
-
         - var post_meta_data = {meta_title:"",meta_name:"",meta_type:"",};
         - var post_type_meta_type = "";
         - if( meta_data !== undefined ) {

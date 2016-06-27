@@ -367,7 +367,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     padding-left: 15px;
     font-weight: 600;
     white-space: nowrap;
-    width: 60%;
+    width: calc(100% - 75px);
     overflow: hidden;
     text-overflow: ellipsis;
     height: 100%;
@@ -447,6 +447,9 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 .tabs .indicator {
     background-color: #0085d2;
     z-index: 1;
+}
+.content-tab {
+    padding-top: 15px;
 }
 /* end tabs */
 
@@ -558,7 +561,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     display: table;
     transition-duration: .3s;
 }
-.e5ojs-header-bar ul.content li.content-left .open-menu i.icon-menu {
+.e5ojs-header-bar ul.content li.content-left .open-menu i.icon-arrow {
     opacity: 0;
 }
 .e5ojs-header-bar ul.content li.content-right {
@@ -744,13 +747,13 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     height: 100%;
     overflow: hidden;
     top: 0;
-    left: 0;
+    left: -300px;
     padding-top: 55px;
     z-index: 9;
     transition-duration: .3s;
 }
-.e5ojs-menu-left-wrapper-close {
-    left: -300px;
+.e5ojs-menu-left-wrapper-show {
+    left: 0px;
 }
 .e5ojs-menu-left-wrapper .user-info {
     width: 100%;
@@ -1001,6 +1004,27 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 }
 .summernote-wrapper:focus label {
     color: #0085d2 !important;
+}
+
+.post-meta-content .post-meta-image img {
+    position: relative;
+    margin-top: 30px;
+    overflow: hidden;
+    width: 100px;
+    height: 100px;
+}
+.post-meta-gallery {
+    position: relative;
+    padding-top: 30px;
+}
+.post-meta-gallery .post-meta-gallery-add-new {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+}
+.post-meta-gallery .e5ojs-open-media-meta {
+    margin-right: 4px;
+    margin-top: 4px !important;
 }
 /* end posts new post - summernote override */
 

@@ -11,6 +11,119 @@ $(document).ready(function(){
             $(image_preview).attr("src",element.sizes[3]);
         });
     });
+
+
+    // for gallery post meta
+    function e5ojs_media_start_action_gallery_meta() {
+        $(".e5ojs-open-media-meta").on("click",function(){
+            var image_preview = $(this);
+            var input_media_id = "#"+$(this).attr("post-meta-value-id");
+            var input_media_value_type = $(this).attr("post-meta-value-type");
+            var media_id = $(this).attr("media-id");
+            var media_image = e5ojs_media.init({
+                title:"Select or upload a image"
+            }).e5ojs_open_media().on("select",function(element){
+                if( input_media_value_type == "" ) {
+                    $(input_media_id).val(element.item.media_id);
+                    $(image_preview).attr("src",element.sizes[0]);
+                } else {
+                    // get current value
+                    var current_media_ids = $(input_media_id).val();
+                    $(input_media_id).val("");
+                    if( current_media_ids == "" ) {
+                        $(input_media_id).val(element.item.media_id);
+                    } else {
+                        // search id and replace
+                        if( typeof media_id === 'undefined' ) {
+                            // add to array
+                            console.log("NUEVO");
+                            current_media_ids = current_media_ids.split(",");
+                            current_media_ids.push(element.item.media_id);
+                            urrent_media_ids = current_media_ids.toString();
+                            $(input_media_id).val(current_media_ids);
+                        } else {
+                            current_media_ids = current_media_ids.split(",");
+                            position = $.inArray( media_id, current_media_ids );
+                            current_media_ids[position] = element.item.media_id;
+                            current_media_ids = current_media_ids.toString();
+                            $(input_media_id).val(current_media_ids);
+                        }
+
+                    }
+                    $(image_preview).attr("src",element.sizes[0]);
+                }
+            });
+        });
+    }
+    e5ojs_media_start_action_gallery_meta();
+
+    // get image from id
+    $(".post-meta-image").each(function(key,element){
+        var image_id = $(this).find(".meta-image-id").val();
+        var image_element = $(this);
+        if( image_id != "" ) {
+            $.getJSON( e5ojs_all_media_url+image_id, function( media_gallery_json ) {
+                var all_media = media_gallery_json[0];
+                if( all_media.status ) {
+                    var media_element = all_media.media_posts[0];
+                    e5ojs_media.e5ojs_media_sizes = all_media.sizes;
+                    //e5ojs_media_sizes
+                    var media_id = media_element.media_id;
+                    var media_url = e5ojs_media_sizes_url+media_element.media_file_name_clean+"-150x150."+(media_element.media_mime_type.split("/"))[1];
+                    var media_name = media_element.media_name;
+                    var media_date = media_element.media_date;
+                    //console.log("image_element",image_element);
+                    $(image_element).find("img").attr("src",media_url);
+                }
+            });
+        }
+    });
+    // get images from ids
+    $(".post-meta-gallery").each(function(key,element){
+        // get ids"
+        var id_data = "#"+$(this).find(".default-gallery-image-data").attr("post-meta-value-id");
+        var image_ids = $(id_data).val();
+        var image_element = $(this);
+        if( image_ids != "" ) {
+            $.getJSON( e5ojs_all_media_url+image_ids, function( media_gallery_json ) {
+                var all_media = media_gallery_json[0];
+                if( all_media.status ) {
+                    $.each(all_media.media_posts,function(key,element){
+                        var media_element = element;
+                        e5ojs_media.e5ojs_media_sizes = all_media.sizes;
+                        //e5ojs_media_sizes
+                        var media_id = media_element.media_id;
+                        var media_url = e5ojs_media_sizes_url+media_element.media_file_name_clean+"-150x150."+(media_element.media_mime_type.split("/"))[1];
+                        var media_name = media_element.media_name;
+                        var media_date = media_element.media_date;
+
+                        var image_default_id = $(image_element).find(".default-gallery-image-data").attr("post-meta-value-id");
+                        var element = '<img class="e5ojs-open-media-meta" src="'+media_url+'" media-id="'+media_id+'" post-meta-value-id="'+image_default_id+'" post-meta-value-type="json")>';
+                        $(image_element).prepend(element);
+                    });
+                    // set actions again
+                    e5ojs_media_start_action_gallery_meta();
+                }
+            });
+        }
+    });
+
+
+    // add new image to gallery
+    $(".post-meta-gallery-add-new").on('click',function(event){
+        event.preventDefault();
+        //event.prevent.default();
+        var element_parent = $(this).closest(".post-meta-gallery");
+        var image_default_url = $(element_parent).find(".default-gallery-image-data").attr("post-meta-image-url");
+        var image_default_id = $(element_parent).find(".default-gallery-image-data").attr("post-meta-value-id");
+        var element = '<img class="e5ojs-open-media-meta" src="'+image_default_url+'" post-meta-value-id="'+image_default_id+'" post-meta-value-type="json")>';
+        $(element_parent).prepend(element);
+        // remove actions and add again
+        $(element_parent).find(".e5ojs-open-media-meta").unbind();
+        // set actions again
+        e5ojs_media_start_action_gallery_meta();
+    });
+
 });
 $(document).load(function(){
 
