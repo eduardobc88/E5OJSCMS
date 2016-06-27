@@ -7,6 +7,7 @@ $(document).ready(function(){
     e5ojs_header_options_action();
     e5ojs_custom_collection();
     e5ojs_custom_post_actions();
+    $('select').material_select();
 });
 $(window).load(function(){
     e5ojs_summernote();

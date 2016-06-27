@@ -67,53 +67,98 @@ block e5ojs_block_content
                                 li(class="tab")
                                     a(href="#current_metas" class="")='Current metas'
                             div(id="new_meta" class="new-meta")
-                                - print_row_meta_data(NULL);
-                            div(id="current_metas" class="current-metas")="Current post metas"
+                                div(class="col-xs-12")
+                                    - print_row_meta_data();
+                            div(id="current_metas" class="current-metas")
+                                - var post_type_total_metas = -1;
                                 - for( var post_type_meta_key in post_type_info.post_type_meta ) {
+                                    - post_type_total_metas = post_type_total_metas + 1;
                                     - var meta_data = post_type_info.post_type_meta[post_type_meta_key];
                                     div(clas="row no-padding")
-                                        - print_row_meta_data(meta_data);
+                                        - print_row_meta_data_update(post_type_total_metas,meta_data);
                                 - }
+                                input(type="hidden" name="update_finish" value=post_type_total_metas)
                             div(class="aling-right")
                                 button( type="submit" class="waves-effect waves-dark btn")='SAVE'
     -}
     
-    - function print_row_meta_data(meta_data) {
-        - var post_meta_data = {post_meta_title:"",post_meta_name:"",post_meta_type:"",};
-        - var post_type_meta_type = "";
-        - if( meta_data !== undefined ) {
-            - post_meta_data.post_meta_title = meta_data.post_meta_title;
-            - post_meta_data.post_meta_name = meta_data.post_meta_name;
-            - if( String(meta_data.post_type_meta_type) == "text" )
-                - post_type_meta_type = "text";
-            - else if( String(meta_data.post_type_meta_type) == "textarea" )
-                    - post_type_meta_type = "textarea";
-            - else if( String(meta_data.post_type_meta_type) == "image" )
-                    - post_type_meta_type = "image";
-            - else if( String(meta_data.post_type_meta_type) == "gallery" )
-                    - post_type_meta_type = "gallery";
-            - else if( String(meta_data.post_type_meta_type) == "calendar" )
-                    - post_type_meta_type = "calendar";
-        - }
+    - function print_row_meta_data() {
         div(class="input-field")
-            input(id="post_type_meta_title" type="text" class="validate" name="post_type_meta_title" value=post_meta_data.post_meta_title)
+            input(id="post_type_meta_title" type="text" class="validate" name="post_type_meta_title")
             label(for="post_type_meta_title")='Title'
         div(class="input-field")
-            input(id="post_type_meta_name" type="text" class="validate" name="post_type_meta_name" value=post_meta_data.post_meta_name)
+            input(id="post_type_meta_name" type="text" class="validate" name="post_type_meta_name")
             label(for="post_type_meta_name")='Name (ID)'
         p
-            input(name="post_type_meta_type" type="radio" id="text" value="text" checked=(( post_type_meta_type == "text" )?"checked":""))
+            input(name="post_type_meta_type" type="radio" id="text" value="text" checked)
             label(for="text")='Text'
         p
-            input(name="post_type_meta_type" type="radio" id="textarea" value="textarea" checked=(( post_type_meta_type == "textarea" )?"checked":""))
+            input(name="post_type_meta_type" type="radio" id="textarea" value="textarea")
             label(for="textarea")='Textarea'
         p
-            input(name="post_type_meta_type" type="radio" id="image" value="image" checked=(( post_type_meta_type == "image" )?"checked":""))
+            input(name="post_type_meta_type" type="radio" id="image" value="image")
             label(for="image")='Image'
         p
-            input(name="post_type_meta_type" type="radio" id="gallery" value="gallery" checked=(( post_type_meta_type == "gallery" )?"checked":""))
+            input(name="post_type_meta_type" type="radio" id="gallery" value="gallery")
             label(for="gallery")='Gallery'
         p
-            input(name="post_type_meta_type" type="radio" id="calendar" value="calendar" checked=(( post_type_meta_type == "calendar" )?"checked":""))
+            input(name="post_type_meta_type" type="radio" id="calendar" value="calendar")
             label(for="calendar")='Calendar'
+    - }
+    
+    - function print_row_meta_data_update(post_type_meta_key,meta_data) {
+
+        - var post_meta_data = {meta_title:"",meta_name:"",meta_type:"",};
+        - var post_type_meta_type = "";
+        - if( meta_data !== undefined ) {
+            - post_meta_data.meta_title = meta_data.meta_title;
+            - post_meta_data.meta_name = meta_data.meta_name;
+            - if( String(meta_data.meta_type) == "text" )
+                - post_type_meta_type = "text";
+            - else if( String(meta_data.meta_type) == "textarea" )
+                    - post_type_meta_type = "textarea";
+            - else if( String(meta_data.meta_type) == "image" )
+                    - post_type_meta_type = "image";
+            - else if( String(meta_data.meta_type) == "gallery" )
+                    - post_type_meta_type = "gallery";
+            - else if( String(meta_data.meta_type) == "calendar" )
+                    - post_type_meta_type = "calendar";
+        - }
+        div(class="col-xs-12 col-md-4")
+            div(class="input-field")
+                input(id=post_type_meta_key+"_meta_title" type="text" class="validate" name=post_type_meta_key+"_meta_title" value=post_meta_data.meta_title)
+                label(for=post_type_meta_key+"_meta_title")='Title'
+        div(class="col-xs-12 col-md-4")
+            div(class="input-field")
+                input(id=post_type_meta_key+"_meta_name" type="text" class="validate" name=post_type_meta_key+"_meta_name" value=post_meta_data.meta_name)
+                label(for=post_type_meta_key+"_meta_name")='Name (ID)'
+        div(class="col-xs-12 col-md-4")
+            div(class="input-field")
+                select(name=post_type_meta_key+"_meta_type")
+                    - var attributes = "";
+                    - if( post_type_meta_type == "text" ) {
+                        - attributes = {"selected":"selected"};
+                    - }
+                    option(value="text")&attributes(attributes)='text'
+                    - attributes = "";
+                    - if( post_type_meta_type == "textarea" ) {
+                        - attributes = {"selected":"selected"};
+                    - }
+                    option(value="textarea")&attributes(attributes)='textarea'
+                    - attributes = "";
+                    - if( post_type_meta_type == "image" ) {
+                        - attributes = {"selected":"selected"};
+                    - }
+                    option(value="image")&attributes(attributes)='image'
+                    - attributes = "";
+                    - if( post_type_meta_type == "gallery" ) {
+                        - attributes = {"selected":"selected"};
+                    - }
+                    option(value="gallery")&attributes(attributes)='gallery'
+                    - attributes = "";
+                    - if( post_type_meta_type == "calendar" ) {
+                        - attributes = {"selected":"selected"};
+                    - }
+                    option(value="calendar")&attributes(attributes)='calendar'
+                label='Meta type'
     - }
