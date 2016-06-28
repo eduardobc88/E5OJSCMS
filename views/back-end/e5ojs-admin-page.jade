@@ -1,0 +1,86 @@
+extends e5ojs-base-layout-admin
+block e5ojs_block_local_css_script
+    link(rel='stylesheet', href=e5ojs_global_data.admin_res.base_url+'/back-end/css/summernote.css')
+    script(type='text/javascript', src=e5ojs_global_data.admin_res.base_url+'/back-end/js/summernote.js')
+    script(type='text/javascript', src=e5ojs_global_data.admin_res.base_url+'/back-end/js/e5ojs-new-edit-post.js')
+block e5ojs_block_content
+    - console.log("page_data",page_data.length);
+    - if( page_data == null ) {
+        form(id="e5ojs-post-form-wrapper" action=e5ojs_global_data.admin_pages.pages.url+e5ojs_global_data.admin_actions.page.action+"edit/" method="post")
+            div(class="row top-page-options no-padding")
+                div(class="col-xs-12 no-padding")
+                    div(class="post-actions")
+                        a(data-status="publish" class="waves-effect waves-dark "+(( page_status == "publish" )?" current":""))='Publish'
+                        a(data-status="pending" class="waves-effect waves-dark "+(( page_status == "pending" )?" current":""))='Pending'
+                        a(data-status="trash" class="waves-effect waves-dark "+(( page_status == "trash" )?" current":""))='Trash'
+            div(class="row")
+                div(class="col-xs-12 col-md-12 no-padding")
+                    div(class="card")
+                        div(class="card-image")
+                            img(class="e5ojs-open-media" src=e5ojs_global_data.admin_res.media_default_image_url)
+                            span(class="card-title")='Post Info'
+                            input(type="hidden" name="page_media_id" class="post_media_id")
+                        div(class="card-content")
+                            div(class="input-field")
+                                input(id="page_title" type="text" class="validate" name="page_title")
+                                label(for="page_title")='Post title'
+                            div(class="summernote-wrapper")
+                                label(for="page_content")='Post content'
+                                textarea(id="page_content" class="materialize-textarea" name="page_content")
+                            div(class="input-field")
+                                textarea(id="page_excerpt" class="materialize-textarea" name="page_excerpt")
+                                label(for="page_excerpt")='Post excerpt'
+                            div(class="input-field")
+                                input(type="date" class="datepicker" name="page_date" value=e5ojs_global_data.admin_res.current_date)
+                                label(for="page_date")='Post date'
+                            div(class="input-field")
+                                select(name="page_template")
+                                    option(value="default")="Default"
+                                    - for( key_template in e5ojs_templates_json.templates ) {
+                                        option(value=key_template)=key_template
+                                    - }
+                                label(for="page_template")='Page template'
+    - } else {
+        - var page_data_object = page_data[0];
+        - var page_status = page_data_object.page_status;
+        form(id="e5ojs-post-form-wrapper" action=e5ojs_global_data.admin_pages.pages.url+e5ojs_global_data.admin_actions.page.action+"edit/"+page_data_object.page_id+"/" method="post")
+            div(class="row top-page-options no-padding")
+                div(class="col-xs-12 no-padding")
+                    div(class="post-actions")
+                        a(data-status="publish" class="waves-effect waves-dark "+(( page_status == "publish" )?" current":""))='Publish'
+                        a(data-status="pending" class="waves-effect waves-dark "+(( page_status == "pending" )?" current":""))='Pending'
+                        a(data-status="trash" class="waves-effect waves-dark "+(( page_status == "trash" )?" current":""))='Trash'
+            div(class="row")
+                div(class="col-xs-12 col-md-12 no-padding")
+                    div(class="card")
+                        div(class="card-image")
+                            img(class="e5ojs-open-media" src=page_data_object.post_media_attachment_url)
+                            span(class="card-title")='Post Info'
+                            input(type="hidden" name="page_media_id" class="post_media_id" value=page_data_object.post_media_attachment_id)
+                        div(class="card-content")
+                            div(class="input-field")
+                                input(id="page_title" type="text" class="validate" name="page_title" value=page_data_object.page_title)
+                                label(for="page_title")='Post title'
+                            div(class="summernote-wrapper")
+                                label(for="page_content")='Post content'
+                                textarea(id="page_content" class="materialize-textarea" name="page_content")=page_data_object.page_content
+                            div(class="input-field")
+                                textarea(id="page_excerpt" class="materialize-textarea" name="page_excerpt")=page_data_object.page_excerpt
+                                label(for="page_excerpt")='Post excerpt'
+                            div(class="input-field")
+                                input(type="date" class="datepicker" name="page_date" value= value=page_data_object.page_date)
+                                label(for="page_date")='Post date'
+                            div(class="input-field")
+                                - var page_template =  value=page_data_object.page_template;
+                                select(name="page_template")
+                                    option(value="default")="Default"
+                                    - for( key_template in e5ojs_templates_json.templates ) {
+                                        - attributes = "";
+                                        - if( page_template == key_template ) {
+                                            - attributes = {"selected":"selected"};
+                                        - }
+                                        option(value=key_template)&attributes(attributes)=key_template
+                                    - }
+                                label(for="page_template")='Page template'
+    - }
+                        

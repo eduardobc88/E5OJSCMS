@@ -23,7 +23,7 @@ function e5ojs_custom_post_actions() {
     $(".post-actions a").on("click",function(){
         var post_status = $(this).attr("data-status");
         console.log( post_status );
-        $("#e5ojs-post-form-wrapper").attr("action",base_url+post_status);
+        $("#e5ojs-post-form-wrapper").attr("action",base_url+post_status+"/");
         $("#e5ojs-post-form-wrapper").submit();
     });
 }
@@ -83,7 +83,7 @@ function e5ojs_custom_collapsible_header_select_all() {
         $(".custom-collapsible .custom-collapsible-header .bulk-actions").find("li").each(function(key,element){
             var action_element = $(this).find("a");
             var current_link = $(action_element).attr("base-url");
-            action_element.attr("href",current_link+collection_ids.join());
+            action_element.attr("href",current_link+collection_ids.join()+"/");
         });
     });
     // for individual collection row
@@ -102,7 +102,7 @@ function e5ojs_custom_collapsible_header_select_all() {
         $(".custom-collapsible .custom-collapsible-header .bulk-actions").find("li").each(function(key,element){
             var action_element = $(this).find("a");
             var current_link = $(action_element).attr("base-url");
-            action_element.attr("href",current_link+collection_ids.join());
+            action_element.attr("href",current_link+collection_ids.join()+"/");
         });
     });
     $(".custom-collapsible .secondary-content a").on('click',function(event) {
@@ -161,9 +161,7 @@ function e5ojs_collection_header_select_all() {
 }
 function e5ojs_header_menu() {
     // close menu default
-    setTimeout(function(){
-        e5ojs_auto_close_left_menu_wrapper();
-    },1000);
+    e5ojs_auto_close_left_menu_wrapper();
 
     $(".e5ojs-header-bar ul.content li.content-left .open-menu").on("click",function(){
         if( $(".e5ojs-menu-left-wrapper").hasClass("e5ojs-menu-left-wrapper-show") ) {

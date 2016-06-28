@@ -50,7 +50,7 @@ function e5ojs_global_data_init() {
     //  three sections
     e5ojs_global_data.admin_pages = {
         dashboard: {title:"dashboard",description:"Lorem ipsum...",url:host_url+"/admin/", icon_name:"dashboard",position:1},
-        pages: {title:"pages",description:"Lorem ipsum...",url:host_url+"/admin/pages/", icon_name:"filter_none",position:2},
+        pages: {title:"pages",description:"Lorem ipsum...",url:host_url+"/admin/page/", icon_name:"filter_none",position:2},
         admin_post_types: {},
         media: {title:"media",description:"Lorem ipsum...",url:host_url+"/admin/media/", icon_name:"collections",position:3},
         post_type: {title:"post types",description:"Lorem ipsum...",url:host_url+"/admin/post-type/", icon_name:"settings",position:4},
@@ -64,6 +64,16 @@ function e5ojs_global_data_init() {
         edit_post_type: {title:"Edit post type",description:"Lorem ipsum...",url:host_url+"/admin/", icon_name:"dashboard",position:1},
     };
     e5ojs_global_data.admin_actions = {
+        page: {
+            action: 'action/',
+            new: 'action/new/',
+            edit: 'action/edit/',
+            delete: 'action/delete/',
+            pagination_all: 'all/page/',
+            pagination_publish: 'publish/page/',
+            pagintaion_pending: 'pending/page/',
+            pagination_trash: 'trash/page/',
+        },
         post_types: {
             action: 'action/',
             new: 'action/new/',
@@ -430,7 +440,7 @@ function e5ojs_add_post_type_router(post_type_data) {
         });
 
     });
-    router.post('/post-type/'+post_type_data.post_type_name+'/action/edit/:post_id/:post_status', function(req, res, next) {
+    router.post('/post-type/'+post_type_data.post_type_name+'/action/edit/:post_id/:post_status/', function(req, res, next) {
         /*
         update post data with post id and post status passed by URL
         */
@@ -737,7 +747,7 @@ router.get('/admin/', function(req, res, next) {
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
-        console.log("e5ojs_global_data",e5ojs_global_data);
+        //console.log("e5ojs_global_data",e5ojs_global_data);
         res.render('back-end/e5ojs-admin', { page_data: e5ojs_global_data.admin_pages['dashboard'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
     });
 });
@@ -858,15 +868,298 @@ router.get('/all-media/:media_id',function(req, res, next){
 
 
 /* start admin pages */
-router.get('/pages/', function(req, res, next) {
+router.get('/page/', function(req, res, next) {
     // get page with validate session
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
-        console.log("ADMIN",e5ojs_global_data.admin_pages.admin_post_types);
-        res.render('back-end/e5ojs-admin-pages', { page_data: e5ojs_global_data.admin_pages['pages'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
+        res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/page/all/page/1/");
     });
 });
+router.get('/page/:page_status/page/:number_page', function(req, res, next) {
+
+
+    // get page with validate session
+    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        // return template with user data
+        // e5ojs_global_data  and e5ojs_user_data default
+        // get all pages paginated
+        // get post status
+        // get post status
+        var post_status = req.params.page_status;
+        var post_status_array = Array();
+        if( post_status == "all" ) {
+            post_status_array = Array('publish','pending','trash');
+        } else {
+            if( post_status == 'publish' )
+                post_status_array.push("publish");
+            if( post_status == 'pending' )
+                post_status_array.push("pending");
+            if( post_status == 'trash' )
+                post_status_array.push("trash");
+        }
+
+        // get posts
+        // get total pages
+        var limit_post = 12;
+        var skip_posts = 0;
+        var total_post = 0;
+        if( parseInt(req.params.number_page) == 1 ) {
+            skip_posts = 0;
+        } else {
+            skip_posts = (parseInt(req.params.number_page)-1)*limit_post;
+        }
+        var total_pages = 0;
+        var current_page = req.params.number_page;
+
+        // total pages
+        db.e5ojs_page.find({'page_status':{$in:post_status_array}}).sort({'post_page_id':-1}).count(function(q_req, q_res, q_next){
+            total_post = parseInt(q_res);
+            total_pages = parseInt(total_post/limit_post);
+        });
+        // query with skip page
+        db.e5ojs_page.find({'page_status':{$in:post_status_array}}).sort({'post_type_id':-1}).skip(skip_posts).limit(limit_post, function(err, pages_data){
+            // get session message
+            var e5ojs_message = e5ojs_get_session_message(req);
+            // remove session message
+            e5ojs_clear_session_message(req);
+            // render post type page
+            //res.render('back-end/e5ojs-admin-post-type', { page_data: e5ojs_global_data.admin_pages['post_type'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], e5ojs_message:e5ojs_message, post_types:post_types, total_pages:total_pages+1, current_page:current_page, total_post:total_post, post_status:post_type_status });
+            res.render('back-end/e5ojs-admin-pages', { page_data: e5ojs_global_data.admin_pages['pages'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], e5ojs_message:e5ojs_message, pages_data:pages_data, total_pages:total_pages+1, current_page:current_page, total_post:total_post, page_status:post_status });
+        });
+
+    });
+});
+router.get('/page/action/new/', function(req, res, next) {
+    // return the template to add new page
+    // get page with validate session
+    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        // return template with user data
+        // e5ojs_global_data  and e5ojs_user_data default
+        e5ojs_read_template_files_json(function(templates_json){
+            // check if has message session
+            // get session message
+            var e5ojs_message = e5ojs_get_session_message(req);
+            // remove session message
+            e5ojs_clear_session_message(req);
+            res.render('back-end/e5ojs-admin-page', { page_data: e5ojs_global_data.admin_pages['pages'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], e5ojs_message:e5ojs_message, page_data:null, e5ojs_templates_json:templates_json });
+        });
+    });
+});
+router.post('/page/action/edit/:page_status/', function(req, res, next) {
+    // save the new page and redirect to edit/:page_id
+    // get page with validate session
+    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        // return template with user data
+        // e5ojs_global_data  and e5ojs_user_data default
+
+        // get post data
+        var page_status = req.params.page_status;
+        var page_media_id = req.body.page_media_id;
+        var page_title = req.body.page_title;
+        var page_content = req.body.page_content;
+        var page_excerpt = req.body.page_excerpt;
+        var page_date = req.body.page_date;
+        var page_template = req.body.page_template;
+
+        var page_data = {
+            page_id: '',
+            page_title: page_title,
+            page_content: page_content,
+            page_excerpt: page_excerpt,
+            page_date: page_date,
+            page_status: page_status,
+            page_media_id: page_media_id,
+            page_template: page_template
+        }
+        // insert new post and redirect with id returned
+        e5ojs_page_insert_new(page_data,function(page_data_result){
+
+            var e5ojs_message = null;
+            if( page_data_result != null ) {
+                // show notification
+                e5ojs_message = {'status':1,'type':'done','text':'New page created.'};
+            } else {
+                e5ojs_message = {'status':1,'type':'error','text':'The page was not created.'};
+            }
+            // save message on session var
+            e5ojs_push_session_message(req,e5ojs_message);
+            res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/page/action/edit/"+page_data_result.page_id+"/");
+        });
+    });
+});
+router.get('/page/action/edit/:page_id/', function(req, res, next) {
+    // return the page data to edit
+    // get page with validate session
+    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        // return template with user data
+        // e5ojs_global_data  and e5ojs_user_data default
+
+        // get page id
+        var page_id = req.params.page_id;
+        // get page with the ID and return data
+        e5ojs_page_get_page(page_id,function(page_data){
+            if( page_data == null ) {
+                res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/page/action/new/");
+            } else {
+                // get image from DB
+                e5ojs_get_media(page_data[0].page_media_id,function(media_result){
+                    if( media_result == false ) {
+                        page_data[0].post_media_attachment_id = "";
+                        page_data[0].post_media_attachment_url = e5ojs_global_data.admin_res.media_default_image_url;
+                    } else {
+                        var media_url = e5ojs_global_data.admin_res.media_uploads_sizes_url+media_result[0].media_file_name_clean+"-800x200."+(media_result[0].media_mime_type.split("/"))[1];
+                        page_data[0].post_media_attachment_id = media_result[0].media_id;
+                        page_data[0].post_media_attachment_url = media_url;
+                    }
+                    // check if has message session
+                    // get session message
+                    var e5ojs_message = e5ojs_get_session_message(req);
+                    // remove session message
+                    e5ojs_clear_session_message(req);
+                    // get templates json file
+                    e5ojs_read_template_files_json(function(templates_json){
+                        res.render('back-end/e5ojs-admin-page', { page_data: e5ojs_global_data.admin_pages['pages'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], e5ojs_message:e5ojs_message, page_data:page_data , e5ojs_templates_json:templates_json });
+                    });
+                });
+
+            }
+        });
+
+    });
+});
+router.post('/page/action/edit/:page_id/:page_status/',function(req, res, next){
+    // update page data
+    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        // get page id
+        var page_id = req.params.page_id;
+        // get post data
+        var page_status = req.params.page_status;
+        var page_media_id = req.body.page_media_id;
+        var page_title = req.body.page_title;
+        var page_content = req.body.page_content;
+        var page_excerpt = req.body.page_excerpt;
+        var page_date = req.body.page_date;
+        var page_template = req.body.page_template;
+
+        var page_data = {
+            page_id: page_id,
+            page_title: page_title,
+            page_content: page_content,
+            page_excerpt: page_excerpt,
+            page_date: page_date,
+            page_status: page_status,
+            page_media_id: page_media_id,
+            page_template: page_template
+        }
+        // update page and redirect with id returned
+        e5ojs_page_update(page_data,function(page_data_result){
+            var e5ojs_message = null;
+            if( page_data_result != null ) {
+                // show notification
+                e5ojs_message = {'status':1,'type':'done','text':'Page updated'};
+            } else {
+                e5ojs_message = {'status':1,'type':'error','text':'Page no updated'};
+            }
+            // save message on session var
+            e5ojs_push_session_message(req,e5ojs_message);
+            res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/page/action/edit/"+page_id+"/");
+        });
+    });
+});
+router.get('/page/action/:page_status/:page_ids/', function(req, res, next) {
+    // bulk action page status
+
+    // change post status to dynamically
+    // get page with validate session
+    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        // return template with user data
+        // e5ojs_global_data  and e5ojs_user_data default
+        // get action
+        var request_action = req.params.page_status;
+        // get post id param
+        var post_id = req.params.page_ids; // get url parm post_id
+        // check if has multiples ids
+        var post_ids = post_id.split(",");
+
+        // validate post status
+        var post_set_status = "pending";
+        if( request_action == "publish" ) {
+            post_set_status = "publish";
+        } else if( request_action == "pending" ) {
+            post_set_status = "pending";
+        } else if( request_action == "trash" ) {
+            post_set_status = "trash";
+        } else if( request_action == "delete" ) {
+            // delete document db
+            post_set_status = "delete";
+        }
+        if( post_set_status == "delete" ) {
+            // delete forever
+            e5ojs_delete_page_status_multiple(post_ids,function(data){
+                // create session message
+                // validate result
+                var e5ojs_message = null;
+                if( data.status ) {
+                    // show notification
+                    e5ojs_message = {'status':1,'type':'done','text':'Successfully - '+post_set_status};
+                } else {
+                    e5ojs_message = {'status':1,'type':'error','text':'Error - Tried to '+post_set_status};
+                }
+                // save message on session var
+                e5ojs_push_session_message(req,e5ojs_message);
+                // redirect to posts archive
+                res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/page/all/page/1/");
+            });
+        } else {
+            //console.log("post_set_status : ",post_set_status);
+            // multiple post ids
+            // update posts
+            e5ojs_change_page_status_multiple(post_ids,post_set_status,function(data){ //aqui
+                // create session message
+                // validate result
+                var e5ojs_message = null;
+                if( data.status ) {
+                    // show notification
+                    e5ojs_message = {'status':1,'type':'done','text':'Successfully - Moved to '+post_set_status};
+                } else {
+                    e5ojs_message = {'status':1,'type':'error','text':'Error - Tried to move to '+post_set_status};
+                }
+                // save message on session var
+                e5ojs_push_session_message(req,e5ojs_message);
+                // redirect to posts archive
+                res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/page/all/page/1/");
+            });
+        }
+
+    });
+});
+
+
+
+function e5ojs_read_template_files_json(callback) {
+    fs = require('fs');
+    fs.readFile(__dirname+'/../views/front-end/e5ojs-templates.json', 'utf8', function (err,file_data) {
+        if (err) {
+            callback(null);
+        } else {
+            var templates_json = JSON.parse(file_data);
+            callback(templates_json);
+        }
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
 router.get('/media/', function(req, res, next) {
     // get page with validate session
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
@@ -1438,6 +1731,82 @@ function e5ojs_remove_post_type_status_multiple(post_ids,callback) {
     });
 }
 /* end post type DB function */
+
+
+
+
+
+
+/* start page DB function */
+function e5ojs_page_insert_new(page_data, callback) {
+    // get increment e5ojs_media
+    e5ojs_get_next_id('page',function(data){
+        // increment post_type counter
+        var next_id = data.seq;
+        page_data.page_id = parseInt(next_id);
+        db.e5ojs_page.insert(page_data,function(err, result_data){
+            if( err )
+                callback(null);
+            else
+                callback(result_data);
+        });
+    });
+}
+function e5ojs_page_get_page(page_id, callback) {
+    db.e5ojs_page.find({'page_id':parseInt(page_id)},function(err,result_data){
+        if( err )
+            callback(null);
+        else
+            callback(result_data);
+    });
+}
+function e5ojs_page_update(page_data, callback) {
+    page_data.page_id = parseInt(page_data.page_id);
+    db.e5ojs_page.update({'page_id':parseInt(page_data.page_id)},{$set:page_data},{new:false},function(err,result_data){
+        if( err )
+            callback(null);
+        else
+            callback(result_data);
+    });
+}
+function e5ojs_delete_page_status_multiple(page_ids,callback) {
+    var ids_array = Array();
+    page_ids.forEach(function(val,key){
+        ids_array.push( parseInt(page_ids[key]) );
+    });
+    db.e5ojs_page.remove({'page_id':{$in:ids_array}},function(err, result_data){
+        // result : { ok: 1, n: 1 }
+        if( err ) {
+            callback({ok:0});
+        } else {
+            if( result_data.ok == 1 && result_data.n > 0 ) {
+                callback({status:1});
+            } else {
+                callback({status:0});
+            }
+        }
+    });
+}
+function e5ojs_change_page_status_multiple(page_ids,status,callback) {
+
+    var ids_array = Array();
+    page_ids.forEach(function(val,key){
+        ids_array.push( parseInt(page_ids[key]) );
+    });
+    db.e5ojs_page.update({'page_id':{$in:ids_array}},{$set:{'page_status':status}},{new: false,multi: true},function(err, result_data){
+        // result : WriteResult({ "nMatched" : 3, "nUpserted" : 0, "nModified" : 3 })
+        if( err ) {
+            callback({ok:0});
+        } else {
+            if( result_data.nModified > 0 ) {
+                callback({status:1});
+            } else {
+                callback({status:0});
+            }
+        }
+    });
+}
+/* end page DB function */
 
 
 
