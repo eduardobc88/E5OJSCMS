@@ -10,6 +10,11 @@ var back_end = require('./routes/back-end');
 var api = require('./routes/api');
 var session = require("express-session");
 
+
+
+
+
+
 /*
 for mongodb backup data use:
 mongodump
@@ -21,6 +26,15 @@ The backup will be created on current terminal location on dump/ Folder
 
 
 var app = express();
+
+/* start global app var */
+app.locals.e5ojs = {
+    host_url: "http://nodejs.dev",
+    e5ojs_refresh_router: false,
+};
+/* end global app var */
+
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

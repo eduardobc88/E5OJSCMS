@@ -942,7 +942,7 @@ router.get('/page/action/new/', function(req, res, next) {
             var e5ojs_message = e5ojs_get_session_message(req);
             // remove session message
             e5ojs_clear_session_message(req);
-            res.render('back-end/e5ojs-admin-page', { page_data: e5ojs_global_data.admin_pages['pages'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], e5ojs_message:e5ojs_message, page_data:null, e5ojs_templates_json:templates_json });
+            res.render('back-end/e5ojs-admin-page', { page_data: e5ojs_global_data.admin_pages['pages'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], pages_data:null, e5ojs_message:e5ojs_message, e5ojs_templates_json:templates_json });
         });
     });
 });
@@ -984,6 +984,9 @@ router.post('/page/action/edit/:page_status/', function(req, res, next) {
             }
             // save message on session var
             e5ojs_push_session_message(req,e5ojs_message);
+            // set true for front-end refresh routers
+            req.app.locals.e5ojs_refresh_router = true;
+            // response
             res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/page/action/edit/"+page_data_result.page_id+"/");
         });
     });
@@ -1019,7 +1022,7 @@ router.get('/page/action/edit/:page_id/', function(req, res, next) {
                     e5ojs_clear_session_message(req);
                     // get templates json file
                     e5ojs_read_template_files_json(function(templates_json){
-                        res.render('back-end/e5ojs-admin-page', { page_data: e5ojs_global_data.admin_pages['pages'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], e5ojs_message:e5ojs_message, page_data:page_data , e5ojs_templates_json:templates_json });
+                        res.render('back-end/e5ojs-admin-page', { page_data: e5ojs_global_data.admin_pages['pages'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], e5ojs_message:e5ojs_message, pages_data:page_data , e5ojs_templates_json:templates_json });
                     });
                 });
 
@@ -1063,6 +1066,9 @@ router.post('/page/action/edit/:page_id/:page_status/',function(req, res, next){
             }
             // save message on session var
             e5ojs_push_session_message(req,e5ojs_message);
+            // set true for front-end refresh routers
+            req.app.locals.e5ojs_refresh_router = true;
+            // response
             res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/page/action/edit/"+page_id+"/");
         });
     });
@@ -1744,6 +1750,7 @@ function e5ojs_page_insert_new(page_data, callback) {
         // increment post_type counter
         var next_id = data.seq;
         page_data.page_id = parseInt(next_id);
+        page_data.page_slug = getSlug(remove_diacritics( page_data.page_title ));
         db.e5ojs_page.insert(page_data,function(err, result_data){
             if( err )
                 callback(null);
@@ -1762,6 +1769,7 @@ function e5ojs_page_get_page(page_id, callback) {
 }
 function e5ojs_page_update(page_data, callback) {
     page_data.page_id = parseInt(page_data.page_id);
+    page_data.page_slug = getSlug(remove_diacritics( page_data.page_title ));
     db.e5ojs_page.update({'page_id':parseInt(page_data.page_id)},{$set:page_data},{new:false},function(err,result_data){
         if( err )
             callback(null);
