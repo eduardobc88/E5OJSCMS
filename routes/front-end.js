@@ -1,3 +1,5 @@
+/* ============== start e5ojs requires ============== */
+
 var express = require('express');
 var router = express.Router();
 // format date
@@ -7,6 +9,7 @@ var current_date = new Date();
 var mongojs = require('mongojs');
 var db = mongojs("e5ojs_db");// choose DB
 
+/* ============== end e5ojs requires ============== */
 
 
 
@@ -16,9 +19,42 @@ var db = mongojs("e5ojs_db");// choose DB
 
 
 
+
+
+
+
+
+
+
+
+/* ============== start e5ojs global var ============== */
+
+var e5ojs_global_data = {};
+
+/* ============== end e5ojs global var ============== */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============== start e5ojs configuration ============== */
 
 /* start e5ojs generate global data */
-var e5ojs_global_data = {};
 function e5ojs_global_data_init() {
     //var host_url = req.protocol+"://"+req.get('host');
     var host_url = "http://nodejs.dev"; // change for current host ip or domain
@@ -45,36 +81,69 @@ e5ojs_global_data_init();
 /* end e5ojs generate global data */
 
 
-
-
-
-
-
-
 /* start e5ojs regenerate page routers */
 function e5ojs_regenetate_routers() {
     console.log("======== E5OJS REGENERATE ROUTERS ========");
-    /* start router pages */
+    // for pages
     for( var current_route_key in e5ojs_global_data.pages ) {
         var route_slug = e5ojs_global_data.pages[current_route_key];
         remove_route_stack(route_slug);
     }
+    // for post types
+    for( var current_route_key in e5ojs_global_data.post_types ) {
+        var route_slug = e5ojs_global_data.post_types[current_route_key];
+        remove_route_stack(route_slug);
+    }
+    // slug from router stack
     function remove_route_stack(route_slug) {
         for(var key_router in router.stack ) {
             var route = router.stack[key_router];
             if( route.regexp.toString().indexOf(route_slug) > 0 ) {
-                //console.log("remove route",route.regexp);
                 router.stack.splice(key_router, 1);
             }
         }
     }
-    /* end router pages */
-    /* start router post types archive */
-
-    /* end router post types archive */
     e5ojs_global_data_init();
 }
 /* start e5ojs regenerate page routers */
+
+
+
+
+/* ============== end e5ojs configuration ============== */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============== start e5ojs router ============== */
+
 
 
 /* start e5ojs load dinamic page templates and generate routers */
@@ -126,6 +195,19 @@ function e5ojs_generate_router_post_type(post_type_data) {
 /* end e5ojs load dinamic page templates and generate routers */
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* start catch all GET request to check if refresh routers */
 router.get('*', function(req, res, next) {
 
@@ -149,16 +231,7 @@ router.get('*', function(req, res, next) {
 
 
 
-
-
-
-
-
-
-
-
-
-/* E5OJS start custom pages */
+/* start custom pages */
 router.get('/', function(req, res, next) {
     var page_data = {};
     page_data = {
@@ -172,7 +245,10 @@ router.get('/', function(req, res, next) {
     }
     res.render('front-end/e5ojs-index', { e5ojs_global_data:e5ojs_global_data, page_data:page_data });
 });
-/* E5OJS start custom pages */
+/* start custom pages */
+
+
+/* ============== end e5ojs router ============== */
 
 
 
@@ -185,6 +261,54 @@ router.get('/', function(req, res, next) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============== start e5ojs mongodb functions =============== */
+/*
+if "new:true" found object data and override with new object data
+if "new:false"  found object data but only update the passed fileds
+*/
+
+
+/* ============== end e5ojs mongodb functions =============== */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============== start e5ojs function ============== */
+
+
+/* ============== end e5ojs function ============== */
 
 
 

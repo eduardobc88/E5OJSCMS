@@ -1,3 +1,5 @@
+/* ============== start e5ojs requires ============== */
+
 var express = require('express');
 var router = express.Router();
 // MD5
@@ -12,6 +14,10 @@ var current_date = new Date();
 var remove_diacritics = require('diacritics').remove;
 // generate slug from string
 var getSlug = require('speakingurl');
+// for image processing
+var multer = require('multer');
+
+/* ============== end e5ojs requires ============== */
 
 
 
@@ -24,8 +30,95 @@ var getSlug = require('speakingurl');
 
 
 
-/* start global data var */
-var e5ojs_global_data = {};
+/* ============== start e5ojs global var ============== */
+
+var host_url = "http://nodejs.dev"; // change for current host ip or domain
+var e5ojs_global_data = {}; // contains all urls for admin
+// for image processing
+var e5ojs_image_sizes = new Array({width:150,height:150},{width:200,height:200},{width:300,height:150},{width:800,height:200});
+var image_sizes_pointer = 0;
+var e5ojs_folder_images_sizes = "sizes/";
+var e5ojs_sizes_return = {};
+
+
+/* start filter upload files */
+var maxSize = (2.5) * 1000 * 1000; // max file size 1 = 1024kb
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, __dirname + '/../public/uploads/');
+  },
+  filename: function (req, file, cb) {
+      // generate name for file
+      var file_name = req.media_file_name;
+      delete req.media_file_name;
+      cb(null, file_name );
+  }
+});
+var upload = multer({
+    storage: storage,
+    limits: { fileSize: maxSize },
+    fileFilter: function (req, file, cb) {
+        if( file.mimetype !== 'image/png' && file.mimetype !== 'image/jpeg' ) {
+            req.e5ojs_file_validation_error = true;
+            return cb(null, false); // no save file
+        } else {
+            // ramdom string
+            var random_string = require("randomstring");
+
+            // get file data and save in DB
+            var file_name_strip = getSlug(remove_diacritics( (file.originalname.split("."))[0] ));
+            var file_original_name = file.originalname;
+            var file_mime_type = file.mimetype;
+            var file_store_name = file.filename;
+            var file_size = file.size;
+            var file_ext = file_mime_type.split("/");
+            var file_name = random_string.generate({charset:file_name_strip})+"."+file_ext[1];
+            req.media_file_name = file_name;
+
+            var file_data = {
+                'media_id':'', // after will be filled
+                'media_name':file_original_name,
+                'media_file_name':file_name,
+                'media_file_name_clean':file_name.split(".")[0],
+                'media_mime_type':file_mime_type,
+                'media_date':date_format(current_date,'dd-mm-yyyy'),
+            };
+            // get increment e5ojs_media
+            e5ojs_get_next_id('media',function(data){
+                var next_id = data.seq;
+                file_data.media_id = next_id;
+                // save on DB
+                //console.log(file_data);
+                e5ojs_insert_new_media(file_data,function(result_data){
+                    // validate error
+                    result_data.media_file_name = e5ojs_global_data.admin_res.media_uploads_url+result_data.media_file_name;
+                    // get image data and send as part of req and get it on router function
+                    req.e5ojs_file_validation_error = false;
+                    req.e5ojs_file_data = result_data; // pass data to request
+                    return cb(null, true);// save file
+                });
+            });
+        }
+    }
+}).any();
+/* end filter upload files */
+/* ============== start e5ojs global var ============== */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============== start e5ojs configuration ============== */
+
 function e5ojs_init(callback) {
     // load all post types
     e5ojs_global_data.admin_pages.admin_post_types = new Array();
@@ -45,8 +138,6 @@ function e5ojs_init(callback) {
 }
 
 function e5ojs_global_data_init() {
-    //var host_url = req.protocol+"://"+req.get('host');
-    var host_url = "http://nodejs.dev"; // change for current host ip or domain
     //  three sections
     e5ojs_global_data.admin_pages = {
         dashboard: {title:"dashboard",description:"Lorem ipsum...",url:host_url+"/admin/", icon_name:"dashboard",position:1},
@@ -112,7 +203,7 @@ function e5ojs_global_data_init() {
 }
 e5ojs_global_data_init();
 
-/* end global data var */
+/* ============== end e5ojs configuration ============== */
 
 
 
@@ -121,132 +212,140 @@ e5ojs_global_data_init();
 
 
 
-/* start parse upload request files */
-var multer = require('multer');
-var maxSize = (2.5) * 1000 * 1000; // max file size 1 = 1024kb
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, __dirname + '/../public/uploads/');
-  },
-  filename: function (req, file, cb) {
-      // generate name for file
-      var file_name = req.media_file_name;
-      delete req.media_file_name;
-      cb(null, file_name );
-  }
-});
-var upload = multer({
-    storage: storage,
-    limits: { fileSize: maxSize },
-    fileFilter: function (req, file, cb) {
-        if( file.mimetype !== 'image/png' && file.mimetype !== 'image/jpeg' ) {
-            req.e5ojs_file_validation_error = true;
-            return cb(null, false); // no save file
-        } else {
-            // ramdom string
-            var random_string = require("randomstring");
-
-            // get file data and save in DB
-            var file_name_strip = getSlug(remove_diacritics( (file.originalname.split("."))[0] ));
-            var file_original_name = file.originalname;
-            var file_mime_type = file.mimetype;
-            var file_store_name = file.filename;
-            var file_size = file.size;
-            var file_ext = file_mime_type.split("/");
-            var file_name = random_string.generate({charset:file_name_strip})+"."+file_ext[1];
-            req.media_file_name = file_name;
-
-            var file_data = {
-                'media_id':'', // after will be filled
-                'media_name':file_original_name,
-                'media_file_name':file_name,
-                'media_file_name_clean':file_name.split(".")[0],
-                'media_mime_type':file_mime_type,
-                'media_date':date_format(current_date,'dd-mm-yyyy'),
-            };
-            // get increment e5ojs_media
-            e5ojs_get_next_id('media',function(data){
-                var next_id = data.seq;
-                file_data.media_id = next_id;
-                // save on DB
-                //console.log(file_data);
-                e5ojs_insert_new_media(file_data,function(result_data){
-                    // validate error
-                    result_data.media_file_name = e5ojs_global_data.admin_res.media_uploads_url+result_data.media_file_name;
-                    // get image data and send as part of req and get it on router function
-                    req.e5ojs_file_validation_error = false;
-                    req.e5ojs_file_data = result_data; // pass data to request
-                    return cb(null, true);// save file
-                });
-            });
-
-        }
-
-    }
-}).any();
-/* end parse upload request files */
 
 
-/* start resize image files */
-var e5ojs_image_sizes = new Array({width:150,height:150},{width:200,height:200},{width:300,height:150},{width:800,height:200});
-var image_sizes_pointer = 0;
-var e5ojs_folder_images_sizes = "sizes/";
-var e5ojs_sizes_return = {};
-function e5ojs_generate_image_file(img_object_data,callback) {
-
-    var media_file_name = img_object_data.media_file_name.split("/");
-    media_file_name = media_file_name[media_file_name.length-1];
-    media_file_name = (media_file_name.split("."))[0];
-    var file_ext = (img_object_data.media_mime_type.split("/"))[1];
-    // paths
-    var file_path =  __dirname + '/../public/uploads/'+media_file_name+"."+file_ext;
-    var file_path_to_save =__dirname + '/../public/uploads/'+e5ojs_folder_images_sizes+media_file_name+"-"+e5ojs_image_sizes[image_sizes_pointer].width+"x"+e5ojs_image_sizes[image_sizes_pointer].height+"."+file_ext;
-
-    // generate array to return with sizes to attach on req json
-    var size_string = e5ojs_image_sizes[image_sizes_pointer].width+"x"+e5ojs_image_sizes[image_sizes_pointer].height;
-    var file_size_name = e5ojs_global_data.admin_res.media_uploads_sizes_url+media_file_name+"-"+e5ojs_image_sizes[image_sizes_pointer].width+"x"+e5ojs_image_sizes[image_sizes_pointer].height+"."+file_ext;
-    e5ojs_sizes_return[size_string] = file_size_name;
 
 
-    // generate images sizes
-    var crop_error = false;
-    e5ojs_crop_image(file_path,file_path_to_save,e5ojs_image_sizes[image_sizes_pointer],function(err){
-        if( err ) {
-            crop_error = true;
-        }
-        // next image crop
-        image_sizes_pointer = image_sizes_pointer+1;
-        if( image_sizes_pointer < e5ojs_image_sizes.length ) {
-            e5ojs_generate_image_file(img_object_data,callback);
-        } else {
-            // return result
-            image_sizes_pointer = 0;
-            callback(crop_error);
-        }
+
+
+
+
+
+
+
+
+
+/* ============== start e5ojs router ============== */
+
+/*  start e5ojs login session routers */
+router.get('/', function(req, res, next) {
+    // get page with validate session
+    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        // return template with user data
+        // e5ojs_global_data  and e5ojs_user_data default
+        res.render('back-end/e5ojs-admin', { page_data: e5ojs_global_data.admin_pages['dashboard'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
     });
+});
+router.post('/', function(req, res, next) {
+    // get page with validate session
+    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        // return template with user data
+        // e5ojs_global_data  and e5ojs_user_data default
+        res.render('back-end/e5ojs-admin', { page_data: e5ojs_global_data.admin_pages['dashboard'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
+    });
+});
+router.get('/admin/', function(req, res, next) {
+    // get page with validate session
+    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        // return template with user data
+        // e5ojs_global_data  and e5ojs_user_data default
+        //console.log("e5ojs_global_data",e5ojs_global_data);
+        res.render('back-end/e5ojs-admin', { page_data: e5ojs_global_data.admin_pages['dashboard'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
+    });
+});
+router.get('/log-out/', function(req, res, next) {
+    e5ojs_global_data_init();
+    // clear session data
+    var e5ojs_session = req.session;
+    e5ojs_session.e5ojs_user_data = null;
+    e5ojs_session.destroy();
+    // return log-in page
+    res.render('back-end/e5ojs-login', { page_data: e5ojs_global_data.admin_other_pages['login'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:null });
+});
+/*  end e5ojs login session routers */
 
-}
-function e5ojs_crop_image(image_path,image_path_to_save,image_size,callback) {
-    // obtain an image object:
-    var lwip = require('lwip');
-    var error = false;
-    // generate images sizes
-    lwip.open(image_path, function(err, image){
-        if( err )
-            callback(err);
-        // define a batch of manipulations and save to disk as JPEG:
-        image.batch()
-        .scale(0.80)
-        .crop(image_size.width, image_size.height) // crop a 200X200 square from center
-        .writeFile(image_path_to_save, function(err){
-            if( err )
-                callback(error);
-            else
-                callback(error);
+
+
+
+
+
+
+
+
+
+/*  start e5ojs media upload routers */
+router.post('/upload/', function(req, res, next) {
+    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        // return template with user data
+        // e5ojs_global_data  and e5ojs_user_data default
+        //res.render('back-end/e5ojs-admin-new-post', { title: 'NEW POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
+        // process image
+        upload(req, res, function(err) {
+            if( req.e5ojs_file_validation_error ) {
+                // remove var req
+                delete req.e5ojs_file_validation_error;
+                delete req.e5ojs_file_data;
+                res.json({"upload":false});
+            } else {
+                var e5ojs_file_data = req.e5ojs_file_data;
+                delete req.e5ojs_file_validation_error;
+                delete req.e5ojs_file_data;
+                // generate image sizes
+                e5ojs_generate_image_file(e5ojs_file_data,function(err){
+                    if( err ) {
+                        e5ojs_sizes_return = new Array();
+                        res.json({"upload":false});
+                    } else {
+                        e5ojs_file_data.sizes = e5ojs_sizes_return;
+                        e5ojs_sizes_return = new Array();
+                        res.json({"upload":true,"e5ojs_file_data":e5ojs_file_data});
+                    }
+                });
+            }
         });
     });
-}
-/* end resize image files */
+});
+// get all media return json
+router.get('/all-media/',function(req, res, next){
+    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        // return template with user data
+        // e5ojs_global_data  and e5ojs_user_data default
+        //res.render('back-end/e5ojs-admin-new-post', { title: 'NEW POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
+        e5ojs_get_all_media(function(media_data){
+            if( media_data != false ) {
+                var media_sizes = {};
+                e5ojs_image_sizes.forEach(function(size,key){
+                    var size_key = size.width+"x"+size.height;
+                    media_sizes[size_key] = size_key;
+                });
+                res.json( new Array({status:true,media_posts:media_data,sizes:media_sizes}) );
+            } else {
+                res.json( new Array({status:false}) );
+            }
+        });
+    });
+});
+// get all media return json
+router.get('/all-media/:media_id',function(req, res, next){
+    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        var media_id = req.params.media_id;
+        // return template with user data
+        // e5ojs_global_data  and e5ojs_user_data default
+        e5ojs_get_media(media_id,function(media_data){
+            if( media_data != false ) {
+                var media_sizes = {};
+                e5ojs_image_sizes.forEach(function(size,key){
+                    var size_key = size.width+"x"+size.height;
+                    media_sizes[size_key] = size_key;
+                });
+                res.json( new Array({status:true,media_posts:media_data,sizes:media_sizes}) );
+            } else {
+                res.json( new Array({status:false}) );
+            }
+        });
+    });
+});
+/*  end e5ojs media upload routers */
 
 
 
@@ -255,25 +354,10 @@ function e5ojs_crop_image(image_path,image_path_to_save,image_size,callback) {
 
 
 
-// FROM: http://www.mongodb.org/display/DOCS/Updating#Updating-update%28%29
-//
-// db.collection.update( criteria, objNew, upsert, multi )
-//   criteria - query which selects the record to update;
-//   objNew - updated object or $ operators (e.g., $inc) which manipulate the object
-//   upsert - if this should be an "upsert"; that is, if the record does not exist, insert it
-//   multi - if all documents matching criteria should be updated
-//
-// db.myCollection.update({condField: 'condValue'}, { $set: { dateField: new Date(2011, 0, 1)}}, false, true);
 
 
 
-
-
-
-
-
-
-/* start post type routers */
+/* start e5ojs post type routers */
 function e5ojs_add_post_type_router(post_type_data) {
     // start routers
     router.get('/post-type/'+post_type_data.post_type_name+'/', function(req, res, next) {
@@ -702,7 +786,7 @@ function e5ojs_add_post_type_router(post_type_data) {
         });
     });
 }
-/* end post type routers */
+/*  end e5ojs post type routers  */
 
 
 
@@ -716,159 +800,7 @@ function e5ojs_add_post_type_router(post_type_data) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-/* start login session */
-router.get('/', function(req, res, next) {
-    // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-        // return template with user data
-        // e5ojs_global_data  and e5ojs_user_data default
-        res.render('back-end/e5ojs-admin', { page_data: e5ojs_global_data.admin_pages['dashboard'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
-    });
-});
-router.post('/', function(req, res, next) {
-    // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-        // return template with user data
-        // e5ojs_global_data  and e5ojs_user_data default
-        res.render('back-end/e5ojs-admin', { page_data: e5ojs_global_data.admin_pages['dashboard'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
-    });
-});
-router.get('/admin/', function(req, res, next) {
-    // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-        // return template with user data
-        // e5ojs_global_data  and e5ojs_user_data default
-        //console.log("e5ojs_global_data",e5ojs_global_data);
-        res.render('back-end/e5ojs-admin', { page_data: e5ojs_global_data.admin_pages['dashboard'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
-    });
-});
-router.get('/log-out/', function(req, res, next) {
-    e5ojs_global_data_init();
-    // clear session data
-    var e5ojs_session = req.session;
-    e5ojs_session.e5ojs_user_data = null;
-    e5ojs_session.destroy();
-    // return log-in page
-    res.render('back-end/e5ojs-login', { page_data: e5ojs_global_data.admin_other_pages['login'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:null });
-});
-/* start login session */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* start media upload */
-router.post('/upload/', function(req, res, next) {
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-        // return template with user data
-        // e5ojs_global_data  and e5ojs_user_data default
-        //res.render('back-end/e5ojs-admin-new-post', { title: 'NEW POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
-        // process image
-        upload(req, res, function(err) {
-            if( req.e5ojs_file_validation_error ) {
-                // remove var req
-                delete req.e5ojs_file_validation_error;
-                delete req.e5ojs_file_data;
-                res.json({"upload":false});
-            } else {
-                var e5ojs_file_data = req.e5ojs_file_data;
-                delete req.e5ojs_file_validation_error;
-                delete req.e5ojs_file_data;
-                // generate image sizes
-                e5ojs_generate_image_file(e5ojs_file_data,function(err){
-                    if( err ) {
-                        e5ojs_sizes_return = new Array();
-                        res.json({"upload":false});
-                    } else {
-                        e5ojs_file_data.sizes = e5ojs_sizes_return;
-                        e5ojs_sizes_return = new Array();
-                        res.json({"upload":true,"e5ojs_file_data":e5ojs_file_data});
-                    }
-                });
-            }
-        });
-    });
-});
-// get all media return json
-router.get('/all-media/',function(req, res, next){
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-        // return template with user data
-        // e5ojs_global_data  and e5ojs_user_data default
-        //res.render('back-end/e5ojs-admin-new-post', { title: 'NEW POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
-        e5ojs_get_all_media(function(media_data){
-            if( media_data != false ) {
-                var media_sizes = {};
-                e5ojs_image_sizes.forEach(function(size,key){
-                    var size_key = size.width+"x"+size.height;
-                    media_sizes[size_key] = size_key;
-                });
-                res.json( new Array({status:true,media_posts:media_data,sizes:media_sizes}) );
-            } else {
-                res.json( new Array({status:false}) );
-            }
-        });
-    });
-});
-// get all media return json
-router.get('/all-media/:media_id',function(req, res, next){
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-        var media_id = req.params.media_id;
-        // return template with user data
-        // e5ojs_global_data  and e5ojs_user_data default
-        e5ojs_get_media(media_id,function(media_data){
-            if( media_data != false ) {
-                var media_sizes = {};
-                e5ojs_image_sizes.forEach(function(size,key){
-                    var size_key = size.width+"x"+size.height;
-                    media_sizes[size_key] = size_key;
-                });
-                res.json( new Array({status:true,media_posts:media_data,sizes:media_sizes}) );
-            } else {
-                res.json( new Array({status:false}) );
-            }
-        });
-    });
-});
-/* end media upload */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* start admin pages */
+/* start e5ojs pages routers */
 router.get('/page/', function(req, res, next) {
     // get page with validate session
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
@@ -1146,49 +1078,7 @@ router.get('/page/action/:page_status/:page_ids/', function(req, res, next) {
     });
 });
 
-
-
-function e5ojs_read_template_files_json(callback) {
-    fs = require('fs');
-    fs.readFile(__dirname+'/../views/front-end/e5ojs-templates.json', 'utf8', function (err,file_data) {
-        if (err) {
-            callback(null);
-        } else {
-            var templates_json = JSON.parse(file_data);
-            callback(templates_json);
-        }
-    });
-}
-
-
-
-
-
-
-
-
-
-
-
-
-router.get('/media/', function(req, res, next) {
-    // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-        // return template with user data
-        // e5ojs_global_data  and e5ojs_user_data default
-        console.log("ADMIN",e5ojs_global_data.admin_pages.admin_post_types);
-        res.render('back-end/e5ojs-admin-media', { page_data: e5ojs_global_data.admin_pages['media'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
-    });
-});
-router.get('/settings/', function(req, res, next) {
-    // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-        // return template with user data
-        // e5ojs_global_data  and e5ojs_user_data default
-        console.log("ADMIN",e5ojs_global_data.admin_pages.admin_post_types);
-        res.render('back-end/e5ojs-admin-settings', { page_data: e5ojs_global_data.admin_pages['settings'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
-    });
-});
+/* end e5ojs pages routers */
 
 
 
@@ -1204,18 +1094,7 @@ router.get('/settings/', function(req, res, next) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-/* ============== start e5ojs post type functions =============== */
+/* start e5ojs post type routers */
 router.get('/post-type/action/new/', function(req, res, next) {
     // get page with validate session
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
@@ -1434,10 +1313,7 @@ router.get('/post-type/:post_type_status/page/:number_page/', function(req, res,
     });
 });
 
-/* ============== end e5ojs post type functions =============== */
-
-
-/* end admin pages */
+/* end e5ojs post type routers */
 
 
 
@@ -1451,6 +1327,29 @@ router.get('/post-type/:post_type_status/page/:number_page/', function(req, res,
 
 
 
+/* start e5ojs admin pages routers */
+router.get('/media/', function(req, res, next) {
+    // get page with validate session
+    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        // return template with user data
+        // e5ojs_global_data  and e5ojs_user_data default
+        //console.log("ADMIN",e5ojs_global_data.admin_pages.admin_post_types);
+        res.render('back-end/e5ojs-admin-media', { page_data: e5ojs_global_data.admin_pages['media'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
+    });
+});
+router.get('/settings/', function(req, res, next) {
+    // get page with validate session
+    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        // return template with user data
+        // e5ojs_global_data  and e5ojs_user_data default
+        //console.log("ADMIN",e5ojs_global_data.admin_pages.admin_post_types);
+        res.render('back-end/e5ojs-admin-settings', { page_data: e5ojs_global_data.admin_pages['settings'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
+    });
+});
+/* end e5ojs admin pages routers */
+
+
+/* ============== end e5ojs router ============== */
 
 
 
@@ -1459,26 +1358,6 @@ router.get('/post-type/:post_type_status/page/:number_page/', function(req, res,
 
 
 
-/* ============== start e5ojs session functions =============== */
-function e5ojs_push_session_message(req,message_object) {
-    var e5ojs_session = req.session;
-    e5ojs_session.e5ojs_message = message_object;
-}
-function e5ojs_get_session_message(req) {
-    var e5ojs_session = req.session;
-    var message_object = {};
-    if( e5ojs_session !== 'undefined' && typeof e5ojs_session.e5ojs_message !== 'undefined' && e5ojs_session.e5ojs_message != null ) {
-         message_object = e5ojs_session.e5ojs_message;
-    }
-    return message_object;
-}
-function e5ojs_clear_session_message(req) {
-    var e5ojs_session = req.session;
-    if( e5ojs_session !== 'undefined' && typeof e5ojs_session.e5ojs_message !== 'undefined' && e5ojs_session.e5ojs_message != null ) {
-         delete e5ojs_session.e5ojs_message;
-    }
-}
-/* ============== end e5ojs session functions =============== */
 
 
 
@@ -1878,9 +1757,6 @@ function e5ojs_update_post_meta_save(post_meta,callback) {
             callback(result_meta);
     });
 }
-
-
-
 function e5ojs_insert_post_meta(post_meta_data,callback) {
     if( post_meta_data.length == 0 ) {
         callback(null);
@@ -1935,6 +1811,9 @@ function e5ojs_get_post_meta(post_id,callback) {
 /* start post meta DB function */
 
 /* ============== end e5ojs mongodb functions =============== */
+
+
+
 
 
 
@@ -2059,6 +1938,136 @@ function e5ojs_get_user_info_callback(user_login,user_pass,use_md5,callback) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============== start e5ojs function ============== */
+
+/* start resize image files */
+function e5ojs_generate_image_file(img_object_data,callback) {
+
+    var media_file_name = img_object_data.media_file_name.split("/");
+    media_file_name = media_file_name[media_file_name.length-1];
+    media_file_name = (media_file_name.split("."))[0];
+    var file_ext = (img_object_data.media_mime_type.split("/"))[1];
+    // paths
+    var file_path =  __dirname + '/../public/uploads/'+media_file_name+"."+file_ext;
+    var file_path_to_save =__dirname + '/../public/uploads/'+e5ojs_folder_images_sizes+media_file_name+"-"+e5ojs_image_sizes[image_sizes_pointer].width+"x"+e5ojs_image_sizes[image_sizes_pointer].height+"."+file_ext;
+
+    // generate array to return with sizes to attach on req json
+    var size_string = e5ojs_image_sizes[image_sizes_pointer].width+"x"+e5ojs_image_sizes[image_sizes_pointer].height;
+    var file_size_name = e5ojs_global_data.admin_res.media_uploads_sizes_url+media_file_name+"-"+e5ojs_image_sizes[image_sizes_pointer].width+"x"+e5ojs_image_sizes[image_sizes_pointer].height+"."+file_ext;
+    e5ojs_sizes_return[size_string] = file_size_name;
+
+
+    // generate images sizes
+    var crop_error = false;
+    e5ojs_crop_image(file_path,file_path_to_save,e5ojs_image_sizes[image_sizes_pointer],function(err){
+        if( err ) {
+            crop_error = true;
+        }
+        // next image crop
+        image_sizes_pointer = image_sizes_pointer+1;
+        if( image_sizes_pointer < e5ojs_image_sizes.length ) {
+            e5ojs_generate_image_file(img_object_data,callback);
+        } else {
+            // return result
+            image_sizes_pointer = 0;
+            callback(crop_error);
+        }
+    });
+
+}
+function e5ojs_crop_image(image_path,image_path_to_save,image_size,callback) {
+    // obtain an image object:
+    var lwip = require('lwip');
+    var error = false;
+    // generate images sizes
+    lwip.open(image_path, function(err, image){
+        if( err )
+            callback(err);
+        // define a batch of manipulations and save to disk as JPEG:
+        image.batch()
+        .scale(0.80)
+        .crop(image_size.width, image_size.height) // crop a 200X200 square from center
+        .writeFile(image_path_to_save, function(err){
+            if( err )
+                callback(error);
+            else
+                callback(error);
+        });
+    });
+}
+/* end resize image files */
+
+
+
+
+
+
+
+
+
+/*  start e5ojs session message functions  */
+function e5ojs_push_session_message(req,message_object) {
+    var e5ojs_session = req.session;
+    e5ojs_session.e5ojs_message = message_object;
+}
+function e5ojs_get_session_message(req) {
+    var e5ojs_session = req.session;
+    var message_object = {};
+    if( e5ojs_session !== 'undefined' && typeof e5ojs_session.e5ojs_message !== 'undefined' && e5ojs_session.e5ojs_message != null ) {
+         message_object = e5ojs_session.e5ojs_message;
+    }
+    return message_object;
+}
+function e5ojs_clear_session_message(req) {
+    var e5ojs_session = req.session;
+    if( e5ojs_session !== 'undefined' && typeof e5ojs_session.e5ojs_message !== 'undefined' && e5ojs_session.e5ojs_message != null ) {
+         delete e5ojs_session.e5ojs_message;
+    }
+}
+/*  end e5ojs session message functions  */
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* start for files */
+function e5ojs_read_template_files_json(callback) {
+    fs = require('fs');
+    fs.readFile(__dirname+'/../views/front-end/e5ojs-templates.json', 'utf8', function (err,file_data) {
+        if (err) {
+            callback(null);
+        } else {
+            var templates_json = JSON.parse(file_data);
+            callback(templates_json);
+        }
+    });
+}
+/* end for files */
+
+/* ============== end e5ojs function ============== */
 
 
 
