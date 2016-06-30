@@ -482,7 +482,7 @@ function e5ojs_add_post_type_router(post_type_data) {
             // update post on DB
             // generate post name
             var post_name = post_title.replace(/\s+/g, '-').toLowerCase();
-            var post_name = getSlug(remove_diacritics(post_name));
+            var post_name = getSlug(remove_diacritics(e5ojs_global_data.e5ojs_current_post_type))+"/"+getSlug(remove_diacritics(post_name));
 
 
             // check for post meta
@@ -560,7 +560,8 @@ function e5ojs_add_post_type_router(post_type_data) {
                                 e5ojs_message = {'status':1,'type':'done','text':'Successfully - Post edited'};
                                 // save message on session var
                                 e5ojs_push_session_message(req,e5ojs_message);
-
+                                // set true for front-end refresh routers
+                                req.app.locals.e5ojs_refresh_router = true;
                                 // redirect to edit post with ID
                                 res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/"+post_type_data.post_type_name+"/action/edit/"+result_data.post_id);
                             });
@@ -612,7 +613,7 @@ function e5ojs_add_post_type_router(post_type_data) {
                 var next_id = data.seq;
                 // insert post data
                 var post_name = post_title.replace(/\s+/g, '-').toLowerCase();
-                var post_name = getSlug(remove_diacritics(post_name));
+                var post_name = getSlug(remove_diacritics(e5ojs_global_data.e5ojs_current_post_type))+"/"+getSlug(remove_diacritics(post_name));
                 e5ojs_insert_new_post({post_id:next_id,post_title:post_title,post_content:post_content,post_excerpt:post_excerpt,post_date:post_date,post_name:post_name,post_media_attachment:post_media_attachment,post_status:post_status,post_post_type_id:post_post_type_id},function(result_data){
                     // validate result
                     // create session message
@@ -1114,6 +1115,8 @@ router.get('/page/action/:page_status/:page_ids/', function(req, res, next) {
                 }
                 // save message on session var
                 e5ojs_push_session_message(req,e5ojs_message);
+                // set true for front-end refresh routers
+                req.app.locals.e5ojs_refresh_router = true;
                 // redirect to posts archive
                 res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/page/all/page/1/");
             });
@@ -1133,6 +1136,8 @@ router.get('/page/action/:page_status/:page_ids/', function(req, res, next) {
                 }
                 // save message on session var
                 e5ojs_push_session_message(req,e5ojs_message);
+                // set true for front-end refresh routers
+                req.app.locals.e5ojs_refresh_router = true;
                 // redirect to posts archive
                 res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/page/all/page/1/");
             });
@@ -1247,6 +1252,8 @@ router.post('/post-type/action/edit/', function(req, res, next) {
             // save message on session var
             e5ojs_push_session_message(req,e5ojs_message);
             // redirect to de same page
+            // set true for front-end refresh routers
+            req.app.locals.e5ojs_refresh_router = true;
             res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/action/edit/"+post_type_data.post_type_id);
         });
     });
@@ -1314,6 +1321,8 @@ router.post('/post-type/action/edit/:post_type_id/', function(req, res, next) {
                 e5ojs_message = {'status':1,'type':'done','text':'Successfully - Post Type updated'};
                 // save message on session var
                 e5ojs_push_session_message(req,e5ojs_message);
+                // set true for front-end refresh routers
+                req.app.locals.e5ojs_refresh_router = true;
                 // redirect to de same page
                 res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/action/edit/"+post_type_id);
             });
@@ -1326,6 +1335,8 @@ router.post('/post-type/action/edit/:post_type_id/', function(req, res, next) {
                 e5ojs_message = {'status':1,'type':'done','text':'Successfully - Post Type deleted'};
                 // save message on session var
                 e5ojs_push_session_message(req,e5ojs_message);
+                // set true for front-end refresh routers
+                req.app.locals.e5ojs_refresh_router = true;
                 // redirect to de same page
                 res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/");
             });
@@ -1347,6 +1358,8 @@ router.get('/post-type/action/:post_type_action/:post_type_id/', function(req, r
                 e5ojs_message = {'status':1,'type':'done','text':'Successfully - Post Type updated'};
                 // save message on session var
                 e5ojs_push_session_message(req,e5ojs_message);
+                // set true for front-end refresh routers
+                req.app.locals.e5ojs_refresh_router = true;
                 // redirect to de same page
                 res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/all/page/1/");
             });
@@ -1359,6 +1372,8 @@ router.get('/post-type/action/:post_type_action/:post_type_id/', function(req, r
                 e5ojs_message = {'status':1,'type':'done','text':'Successfully - Post Type removed'};
                 // save message on session var
                 e5ojs_push_session_message(req,e5ojs_message);
+                // set true for front-end refresh routers
+                req.app.locals.e5ojs_refresh_router = true;
                 // redirect to de same page
                 res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/all/page/1/");
             });
@@ -1607,6 +1622,9 @@ function e5ojs_insert_new_media(post_data,callback) {
     });
 }
 function e5ojs_get_media(media_ids,callback) {
+    if( media_ids === undefined ) {
+        callback(false);
+    }
     var media_ids_array = media_ids.split(",");
     var media_ids = [];
     for( media_key in media_ids_array ) {

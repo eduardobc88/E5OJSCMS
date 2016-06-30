@@ -23,6 +23,7 @@ function e5ojs_global_data_init() {
     //var host_url = req.protocol+"://"+req.get('host');
     var host_url = "http://nodejs.dev"; // change for current host ip or domain
     e5ojs_global_data.pages = [];
+    e5ojs_global_data.post_types = [];
     e5ojs_global_data.res = {
         base_url: host_url,
         current_url: host_url,
@@ -37,14 +38,23 @@ function e5ojs_global_data_init() {
     };
     // generate page routers fisrt time
     e5ojs_generate_routers_for_pages();
+    // genetate post type routers first time
+    e5ojs_generate_routers_for_post_types();
 }
 e5ojs_global_data_init();
 /* end e5ojs generate global data */
 
 
+
+
+
+
+
+
 /* start e5ojs regenerate page routers */
-function e5ojs_regenetate_page_routers() {
-    //console.log("======== E5OJS REGENERATE ROUTERS ========");
+function e5ojs_regenetate_routers() {
+    console.log("======== E5OJS REGENERATE ROUTERS ========");
+    /* start router pages */
     for( var current_route_key in e5ojs_global_data.pages ) {
         var route_slug = e5ojs_global_data.pages[current_route_key];
         remove_route_stack(route_slug);
@@ -58,8 +68,11 @@ function e5ojs_regenetate_page_routers() {
             }
         }
     }
+    /* end router pages */
+    /* start router post types archive */
+
+    /* end router post types archive */
     e5ojs_global_data_init();
-    //console.log("======== E5OJS REGENERATE ROUTERS ========");
 }
 /* start e5ojs regenerate page routers */
 
@@ -78,6 +91,19 @@ function e5ojs_generate_routers_for_pages() {
         }
     });
 }
+function e5ojs_generate_routers_for_post_types() {
+    // remove routers
+    // get all publish post types
+    db.e5ojs_post_type.find({'post_type_status':1}, function(err, e5ojs_post_types_result){
+        if( e5ojs_post_types_result.length ) {
+            // generate router for each page
+            for( var key_post_type in e5ojs_post_types_result ){
+                var post_type_data = e5ojs_post_types_result[key_post_type];
+                e5ojs_generate_router_post_type(post_type_data);
+            }
+        }
+    });
+}
 function e5ojs_generate_router_page(page_data) {
     //console.log("FRONTEND - Route",page_data.page_slug);
     e5ojs_global_data.pages.push(page_data.page_slug);
@@ -85,17 +111,28 @@ function e5ojs_generate_router_page(page_data) {
         res.render('front-end/'+page_data.page_template, { e5ojs_global_data:e5ojs_global_data, page_data:page_data });
     });
 }
+function e5ojs_generate_router_post_type(post_type_data) {
+    e5ojs_global_data.post_types.push(post_type_data.post_type_slug);
+    // post type archive
+    router.get('/'+post_type_data.post_type_slug+'/', function(req, res, next) {
+        console.log("E5OJS ARCHIVE : "+post_type_data.post_type_slug);
+    });
+    // post type single
+    router.get('/'+post_type_data.post_type_slug+'/:post_name/', function(req, res, next) {
+        var post_name = req.params.post_name;
+        console.log("E5OJS ARCHIVE SINGLE : "+post_type_data.post_type_slug+"/"+post_name+"/");
+    });
+}
 /* end e5ojs load dinamic page templates and generate routers */
 
 
 /* start catch all GET request to check if refresh routers */
 router.get('*', function(req, res, next) {
-    console.log("=========== E5OJS * GET ============");
+
     // check for refresh routers
-    console.log("App locals",req.app.locals.e5ojs_refresh_router);
     if( req.app.locals.e5ojs_refresh_router == true ) {
         req.app.locals.e5ojs_refresh_router = false;
-        e5ojs_regenetate_page_routers();
+        e5ojs_regenetate_routers();
         next();
     } else {
         next();
