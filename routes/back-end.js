@@ -1327,6 +1327,59 @@ router.get('/post-type/:post_type_status/page/:number_page/', function(req, res,
 
 
 
+
+
+/* end e5ojs settings routers */
+
+router.get('/settings/', function(req, res, next) {
+    // get page with validate session
+    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        // get settins
+        e5ojs_settings_get_all(function(result_settings){
+            var settings_data = {};
+            settings_data.current_settings = {};
+            if( result_settings != null )
+                settings_data.current_settings = result_settings[0];
+            // get all publish pages for
+            e5ojs_page_get_all('publish',function(result_pages){
+                settings_data.public_pages = [];
+                if( result_pages != null )
+                    settings_data.public_pages = result_pages;
+                // e5ojs_global_data  and e5ojs_user_data default
+                res.render('back-end/e5ojs-admin-settings', { page_data: e5ojs_global_data.admin_pages['settings'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], settings_data:settings_data});
+            });
+        });
+    });
+});
+router.post('/settings/', function(req, res, next) {
+    // for save config settings
+    // get page with validate session
+    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        // get vars to save
+        var settings = {};
+        var settings_host_url = req.body.settings_host_url;
+        var settings_home_page = req.body.settings_home_page;
+        settings.settings_host_url = settings_host_url;
+        settings.settings_home_page = settings_home_page;
+
+        e5ojs_settings_update_multiple(settings,function(result_settings){
+            //console.log("result_settings",result_settings);
+            // redirect to settings page
+            res.redirect(e5ojs_global_data.admin_pages.settings.url);
+        });
+    });
+});
+
+/* end e5ojs settings routers */
+
+
+
+
+
+
+
+
+
 /* start e5ojs admin pages routers */
 router.get('/media/', function(req, res, next) {
     // get page with validate session
@@ -1335,15 +1388,6 @@ router.get('/media/', function(req, res, next) {
         // e5ojs_global_data  and e5ojs_user_data default
         //console.log("ADMIN",e5ojs_global_data.admin_pages.admin_post_types);
         res.render('back-end/e5ojs-admin-media', { page_data: e5ojs_global_data.admin_pages['media'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
-    });
-});
-router.get('/settings/', function(req, res, next) {
-    // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-        // return template with user data
-        // e5ojs_global_data  and e5ojs_user_data default
-        //console.log("ADMIN",e5ojs_global_data.admin_pages.admin_post_types);
-        res.render('back-end/e5ojs-admin-settings', { page_data: e5ojs_global_data.admin_pages['settings'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
     });
 });
 /* end e5ojs admin pages routers */
@@ -1394,6 +1438,30 @@ function e5ojs_get_next_id(name,callback) {
     });
 }
 /* start counter function */
+
+
+
+
+
+/* start settings function */
+function e5ojs_settings_get_all(callback) {
+    db.e5ojs_settings.find({},function(err, result_settings){
+        if( err )
+            callback(null);
+        else
+            callback(result_settings);
+    });
+}
+function e5ojs_settings_update_multiple(settings_data, callback) {
+    db.e5ojs_settings.update({},{$set:settings_data},{new:false},function(err, result_settings){
+        if( err )
+            callback(null);
+        else
+            callback(result_settings);
+    });
+}
+/* end settings function */
+
 
 
 
@@ -1641,6 +1709,14 @@ function e5ojs_remove_post_type_status_multiple(post_ids,callback) {
 
 
 /* start page DB function */
+function e5ojs_page_get_all(page_status, callback) {
+    db.e5ojs_page.find({'page_status':page_status},function(err, result_pages){
+        if( err )
+            callback(null);
+        else
+            callback(result_pages);
+    });
+}
 function e5ojs_page_insert_new(page_data, callback) {
     // get increment e5ojs_media
     e5ojs_get_next_id('page',function(data){

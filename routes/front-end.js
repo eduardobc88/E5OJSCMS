@@ -231,22 +231,35 @@ router.get('*', function(req, res, next) {
 
 
 
-/* start custom pages */
-router.get('/', function(req, res, next) {
-    var page_data = {};
-    page_data = {
-      page_title: 'front End /',
-      page_content: 'No Content',
-      page_excerpt: 'No excerpt ',
-      page_date: '29-06-2016',
-      page_media_id: '0',
-      page_template: 'e5ojs-template-default',
-      page_slug: '/'
-    }
-    res.render('front-end/e5ojs-index', { e5ojs_global_data:e5ojs_global_data, page_data:page_data });
-});
-/* start custom pages */
+/* start e5ojs generate home page router */
+function e5ojs_generate_home_page() {
+    // add this to init to regenerate
+    e5ojs_settings_get_all(function(result_settings){
+        var page_home_id = result_settings[0].settings_home_page;
+        // get page
+        e5ojs_page_get(page_home_id, function(result_page){
+            var home_page = result_page[0];
+            router.get('/', function(req, res, next) {
+                var page_data = home_page;
+                /*
+                page_data = {
+                  page_title: 'front End /',
+                  page_content: 'No Content',
+                  page_excerpt: 'No excerpt ',
+                  page_date: '29-06-2016',
+                  page_media_id: '0',
+                  page_template: 'e5ojs-template-default',
+                  page_slug: '/'
+                }
+                */
+                res.render('front-end/'+page_data.page_template, { e5ojs_global_data:e5ojs_global_data, page_data:page_data });
+            });
+        });
+    });
+    /* start e5ojs generate home page router */
+}
 
+e5ojs_generate_home_page();
 
 /* ============== end e5ojs router ============== */
 
@@ -281,6 +294,22 @@ if "new:true" found object data and override with new object data
 if "new:false"  found object data but only update the passed fileds
 */
 
+function e5ojs_settings_get_all(callback) {
+    db.e5ojs_settings.find({},function(err, result_settings){
+        if( err )
+            callback(null);
+        else
+            callback(result_settings);
+    });
+}
+function e5ojs_page_get(page_id, callback) {
+    db.e5ojs_page.find({'page_id':parseInt(page_id)},function(err, result_page){
+        if( err )
+            callback(null);
+        else
+            callback(result_page);
+    });
+}
 
 /* ============== end e5ojs mongodb functions =============== */
 
