@@ -58,6 +58,7 @@ var e5ojs_global_data = {};
 function e5ojs_global_data_init() {
     //var host_url = req.protocol+"://"+req.get('host');
     var host_url = "http://nodejs.dev"; // change for current host ip or domain
+    e5ojs_global_data.home_page = "";
     e5ojs_global_data.pages = [];
     e5ojs_global_data.post_types = [];
     e5ojs_global_data.res = {
@@ -77,7 +78,6 @@ function e5ojs_global_data_init() {
     // genetate post type routers first time
     e5ojs_generate_routers_for_post_types();
 }
-e5ojs_global_data_init();
 /* end e5ojs generate global data */
 
 
@@ -98,17 +98,21 @@ function e5ojs_regenetate_routers() {
     function remove_route_stack(route_slug) {
         for(var key_router in router.stack ) {
             var route = router.stack[key_router];
-            if( route.regexp.toString().indexOf(route_slug) > 0 ) {
+            if( route.route.path.toString().indexOf(route_slug) > 0 ) {
                 router.stack.splice(key_router, 1);
             }
         }
     }
+    console.log(" ======== ROUTER ======== ",router.stack);
     e5ojs_global_data_init();
 }
 /* start e5ojs regenerate page routers */
 
 
 
+// generate dinamic routers
+e5ojs_generate_router_for_home_page();
+e5ojs_global_data_init();
 
 /* ============== end e5ojs configuration ============== */
 
@@ -173,6 +177,23 @@ function e5ojs_generate_routers_for_post_types() {
         }
     });
 }
+function e5ojs_generate_router_for_home_page() {
+    // remove home router
+    router.get('/', function(req, res, next) {
+        e5ojs_settings_get_all(function(result_settings){
+            var page_home_id = result_settings[0].settings_home_page;
+            // get page
+            e5ojs_page_get(page_home_id, function(result_page){
+                var home_page = result_page[0];
+                var page_data = home_page;
+                e5ojs_global_data.home_page = page_home_id;
+                console.log(" ===== page_home_id ===== ",page_home_id);
+                res.render('front-end/'+page_data.page_template, { e5ojs_global_data:e5ojs_global_data, page_data:page_data });
+            });
+        });
+    });
+    /* start e5ojs generate home page router */
+}
 function e5ojs_generate_router_page(page_data) {
     //console.log("FRONTEND - Route",page_data.page_slug);
     e5ojs_global_data.pages.push(page_data.page_slug);
@@ -225,41 +246,6 @@ router.get('*', function(req, res, next) {
 
 
 
-
-
-
-
-
-
-/* start e5ojs generate home page router */
-function e5ojs_generate_home_page() {
-    // add this to init to regenerate
-    e5ojs_settings_get_all(function(result_settings){
-        var page_home_id = result_settings[0].settings_home_page;
-        // get page
-        e5ojs_page_get(page_home_id, function(result_page){
-            var home_page = result_page[0];
-            router.get('/', function(req, res, next) {
-                var page_data = home_page;
-                /*
-                page_data = {
-                  page_title: 'front End /',
-                  page_content: 'No Content',
-                  page_excerpt: 'No excerpt ',
-                  page_date: '29-06-2016',
-                  page_media_id: '0',
-                  page_template: 'e5ojs-template-default',
-                  page_slug: '/'
-                }
-                */
-                res.render('front-end/'+page_data.page_template, { e5ojs_global_data:e5ojs_global_data, page_data:page_data });
-            });
-        });
-    });
-    /* start e5ojs generate home page router */
-}
-
-e5ojs_generate_home_page();
 
 /* ============== end e5ojs router ============== */
 

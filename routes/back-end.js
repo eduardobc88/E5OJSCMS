@@ -1363,7 +1363,8 @@ router.post('/settings/', function(req, res, next) {
         settings.settings_home_page = settings_home_page;
 
         e5ojs_settings_update_multiple(settings,function(result_settings){
-            //console.log("result_settings",result_settings);
+            // set true for front-end refresh routers
+            req.app.locals.e5ojs_refresh_router = true;
             // redirect to settings page
             res.redirect(e5ojs_global_data.admin_pages.settings.url);
         });
