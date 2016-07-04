@@ -1,5 +1,6 @@
 {
     "templates": {
+        "e5ojs-template-default": true,
         "e5ojs-template-home": true,
         "e5ojs-template-contact": true
     }

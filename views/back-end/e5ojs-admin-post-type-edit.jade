@@ -19,14 +19,14 @@ block e5ojs_block_content
                                 label(for="post_type_description")='Description'
                             div(class="input-field")
                                 select(name="post_type_archive_template")
-                                    option(value="default")="Default"
+                                    option(value="e5ojs-template-default")="Choose a template"
                                     - for( key_template in e5ojs_templates_json.templates ) {
                                         option(value=key_template)=key_template
                                     - }
                                 label(for="post_type_archive_template")='Archive template'
                             div(class="input-field")
                                 select(name="post_type_single_template")
-                                    option(value="default")="Default"
+                                    option(value="e5ojs-template-default")="Choose a template"
                                     - for( key_template in e5ojs_templates_json.templates ) {
                                         option(value=key_template)=key_template
                                     - }
@@ -58,7 +58,7 @@ block e5ojs_block_content
                                 label(for="post_type_description")='Description'
                             div(class="input-field")
                                 select(name="post_type_archive_template")
-                                    option(value="default")="Default"
+                                    option(value="e5ojs-template-default")="Choose a template"
                                     - for( key_template in e5ojs_templates_json.templates ) {
                                         - attributes = "";
                                         - if( post_type_info.post_type_archive_template == key_template ) {
@@ -69,7 +69,7 @@ block e5ojs_block_content
                                 label(for="post_type_archive_template")='Archive template'
                             div(class="input-field")
                                 select(name="post_type_single_template")
-                                    option(value="default")="Default"
+                                    option(value="e5ojs-template-default")="Choose a template"
                                     - for( key_template in e5ojs_templates_json.templates ) {
                                         - attributes = "";
                                         - if( post_type_info.post_type_single_template == key_template ) {
@@ -97,7 +97,7 @@ block e5ojs_block_content
                 div(class="col-xs-12 no-padding")
                     div(class="card")
                         div(class="card-content")
-                            span(class="card-title")='Post type Post-Meta'
+                            span(class="card-title")='Post type - Metas'
                             ul(class="tabs")
                                 li(class="tab")
                                     a(href="#new_meta" class="active")='New meta'

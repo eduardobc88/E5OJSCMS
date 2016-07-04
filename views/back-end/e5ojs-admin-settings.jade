@@ -1,12 +1,19 @@
 extends e5ojs-base-layout-admin
 block e5ojs_block_local_css_script
 block e5ojs_block_content
-    - var settings = { settings_host_url: "", settings_home_page: "", settings_pages: settings_data.public_pages };
-    - if( settings_data.current_settings !== null ) {
-        - settings.settings_host_url = settings_data.current_settings.settings_host_url;
-        - settings.settings_home_page = settings_data.current_settings.settings_home_page;
+    - var settings = { settings_host_url: "", settings_home_page_template: "", settings_page_metas: [],settings_pages: settings_data.public_pages };
+    - for( settings_key in settings_data.current_settings ) {
+        
+        - if( settings_data.current_settings[settings_key].settings_id == "settings_host_url" ) {
+            - settings.settings_host_url = settings_data.current_settings[settings_key].settings_value;
+        - }
+        - if( settings_data.current_settings[settings_key].settings_id == "settings_home_page_template" ) {
+            - settings.settings_home_page_template = settings_data.current_settings[settings_key].settings_value;
+        - }
+        - if( settings_data.current_settings[settings_key].settings_id == "settings_page_metas" ) {
+            - settings.settings_page_metas = settings_data.current_settings[settings_key].settings_value;
+        - }
     - }
-    
     form(id="e5ojs-form-wrapper" action=e5ojs_global_data.admin_pages.settings.url method="post")
         div(class="row no-padding")
             div(class="col-xs-12 no-padding")
@@ -17,17 +24,159 @@ block e5ojs_block_content
                             input(id="settings_host_url" type="text" class="validate" name="settings_host_url" value=settings.settings_host_url)
                             label(for="settings_host_url")='Host URL'
                         div(class="input-field")
-                            select(name="settings_home_page")
+                            select(name="settings_home_page_template")
                                 option(value="")="Choose the default Home page"
                                 - for( key_page in settings.settings_pages ) {
                                     - var page = settings.settings_pages[key_page];
                                     - attributes = "";
-                                    - if( settings.settings_home_page == page.page_id ) {
+                                    - if( settings.settings_home_page_template == page.page_id ) {
                                         - attributes = {"selected":"selected"};
                                     - }
                                     option(value=page.page_id)&attributes(attributes)=page.page_title
                                 - }
-                            label(for="settings_home_page")='Home page template'
+                            label(for="settings_home_page_template")='Home page template'
                         div(class="aling-right")
                             button( type="submit" class="waves-effect waves-dark btn")='SAVE'
+        
+        div(class="row no-padding")
+            div(class="col-xs-12 no-padding")
+                div(class="card")
+                    div(class="card-content")
+                        span(class="card-title")='Admin pages (Info)'
+                        div(class="input-field")
+                            input(id="settings_dashboard_page_title" type="text" class="validate" name="settings_dashboard_page_title")
+                            label(for="settings_dashboard_page_title")='Dashboard title'
+                        div(class="input-field")
+                            textarea(id="settings_dashboard_page_description" class="materialize-textarea" name="settings_dashboard_page_description")
+                            label(for="settings_dashboard_page_description")='Dashboard description'
+                        div(class="input-field")
+                            input(id="settings_pages_page_title" type="text" class="validate" name="settings_pages_page_title")
+                            label(for="settings_pages_page_title")='Pages title'
+                        div(class="input-field")
+                            textarea(id="settings_pages_page_description" class="materialize-textarea" name="settings_pages_page_description")
+                            label(for="settings_pages_page_description")='Pages description'
+                        div(class="input-field")
+                            input(id="settings_media_page_title" type="text" class="validate" name="settings_media_page_title")
+                            label(for="settings_media_page_title")='Media title'
+                        div(class="input-field")
+                            textarea(id="settings_media_page_description" class="materialize-textarea" name="settings_media_page_description")
+                            label(for="settings_media_page_description")='Media description'
+                        div(class="input-field")
+                            input(id="settings_post_type_page_title" type="text" class="validate" name="settings_post_type_page_title")
+                            label(for="settings_post_type_page_title")='Post types title'
+                        div(class="input-field")
+                            textarea(id="settings_post_type_page_description" class="materialize-textarea" name="settings_post_type_page_description")
+                            label(for="settings_post_type_page_description")='Post types description'
+                        div(class="aling-right")
+                            button( type="submit" class="waves-effect waves-dark btn")='SAVE'
+        
+        div(class="row no-padding")
+            div(class="col-xs-12 no-padding")
+                div(class="card")
+                    div(class="card-content")
+                        span(class="card-title")='Page Settings (Metas)'
+                        ul(class="tabs")
+                            li(class="tab")
+                                a(href="#new_meta" class="active")='New meta'
+                            li(class="tab")
+                                a(href="#current_metas" class="")='Current metas'
+                        div(id="new_meta" class="new-meta content-tab")
+                            div(class="col-xs-12")
+                                - print_row_meta_data();
+                        div(id="current_metas" class="current-metas content-tab")
+                            - var post_type_total_metas = -1;
+                            - for( var settings_page_meta_key in settings.settings_page_metas ) {
+                                - post_type_total_metas = post_type_total_metas + 1;
+                                - var meta_data = settings.settings_page_metas[settings_page_meta_key];
+                                div(clas="row no-padding")
+                                    - print_row_meta_data_update(post_type_total_metas,meta_data);
+                            - }
+                            input(type="hidden" name="update_finish" value=post_type_total_metas)
+                        div(class="aling-right")
+                            button( type="submit" class="waves-effect waves-dark btn")='SAVE'
+                            
+                            
+    
+    
+    
+    - function print_row_meta_data() {
+        div(class="input-field")
+            input(id="settings_page_meta_title" type="text" class="validate" name="settings_page_meta_title")
+            label(for="settings_page_meta_title")='Title'
+        div(class="input-field")
+            input(id="settings_page_meta_name" type="text" class="validate" name="settings_page_meta_name")
+            label(for="settings_page_meta_name")='Name (ID)'
+        p
+            input(name="settings_page_meta_type" type="radio" id="text" value="text" checked)
+            label(for="text")='Text'
+        p
+            input(name="settings_page_meta_type" type="radio" id="textarea" value="textarea")
+            label(for="textarea")='Textarea'
+        p
+            input(name="settings_page_meta_type" type="radio" id="image" value="image")
+            label(for="image")='Image'
+        p
+            input(name="settings_page_meta_type" type="radio" id="gallery" value="gallery")
+            label(for="gallery")='Gallery'
+        p
+            input(name="settings_page_meta_type" type="radio" id="calendar" value="calendar")
+            label(for="calendar")='Calendar'
+    - }
+
+    - function print_row_meta_data_update(settings_page_meta_key,meta_data) {
+        - var post_meta_data = {meta_title:"",meta_name:"",meta_type:"",};
+        - var settings_page_meta_type = "";
+        - if( meta_data !== undefined ) {
+            - post_meta_data.meta_title = meta_data.page_meta_title;
+            - post_meta_data.meta_name = meta_data.page_meta_name;
+            - if( String(meta_data.page_meta_type) == "text" )
+                - settings_page_meta_type = "text";
+            - else if( String(meta_data.page_meta_type) == "textarea" )
+                    - settings_page_meta_type = "textarea";
+            - else if( String(meta_data.page_meta_type) == "image" )
+                    - settings_page_meta_type = "image";
+            - else if( String(meta_data.page_meta_type) == "gallery" )
+                    - settings_page_meta_type = "gallery";
+            - else if( String(meta_data.page_meta_type) == "calendar" )
+                    - settings_page_meta_type = "calendar";
+        - }
+        div(class="col-xs-12 col-md-4")
+            div(class="input-field")
+                input(id=settings_page_meta_key+"_meta_title" type="text" class="validate" name=settings_page_meta_key+"_meta_title" value=post_meta_data.meta_title)
+                label(for=settings_page_meta_key+"_meta_title")='Title'
+        div(class="col-xs-12 col-md-4")
+            div(class="input-field")
+                input(id=settings_page_meta_key+"_meta_name" type="text" class="validate" name=settings_page_meta_key+"_meta_name" value=post_meta_data.meta_name)
+                label(for=settings_page_meta_key+"_meta_name")='Name (ID)'
+        div(class="col-xs-12 col-md-4")
+            div(class="input-field")
+                select(name=settings_page_meta_key+"_meta_type")
+                    - var attributes = "";
+                    - if( settings_page_meta_type == "text" ) {
+                        - attributes = {"selected":"selected"};
+                    - }
+                    option(value="text")&attributes(attributes)='text'
+                    - attributes = "";
+                    - if( settings_page_meta_type == "textarea" ) {
+                        - attributes = {"selected":"selected"};
+                    - }
+                    option(value="textarea")&attributes(attributes)='textarea'
+                    - attributes = "";
+                    - if( settings_page_meta_type == "image" ) {
+                        - attributes = {"selected":"selected"};
+                    - }
+                    option(value="image")&attributes(attributes)='image'
+                    - attributes = "";
+                    - if( settings_page_meta_type == "gallery" ) {
+                        - attributes = {"selected":"selected"};
+                    - }
+                    option(value="gallery")&attributes(attributes)='gallery'
+                    - attributes = "";
+                    - if( settings_page_meta_type == "calendar" ) {
+                        - attributes = {"selected":"selected"};
+                    - }
+                    option(value="calendar")&attributes(attributes)='calendar'
+                label='Meta type'
+    - }
+
                 

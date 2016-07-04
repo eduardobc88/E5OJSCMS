@@ -1359,13 +1359,14 @@ router.get('/settings/', function(req, res, next) {
             var settings_data = {};
             settings_data.current_settings = {};
             if( result_settings != null )
-                settings_data.current_settings = result_settings[0];
+                settings_data.current_settings = result_settings;
             // get all publish pages for
             e5ojs_page_get_all('publish',function(result_pages){
                 settings_data.public_pages = [];
                 if( result_pages != null )
                     settings_data.public_pages = result_pages;
                 // e5ojs_global_data  and e5ojs_user_data default
+                //console.log("settings_data",settings_data);
                 res.render('back-end/e5ojs-admin-settings', { page_data: e5ojs_global_data.admin_pages['settings'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], settings_data:settings_data});
             });
         });
@@ -1376,18 +1377,67 @@ router.post('/settings/', function(req, res, next) {
     // get page with validate session
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // get vars to save
-        var settings = {};
+        var settings = [];
+        // site settings
         var settings_host_url = req.body.settings_host_url;
-        var settings_home_page = req.body.settings_home_page;
-        settings.settings_host_url = settings_host_url;
-        settings.settings_home_page = settings_home_page;
+        var settings_home_page_template = parseInt(req.body.settings_home_page_template);
+        // settings pages
+        // for new meta
+        var settings_page_meta_title = req.body.settings_page_meta_title;
+        var settings_page_meta_name = req.body.settings_page_meta_name;
+        var settings_page_meta_type = req.body.settings_page_meta_type;
+        // for current meta request
 
-        e5ojs_settings_update_multiple(settings,function(result_settings){
-            // set true for front-end refresh routers
-            req.app.locals.e5ojs_refresh_router = true;
-            // redirect to settings page
-            res.redirect(e5ojs_global_data.admin_pages.settings.url);
+        var page_type_current_metas = [];
+        if( req.body.update_finish !== undefined ) {
+            // each current post meta
+            for( var meta_key = 0; meta_key<=parseInt(req.body.update_finish); meta_key++ ) {
+                page_type_current_metas.push({
+                    page_meta_title:req.body[meta_key+"_meta_title"],
+                    page_meta_name:req.body[meta_key+"_meta_name"],
+                    page_meta_type:req.body[meta_key+"_meta_type"],
+                });
+            }
+        }
+
+
+        // get current settings
+        e5ojs_settings_get_all(function(current_settings){
+            settings = current_settings;
+            // validate for site settings
+            for( settings_key in settings ) {
+                if( settings[settings_key].settings_id == "settings_host_url" ) {
+                    settings[settings_key].settings_value = settings_host_url;
+                }
+                if( settings[settings_key].settings_id == "settings_home_page_template" ) {
+                    settings[settings_key].settings_value = settings_home_page_template;
+                }
+            }
+            // replace page metas with req data
+            for( settings_key in settings ) {
+                if( settings[settings_key].settings_id == 'settings_page_metas' ) {
+                    settings[settings_key].settings_value = page_type_current_metas;
+                    break;
+                }
+            }
+            // validate for page new meta
+            if( settings_page_meta_title != "" && settings_page_meta_name != "" && settings_page_meta_type != "" ) {
+                for( settings_key in settings ) {
+                    if( settings[settings_key].settings_id == 'settings_page_metas' ) {
+                        settings[settings_key].settings_value.push( {'page_meta_title':settings_page_meta_title, 'page_meta_name':settings_page_meta_name, 'page_meta_type':settings_page_meta_type} );
+                        break;
+                    }
+                }
+            }
+            // save settings
+            e5ojs_settings_update(settings, index=0,function(update_result) {
+                // set true for front-end refresh routers
+                req.app.locals.e5ojs_refresh_router = true;
+                // redirect to settings page
+                res.redirect(e5ojs_global_data.admin_pages.settings.url);
+            });
         });
+
     });
 });
 
@@ -1465,6 +1515,28 @@ function e5ojs_get_next_id(name,callback) {
 
 
 /* start settings function */
+function e5ojs_settings_update(settings, settings_count, callback) {
+
+    var settings_id = settings[settings_count].settings_id;
+    var settings_value = settings[settings_count].settings_value;
+    e5ojs_settings_update_multiple(settings_id, settings_value,function(err, result_settings){
+        settings_count = settings_count + 1;
+        if( settings_count < settings.length ) {
+            e5ojs_settings_update(settings, settings_count, callback); // only pass the callback instead of function to return to the init function call
+        } else {
+            // return callback
+            callback(true);
+        }
+    });
+}
+function e5ojs_settings_get_by_id(settings_id, callback) {
+    db.e5ojs_settings.find({'settings_id':parseInt(settings_id)},function(err, result_settings){
+        if( err )
+            callback(null);
+        else
+            callback(result_settings);
+    });
+}
 function e5ojs_settings_get_all(callback) {
     db.e5ojs_settings.find({},function(err, result_settings){
         if( err )
@@ -1473,8 +1545,8 @@ function e5ojs_settings_get_all(callback) {
             callback(result_settings);
     });
 }
-function e5ojs_settings_update_multiple(settings_data, callback) {
-    db.e5ojs_settings.update({},{$set:settings_data},{new:false},function(err, result_settings){
+function e5ojs_settings_update_multiple(settings_id, settings_value, callback) {
+    db.e5ojs_settings.update({'settings_id':settings_id},{$set:{'settings_value':settings_value}},{new:false},function(err, result_settings){
         if( err )
             callback(null);
         else

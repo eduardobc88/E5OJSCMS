@@ -258,6 +258,7 @@ input:not([type]).valid, input:not([type]):focus.valid, input[type=text].valid, 
 }
 .picker__day--selected, .picker__day--selected:hover, .picker--focused .picker__day--selected {
     background-color: #0288d1;
+    padding: 10px !important;
 }
 button.picker__today:focus, button.picker__clear:focus, button.picker__close:focus {
     background-color: rgba(33, 150, 243, 0.33);
