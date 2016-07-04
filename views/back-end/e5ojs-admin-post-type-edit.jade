@@ -17,6 +17,20 @@ block e5ojs_block_content
                             div(class="input-field")
                                 input(id="post_type_description" type="text" class="validate" name="post_type_description")
                                 label(for="post_type_description")='Description'
+                            div(class="input-field")
+                                select(name="post_type_archive_template")
+                                    option(value="default")="Default"
+                                    - for( key_template in e5ojs_templates_json.templates ) {
+                                        option(value=key_template)=key_template
+                                    - }
+                                label(for="post_type_archive_template")='Archive template'
+                            div(class="input-field")
+                                select(name="post_type_single_template")
+                                    option(value="default")="Default"
+                                    - for( key_template in e5ojs_templates_json.templates ) {
+                                        option(value=key_template)=key_template
+                                    - }
+                                label(for="post_type_single_template")='Single template'
                             div(class="switch")
                                 label
                                     !='Desactive'
@@ -26,6 +40,7 @@ block e5ojs_block_content
                             div(class="aling-right")
                                 button( type="submit" class="waves-effect waves-dark btn")='SAVE'
     - } else {
+        - console.log("post_type_info",post_type_info);
         form(id="e5ojs-post-type-form-wrapper" action=e5ojs_global_data.admin_pages.post_type.url+e5ojs_global_data.admin_actions.post_types.edit+post_type_info.post_type_id+"/" method="post")
             div(class="row")
                 div(class="col-xs-12 no-padding")
@@ -41,6 +56,28 @@ block e5ojs_block_content
                             div(class="input-field")
                                 input(id="post_type_description" type="text" class="validate" name="post_type_description" value=post_type_info.post_type_description)
                                 label(for="post_type_description")='Description'
+                            div(class="input-field")
+                                select(name="post_type_archive_template")
+                                    option(value="default")="Default"
+                                    - for( key_template in e5ojs_templates_json.templates ) {
+                                        - attributes = "";
+                                        - if( post_type_info.post_type_archive_template == key_template ) {
+                                            - attributes = {"selected":"selected"};
+                                        - }
+                                        option(value=key_template)&attributes(attributes)=key_template
+                                    - }
+                                label(for="post_type_archive_template")='Archive template'
+                            div(class="input-field")
+                                select(name="post_type_single_template")
+                                    option(value="default")="Default"
+                                    - for( key_template in e5ojs_templates_json.templates ) {
+                                        - attributes = "";
+                                        - if( post_type_info.post_type_single_template == key_template ) {
+                                            - attributes = {"selected":"selected"};
+                                        - }
+                                        option(value=key_template)&attributes(attributes)=key_template
+                                    - }
+                                label(for="post_type_single_template")='Single template'
                             div(class="switch")
                                 - var active = (( parseInt(post_type_info.post_type_status) == 1)?'checked':'');
                                 - if( parseInt(post_type_info.post_type_status) == 1 ) {

@@ -55,15 +55,11 @@ block e5ojs_block_content
                             div(class="post-content")=page.page_content
                 li(class="custom-collapsible-footer")
                     ul(class="e5ojs-pagination")
-                        - var range = 2
-                        - var curr_page = parseInt(current_page)
-                        - if( total_pages > 1 ) {
-                            - for (var i = 1; i <= total_pages; ++i) {
-                                if i >= (curr_page-range) && i <= (curr_page+range)
-                                    a(href=e5ojs_global_data.admin_pages.admin_post_types[post_type_name].url+page_status+'/page/'+i+'/' class=((i==curr_page)?"current":""))
-                                        li(class="item")
-                                            span=i
-                            - }
+                        - for( var page_key in e5ojs_pagination ) {
+                            - page_data = e5ojs_pagination[page_key];
+                            a(href=page_data.url class=page_data.current)
+                                li(class="item")
+                                    span=page_data.number
                         - }
                     
             
