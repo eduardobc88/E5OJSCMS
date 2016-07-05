@@ -181,7 +181,14 @@ function e5ojs_generate_router_for_home_page() {
     // remove home router
     router.get('/', function(req, res, next) {
         e5ojs_settings_get_all(function(result_settings){
-            var page_home_id = result_settings[0].settings_home_page;
+            console.log("result_settings",result_settings);
+            var page_home_id = "";
+            for( settings_key in result_settings ) {
+                if( result_settings[settings_key].settings_id == "settings_home_page_template" ) {
+                    page_home_id = result_settings[settings_key].settings_value;
+                    break;
+                }
+            }
             // get page
             e5ojs_page_get(page_home_id, function(result_page){
                 var home_page = result_page[0];

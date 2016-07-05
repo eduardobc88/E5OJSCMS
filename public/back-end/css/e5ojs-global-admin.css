@@ -647,7 +647,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     position: relative;
     width: 100%;
     color: #777;
-    padding-left: 50px;
+    padding-left: 65px;
     padding-right: 15px;
     display: table;
     top: 0;

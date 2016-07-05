@@ -13,6 +13,15 @@ block e5ojs_block_content
         - if( settings_data.current_settings[settings_key].settings_id == "settings_page_metas" ) {
             - settings.settings_page_metas = settings_data.current_settings[settings_key].settings_value;
         - }
+        - if( settings_data.current_settings[settings_key].settings_id == "settings_admin_pages_data" ) {
+            - settings.settings_admin_pages_data = settings_data.current_settings[settings_key].settings_value;
+        - }
+        - if( settings_data.current_settings[settings_key].settings_id == "settings_admin_posts_peer_page" ) {
+            - settings.settings_admin_posts_peer_page = settings_data.current_settings[settings_key].settings_value;
+        - }
+        - if( settings_data.current_settings[settings_key].settings_id == "settings_posts_peer_page" ) {
+            - settings.settings_posts_peer_page = settings_data.current_settings[settings_key].settings_value;
+        - }
     - }
     form(id="e5ojs-form-wrapper" action=e5ojs_global_data.admin_pages.settings.url method="post")
         div(class="row no-padding")
@@ -35,6 +44,12 @@ block e5ojs_block_content
                                     option(value=page.page_id)&attributes(attributes)=page.page_title
                                 - }
                             label(for="settings_home_page_template")='Home page template'
+                        div(class="input-field")
+                            input(id="settings_admin_posts_peer_page" type="text" class="validate" name="settings_admin_posts_peer_page" value=settings.settings_admin_posts_peer_page)
+                            label(for="settings_admin_posts_peer_page")='Post peer page (Admin)'
+                        div(class="input-field")
+                            input(id="settings_posts_peer_page" type="text" class="validate" name="settings_posts_peer_page" value=settings.settings_posts_peer_page)
+                            label(for="settings_posts_peer_page")='Post peer page (Theme)'
                         div(class="aling-right")
                             button( type="submit" class="waves-effect waves-dark btn")='SAVE'
         
@@ -44,28 +59,28 @@ block e5ojs_block_content
                     div(class="card-content")
                         span(class="card-title")='Admin pages (Info)'
                         div(class="input-field")
-                            input(id="settings_dashboard_page_title" type="text" class="validate" name="settings_dashboard_page_title")
+                            input(id="settings_dashboard_page_title" type="text" class="validate" name="settings_dashboard_page_title" value=settings.settings_admin_pages_data.settings_dashboard_page_title)
                             label(for="settings_dashboard_page_title")='Dashboard title'
                         div(class="input-field")
-                            textarea(id="settings_dashboard_page_description" class="materialize-textarea" name="settings_dashboard_page_description")
+                            textarea(id="settings_dashboard_page_description" class="materialize-textarea" name="settings_dashboard_page_description")=settings.settings_admin_pages_data.settings_dashboard_page_description
                             label(for="settings_dashboard_page_description")='Dashboard description'
                         div(class="input-field")
-                            input(id="settings_pages_page_title" type="text" class="validate" name="settings_pages_page_title")
+                            input(id="settings_pages_page_title" type="text" class="validate" name="settings_pages_page_title" value=settings.settings_admin_pages_data.settings_pages_page_title)
                             label(for="settings_pages_page_title")='Pages title'
                         div(class="input-field")
-                            textarea(id="settings_pages_page_description" class="materialize-textarea" name="settings_pages_page_description")
+                            textarea(id="settings_pages_page_description" class="materialize-textarea" name="settings_pages_page_description")=settings.settings_admin_pages_data.settings_pages_page_description
                             label(for="settings_pages_page_description")='Pages description'
                         div(class="input-field")
-                            input(id="settings_media_page_title" type="text" class="validate" name="settings_media_page_title")
+                            input(id="settings_media_page_title" type="text" class="validate" name="settings_media_page_title" value=settings.settings_admin_pages_data.settings_media_page_title)
                             label(for="settings_media_page_title")='Media title'
                         div(class="input-field")
-                            textarea(id="settings_media_page_description" class="materialize-textarea" name="settings_media_page_description")
+                            textarea(id="settings_media_page_description" class="materialize-textarea" name="settings_media_page_description")=settings.settings_admin_pages_data.settings_media_page_description
                             label(for="settings_media_page_description")='Media description'
                         div(class="input-field")
-                            input(id="settings_post_type_page_title" type="text" class="validate" name="settings_post_type_page_title")
+                            input(id="settings_post_type_page_title" type="text" class="validate" name="settings_post_type_page_title" value=settings.settings_admin_pages_data.settings_post_type_page_title)
                             label(for="settings_post_type_page_title")='Post types title'
                         div(class="input-field")
-                            textarea(id="settings_post_type_page_description" class="materialize-textarea" name="settings_post_type_page_description")
+                            textarea(id="settings_post_type_page_description" class="materialize-textarea" name="settings_post_type_page_description")=settings.settings_admin_pages_data.settings_post_type_page_description
                             label(for="settings_post_type_page_description")='Post types description'
                         div(class="aling-right")
                             button( type="submit" class="waves-effect waves-dark btn")='SAVE'
