@@ -82,6 +82,12 @@ block e5ojs_block_content
                         div(class="input-field")
                             textarea(id="settings_post_type_page_description" class="materialize-textarea" name="settings_post_type_page_description")=settings.settings_admin_pages_data.settings_post_type_page_description
                             label(for="settings_post_type_page_description")='Post types description'
+                        div(class="input-field")
+                            input(id="settings_users_page_title" type="text" class="validate" name="settings_users_page_title" value=settings.settings_admin_pages_data.settings_users_page_title)
+                            label(for="settings_users_page_title")='Users title'
+                        div(class="input-field")
+                            textarea(id="settings_users_page_description" class="materialize-textarea" name="settings_users_page_description")=settings.settings_admin_pages_data.settings_users_page_description
+                            label(for="settings_users_page_description")='Users description'
                         div(class="aling-right")
                             button( type="submit" class="waves-effect waves-dark btn")='SAVE'
         

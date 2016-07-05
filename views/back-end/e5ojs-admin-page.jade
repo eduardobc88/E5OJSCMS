@@ -83,5 +83,69 @@ block e5ojs_block_content
                                         option(value=key_template)&attributes(attributes)=key_template
                                     - }
                                 label(for="page_template")='Page template'
+        
+            - if( page_data_object.settings_page_metas.length > 0 ) {
+                div(class="row")
+                    div(class="col-xs-12 col-md-12 no-padding")
+                        div(class="card")
+                            div(class="card-content post-meta-content")
+                                span(class="card-title")='Page Meta'
+                                //- metas { meta_title: 'aaa', meta_name: 'aaa', meta_type: 'text' }
+                                - console.log(" === PAGE METAS === ",page_data_object.settings_page_metas);
+                                - for( var meta_key in page_data_object.settings_page_metas ) {
+                                    - var meta = page_data_object.settings_page_metas[meta_key];
+                                    
+                                    - if( meta.meta_type == "text" ) {
+                                        - set_meta_text(meta);
+                                    - }
+                                    - if( meta.meta_type == "textarea" ) {
+                                        - set_meta_textarea(meta);
+                                    - }
+                                    - if( meta.meta_type == "calendar" ) {
+                                        - set_meta_calendar(meta);
+                                    - }
+                                    - if( meta.meta_type == "image" ) {
+                                        - set_meta_image(meta);
+                                    - }
+                                    - if( meta.meta_type == "gallery" ) {
+                                        - set_meta_gallery(meta);
+                                    - }
+                                - }
+            - }
+    - }
+    
+    
+    - function set_meta_text(meta_data) {
+        //- console.log(" === meta_data === ",meta_data);
+        div(class="input-field")
+            input(id="meta_"+meta_data.meta_name type="text" class="validate" name="meta_"+meta_data.meta_name value=meta_data.post_meta_value)
+            label(for="meta_"+meta_data.meta_name)=meta_data.meta_title
+    - }
+    - function set_meta_textarea(meta_data) {
+        div(class="input-field")
+            textarea(id="meta_"+meta_data.meta_name class="materialize-textarea" name="meta_"+meta_data.meta_name)=meta_data.post_meta_value
+            label(for="meta_"+meta_data.meta_name)=meta_data.meta_title
+    - }
+    - function set_meta_calendar(meta_data) {
+        div(class="input-field")
+            input(id="meta_"+meta_data.meta_name type="date" class="datepicker" name="meta_"+meta_data.meta_name value=meta_data.post_meta_value)
+            label(for="meta_"+meta_data.meta_name)=meta_data.meta_title
+    - }
+    - function set_meta_image(meta_data) {
+        div(class="input-field post-meta-image")
+            img(class="e5ojs-open-media-meta" src=e5ojs_global_data.admin_res.media_default_image_gallery update_media_id="0" post-meta-value-id="meta_"+meta_data.meta_name post-meta-value-type="")
+            input(id="meta_"+meta_data.meta_name class="meta-image-id" type="hidden" name="meta_"+meta_data.meta_name value=meta_data.post_meta_value)
+            label(for="meta_"+meta_data.meta_name)=meta_data.meta_title
+    - }
+    - function set_meta_gallery(meta_data) {
+        div(class="input-field post-meta-image")
+            div(class="post-meta-gallery")
+                input(type="hidden" class="default-gallery-image-data" post-meta-image-url=e5ojs_global_data.admin_res.media_default_image_gallery post-meta-value-id="meta_"+meta_data.meta_name)
+                a(class="btn-floating btn-large waves-effect waves-dark post-meta-gallery-add-new")
+                    i(class="material-icons")='add'
+                - if( meta_data.post_meta_value == "" )
+                    img(class="e5ojs-open-media-meta" src=e5ojs_global_data.admin_res.media_default_image_gallery update_media_id="0" post-meta-value-id="meta_"+meta_data.meta_name post-meta-value-type="json")
+            input(id="meta_"+meta_data.meta_name class="meta-image-id" type="hidden" name="meta_"+meta_data.meta_name value=meta_data.post_meta_value)
+            label(for="meta_"+meta_data.meta_name)=meta_data.meta_title
     - }
                         

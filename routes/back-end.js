@@ -245,6 +245,14 @@ function e5ojs_refresh_admin_pages_data(callback) {
             if( page_data_key == "settings_post_type_page_description" ) {
                 e5ojs_global_data.admin_pages.post_type.description = settings_admin_pages_data[page_data_key];
             }
+            if( page_data_key == "settings_users_page_title" ) {
+                e5ojs_global_data.admin_pages.users.title = settings_admin_pages_data[page_data_key];
+            }
+            if( page_data_key == "settings_users_page_description" ) {
+                e5ojs_global_data.admin_pages.users.description = settings_admin_pages_data[page_data_key];
+            }
+
+
         }
         callback();
         // get post types
@@ -984,40 +992,81 @@ router.get('/page/action/edit/:page_id/', function(req, res, next) {
     // return the page data to edit
     // get page with validate session
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-        // return template with user data
-        // e5ojs_global_data  and e5ojs_user_data default
+            // return template with user data
+            // e5ojs_global_data  and e5ojs_user_data default
+            // get page id
+            var page_id = req.params.page_id;
 
-        // get page id
-        var page_id = req.params.page_id;
-        // get page with the ID and return data
-        e5ojs_page_get_page(page_id,function(page_data){
-            if( page_data == null ) {
-                res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/page/action/new/");
-            } else {
-                // get image from DB
-                e5ojs_get_media(page_data[0].page_media_id,function(media_result){
-                    if( media_result == false ) {
-                        page_data[0].post_media_attachment_id = "";
-                        page_data[0].post_media_attachment_url = e5ojs_global_data.admin_res.media_default_image_url;
-                    } else {
-                        var media_url = e5ojs_global_data.admin_res.media_uploads_sizes_url+media_result[0].media_file_name_clean+"-800x200."+(media_result[0].media_mime_type.split("/"))[1];
-                        page_data[0].post_media_attachment_id = media_result[0].media_id;
-                        page_data[0].post_media_attachment_url = media_url;
+
+            // get page metas to match
+            e5ojs_settings_get_all(function(current_settings){
+                // page metas
+                var post_type_meta = [];
+                for( settings_key in current_settings ) {
+                    if( current_settings[settings_key].settings_id == "settings_page_metas" ) {
+                        post_type_meta = current_settings[settings_key].settings_value;
+                        break;
                     }
-                    // check if has message session
-                    // get session message
-                    var e5ojs_message = e5ojs_get_session_message(req);
-                    // remove session message
-                    e5ojs_clear_session_message(req);
-                    // get templates json file
-                    e5ojs_read_template_files_json(function(templates_json){
-                        res.render('back-end/e5ojs-admin-page', { page_data: e5ojs_global_data.admin_pages['pages'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], e5ojs_message:e5ojs_message, pages_data:page_data , e5ojs_templates_json:templates_json });
+                }
+
+                // get post meta
+                e5ojs_get_post_meta(page_id,function(current_post_meta){
+                    //console.log("current_post_meta",current_post_meta);
+                    // math metas
+                    // remove meta saved diffrerent to post type meta name
+                    var post_meta_data = [];
+                    for( key_meta in post_type_meta ) {
+                        var find = 0;
+                        for( key_current_meta in current_post_meta ) {
+                            //- console.log("meta - ",post_type_meta[key_meta]);
+                            if( "meta_"+post_type_meta[key_meta].page_meta_name == current_post_meta[key_current_meta].post_meta_name ) {
+                                current_post_meta[key_current_meta].meta_name = post_type_meta[key_meta].page_meta_name;
+                                current_post_meta[key_current_meta].meta_type = post_type_meta[key_meta].page_meta_type;
+                                current_post_meta[key_current_meta].meta_title = post_type_meta[key_meta].page_meta_title;
+                                post_meta_data.push(current_post_meta[key_current_meta]);
+                                find = 1;
+                            }
+                        }
+                        if( find == 0 ) {
+                            // add meta data
+                            post_meta_data.push({meta_title:post_type_meta[key_meta].page_meta_title,meta_type:post_type_meta[key_meta].page_meta_type,meta_name:post_type_meta[key_meta].page_meta_name,post_meta_value:""});
+                        }
+
+                    }
+
+
+                    // get page with the ID and return data
+                    e5ojs_page_get_page(page_id,function(page_data){
+                        if( page_data == null ) {
+                            res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/page/action/new/");
+                        } else {
+                            // get image from DB
+                            e5ojs_get_media(page_data[0].page_media_id,function(media_result){
+                                if( media_result == false ) {
+                                    page_data[0].post_media_attachment_id = "";
+                                    page_data[0].post_media_attachment_url = e5ojs_global_data.admin_res.media_default_image_url;
+                                } else {
+                                    var media_url = e5ojs_global_data.admin_res.media_uploads_sizes_url+media_result[0].media_file_name_clean+"-800x200."+(media_result[0].media_mime_type.split("/"))[1];
+                                    page_data[0].post_media_attachment_id = media_result[0].media_id;
+                                    page_data[0].post_media_attachment_url = media_url;
+                                }
+                                // embed page metas
+
+                                page_data[0].settings_page_metas = post_meta_data;
+                                // check if has message session
+                                // get session message
+                                var e5ojs_message = e5ojs_get_session_message(req);
+                                // remove session message
+                                e5ojs_clear_session_message(req);
+                                // get templates json file
+                                e5ojs_read_template_files_json(function(templates_json){
+                                    res.render('back-end/e5ojs-admin-page', { page_data: e5ojs_global_data.admin_pages['pages'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], e5ojs_message:e5ojs_message, pages_data:page_data, e5ojs_templates_json:templates_json });
+                                });
+                            });
+                        }
                     });
                 });
-
-            }
-        });
-
+            });
     });
 });
 router.post('/page/action/edit/:page_id/:page_status/',function(req, res, next){
@@ -1044,21 +1093,102 @@ router.post('/page/action/edit/:page_id/:page_status/',function(req, res, next){
             page_media_id: page_media_id,
             page_template: page_template
         }
-        // update page and redirect with id returned
-        e5ojs_page_update(page_data,function(page_data_result){
-            var e5ojs_message = null;
-            if( page_data_result != null ) {
-                // show notification
-                e5ojs_message = {'status':1,'type':'done','text':'Page updated'};
-            } else {
-                e5ojs_message = {'status':1,'type':'error','text':'Page no updated'};
+
+
+
+
+
+        // check for page meta
+        var post_meta = [];
+        for( element_key in req.body ) {
+            var index_position = element_key.indexOf("meta_");
+            if( index_position != -1 ) {
+                if( index_position == 0 ) {
+                    //console.log("META : "+element_key,req.body[element_key]);
+                    post_meta.push( {post_meta_id:'',post_meta_post_id:parseInt(page_id),post_meta_name:element_key,post_meta_value:req.body[element_key]} );
+                }
             }
-            // save message on session var
-            e5ojs_push_session_message(req,e5ojs_message);
-            // set true for front-end refresh routers
-            req.app.locals.e5ojs_refresh_router = true;
-            // response
-            res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/page/action/edit/"+page_id+"/");
+        }
+        var post_meta_save = [];
+        //console.log(" === post_meta adriana === ",post_meta);
+
+
+        // get page metas to match
+        e5ojs_settings_get_all(function(current_settings){
+            // get page metas
+            var post_type_meta = {};
+            for( settings_key in current_settings ) {
+                if( current_settings[settings_key].settings_id == "settings_page_metas" ) {
+                    post_type_meta = current_settings[settings_key].settings_value;
+                    break;
+                }
+            }
+
+            // the post meta has metas
+            // math request meta and post type meta
+            for( meta_key in post_type_meta ) {
+                var meta_name = post_type_meta[meta_key].page_meta_name;
+                // search meta_name on post_meta
+                for( post_meta_key in post_meta ) {
+                    if( post_meta[post_meta_key].post_meta_name.indexOf(meta_name) > 0 ) {
+                        post_meta_save.push( {post_meta_id:'',post_meta_post_id:post_meta[post_meta_key].post_meta_post_id,post_meta_name:post_meta[post_meta_key].post_meta_name,post_meta_value:post_meta[post_meta_key].post_meta_value} );
+                        break;
+                    }
+                }
+            }
+            //console.log(" === post_meta_save adriana === ",post_meta_save);
+
+            var post_meta_update = [];
+            // get current post meta from this posts and to do math with request meta to save
+            e5ojs_get_post_meta(page_id,function(current_post_meta_saved){
+                if( current_post_meta_saved != null && current_post_meta_saved.length > 0 ) {
+                    // math post metas
+                    // current meta
+                    for( current_meta_key in current_post_meta_saved ) {
+                        current_meta = current_post_meta_saved[current_meta_key];
+                        // meta save
+                        for( meta_save_key in post_meta_save ) {
+                            meta_save = post_meta_save[meta_save_key];
+                            // compare meta names
+                            if( current_meta.post_meta_name == meta_save.post_meta_name ) {
+                                // copy data
+                                current_meta.post_meta_value = meta_save.post_meta_value;
+                                //delete post_meta_save[meta_save_key];
+                                post_meta_save.splice(meta_save_key, 1);
+                                post_meta_update.push(current_meta);
+                            }
+                        }
+                    }
+                    //return false;
+                }
+                //console.log("post_meta_save",post_meta_save);
+                //console.log("post_meta_update",post_meta_update);
+
+                //update post metas
+                e5ojs_update_post_meta(post_meta_update,function(update_post_meta_result){
+                    //console.log("update_post_meta_result",update_post_meta_result);
+                    // insert post meta on DB
+                    e5ojs_insert_post_meta(post_meta_save,function(insert_post_meta_result){
+                        //console.log("insert_post_meta_result",insert_post_meta_result);
+                        // update page and redirect with id returned
+                        e5ojs_page_update(page_data,function(page_data_result){
+                            var e5ojs_message = null;
+                            if( page_data_result != null ) {
+                                // show notification
+                                e5ojs_message = {'status':1,'type':'done','text':'Page updated'};
+                            } else {
+                                e5ojs_message = {'status':1,'type':'error','text':'Page no updated'};
+                            }
+                            // save message on session var
+                            e5ojs_push_session_message(req,e5ojs_message);
+                            // set true for front-end refresh routers
+                            req.app.locals.e5ojs_refresh_router = true;
+                            // response
+                            res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/page/action/edit/"+page_id+"/");
+                        });
+                    });
+                });
+            });
         });
     });
 });
@@ -1455,6 +1585,8 @@ router.post('/settings/', function(req, res, next) {
         settings_admin_pages_data.settings_media_page_description = req.body.settings_media_page_description;
         settings_admin_pages_data.settings_post_type_page_title = req.body.settings_post_type_page_title;
         settings_admin_pages_data.settings_post_type_page_description = req.body.settings_post_type_page_description;
+        settings_admin_pages_data.settings_users_page_title = req.body.settings_users_page_title;
+        settings_admin_pages_data.settings_users_page_description = req.body.settings_users_page_description;
 
         // for posts peer page
         var settings_admin_posts_peer_page = req.body.settings_admin_posts_peer_page;
