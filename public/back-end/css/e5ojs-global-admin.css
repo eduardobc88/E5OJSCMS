@@ -20,6 +20,24 @@ body .waves-effect {
 .aling-right {
     text-align: right;
 }
+.aling-center {
+    text-align: center;
+}
+.aling-left {
+    text-align: left;
+}
+/* centered columns styles */
+.row-centered {
+    text-align:center;
+}
+.col-centered {
+    display:inline-block;
+    float:none;
+    /* reset the text-align */
+    text-align:left;
+    /* inline-block space fix */
+    margin-right:-4px;
+}
 
 /* end global components */
 
@@ -848,16 +866,25 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 }
 .media-content .media-item {
     display: inline-block;
-    margin: 3px;
     padding: 0px;
-    margin-left: 5px;
-    margin-right: 5px;
     position: relative;
     overflow: hidden;
     width: 150px;
     height: 150px;
+    margin: auto;
+    top: 0;
+    bottom: 0;
+    vertical-align: middle;
 }
-
+.media-content .media-item img {
+    padding: 1px;
+    position: relative;
+    transition-duration: .3s;
+}
+.media-content .media-item:hover img{
+    transform: scale(1.35) rotate(10deg);
+    transition-duration: .3s;
+}
 /* end gallery page */
 
 
