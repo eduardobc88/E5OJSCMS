@@ -885,6 +885,39 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     transform: scale(1.35) rotate(10deg);
     transition-duration: .3s;
 }
+.media-content .item-selected {
+    -webkit-filter: grayscale(100%); /* Chrome, Safari, Opera */
+   filter: grayscale(100%);
+}
+
+
+.e5ojs-media-editor-wrapper .e5ojs-media-editor-actions-wrapper {
+    padding: 15px;
+}
+.e5ojs-media-editor-wrapper .btn {
+    font-size: 12px;
+    position: relative;
+    padding-right: 30px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 15px;
+    margin-right: 15px;
+    color: #FFF;
+    line-height: 18px;
+    font-weight: 500;
+}
+.e5ojs-media-editor-wrapper .btn i {
+    font-size: 20px;
+    position: absolute;
+    margin: auto;
+    z-index: 2;
+    right: 5px;
+    top: 0;
+    bottom: 0;
+    display: table;
+}
+.e5ojs-media-editor-wrapper .e5ojs-media-editor-load-wrapper {
+}
 /* end gallery page */
 
 

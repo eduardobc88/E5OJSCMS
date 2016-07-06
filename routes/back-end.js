@@ -199,6 +199,7 @@ function e5ojs_global_data_init() {
     };
     e5ojs_global_data.admin_api = {
         get_all_media: host_url+"/admin/all-media/",
+        e5ojs_media_api: host_url+'/admin/e5ojs-media-api/page/',
     };
 
     // fill e5ojs_global_data with settings data
@@ -1683,6 +1684,93 @@ router.get('/media/', function(req, res, next) {
         res.render('back-end/e5ojs-admin-media', { page_data: e5ojs_global_data.admin_pages['media'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
     });
 });
+
+
+
+/* media items paginated API */
+router.get('/e5ojs-media-api/page/:number_page/', function(req, res, next){
+    var number_page = req.params.number_page;
+
+    // get posts
+    // get total pages
+    var limit_post = 12;
+    var skip_posts = 0;
+    var total_post = 0;
+    if( parseInt(number_page) == 1 ) {
+        skip_posts = 0;
+    } else {
+        skip_posts = (parseInt(number_page)-1)*limit_post;
+    }
+    var total_pages = 0;
+    var current_page = number_page;
+
+    // total pages
+    db.e5ojs_media.find({}).sort({'media_date':-1}).count(function(q_req, q_res, q_next){
+        total_post = parseInt(q_res);
+        total_pages = parseInt(total_post/limit_post);
+        total_pages = (( total_pages == 0 )?1:parseInt(total_pages)+parseInt(total_post%limit_post));
+    });
+    // query with skip page
+    db.e5ojs_media.find({}).skip(skip_posts).limit(limit_post, function(err, pages_data){
+        // get pagination
+        var e5ojs_pagination = e5ojs_get_pagination(total_pages,current_page,total_post,base_url=e5ojs_global_data.admin_pages['media'].url);
+        // get media sizes
+        var media_sizes = {};
+        e5ojs_image_sizes.forEach(function(size,key){
+            var size_key = size.width+"x"+size.height;
+            media_sizes[size_key] = size_key;
+        });
+        // render media page
+        res.json({"e5ojs_media_api":{ e5ojs_status:1, e5ojs_media_items:pages_data, e5ojs_pagination:e5ojs_pagination, e5ojs_total_media_items:total_post, e5ojs_media_uploads_url:e5ojs_global_data.admin_res.media_uploads_url, e5ojs_media_uploads_sizes_url:e5ojs_global_data.admin_res.media_uploads_sizes_url, e5ojs_media_sizes:media_sizes, e5ojs_total_pages:total_pages }});
+    });
+});
+
+var e5ojs_delete = require('delete');
+router.delete('/e5ojs-media-api/', function(req, res, next){
+    var e5ojs_media_ids = req.body.media_ids;
+    e5ojs_media_ids_json = JSON.parse(e5ojs_media_ids);
+    e5ojs_media_ids = [];
+    for( element_key in e5ojs_media_ids_json ) {
+        media_id_remove = e5ojs_media_ids_json[element_key].data_media_id;
+        e5ojs_media_ids.push(parseInt(media_id_remove));
+    }
+    e5ojs_media_api_delete_media(e5ojs_media_ids, function(media_data_result){
+        //console.log("media_data_result",media_data_result);
+
+        var media_file_name = [];
+        for( element_key in media_data_result ) {
+            media_file_name.push(media_data_result[element_key].media_file_name);
+        }
+        // delete from DB
+
+        // delete files
+        e5ojs_media_api_delete_files(media_file_name, element_number=0, function(delete_result){
+            console.log("delete_result",delete_result);
+            res.json({e5ojs_media_api_delete:{e5ojs_status:1,e5ojs_delete_status:1,e5ojs_media_ids:req.body}});
+        });
+
+    });
+
+});
+
+
+function e5ojs_media_api_delete_media(media_ids, callback) {
+    db.e5ojs_media.find({'media_id':{$in:media_ids}},function(err, media_result){
+        if( err )
+            callback([]);
+        else
+            callback(media_result);
+    });
+}
+function e5ojs_media_api_delete_files(media_names, element_number, callback) {
+    for( element_key in media_names ) {
+        file_name = __dirname + '/../public/uploads/'+media_names[element_key];
+        console.log("dir_file",file_name);
+        // sync
+        e5ojs_delete.sync(file_name, {force: true});
+    }
+    callback({status:1});
+}
 /* end e5ojs admin pages routers */
 
 
