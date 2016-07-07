@@ -1734,27 +1734,39 @@ router.delete('/e5ojs-media-api/', function(req, res, next){
         media_id_remove = e5ojs_media_ids_json[element_key].data_media_id;
         e5ojs_media_ids.push(parseInt(media_id_remove));
     }
-    e5ojs_media_api_delete_media(e5ojs_media_ids, function(media_data_result){
+    e5ojs_media_api_get_media(e5ojs_media_ids, function(media_data_result){
         //console.log("media_data_result",media_data_result);
 
         var media_file_name = [];
         for( element_key in media_data_result ) {
             media_file_name.push(media_data_result[element_key].media_file_name);
+            // sizes
+            media_file_name_clean = media_data_result[element_key].media_file_name_clean
+            media_mime_type = (media_data_result[element_key].media_mime_type).split("/")[1];
+            e5ojs_image_sizes.forEach(function(size,key){
+                var size_key = size.width+"x"+size.height;
+                media_file_name.push("sizes/"+media_file_name_clean+"-"+size_key+"."+media_mime_type);
+            });
+        }
+        var media_ids_delete = [];
+        for( element_key in media_data_result ) {
+            media_ids_delete.push( parseInt(media_data_result[element_key].media_id) );
         }
         // delete from DB
-
+        console.log("media_ids_delete",media_ids_delete);
+        e5ojs_media_api_delete_media(media_ids_delete, function(result_media_delete){
+            console.log("result_media_delete",result_media_delete);
+        });
         // delete files
         e5ojs_media_api_delete_files(media_file_name, element_number=0, function(delete_result){
-            console.log("delete_result",delete_result);
             res.json({e5ojs_media_api_delete:{e5ojs_status:1,e5ojs_delete_status:1,e5ojs_media_ids:req.body}});
         });
-
     });
 
 });
 
 
-function e5ojs_media_api_delete_media(media_ids, callback) {
+function e5ojs_media_api_get_media(media_ids, callback) {
     db.e5ojs_media.find({'media_id':{$in:media_ids}},function(err, media_result){
         if( err )
             callback([]);
@@ -1762,10 +1774,18 @@ function e5ojs_media_api_delete_media(media_ids, callback) {
             callback(media_result);
     });
 }
+function e5ojs_media_api_delete_media(media_ids, callback) {
+    db.e5ojs_media.remove({'media_id':{$in:media_ids}},function(err, result_media_delete){
+        if( err )
+            callback([]);
+        else
+            callback(result_media_delete);
+    });
+};
 function e5ojs_media_api_delete_files(media_names, element_number, callback) {
     for( element_key in media_names ) {
         file_name = __dirname + '/../public/uploads/'+media_names[element_key];
-        console.log("dir_file",file_name);
+        //console.log("dir_file",file_name);
         // sync
         e5ojs_delete.sync(file_name, {force: true});
     }

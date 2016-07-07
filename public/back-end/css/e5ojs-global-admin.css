@@ -917,6 +917,19 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     display: table;
 }
 .e5ojs-media-editor-wrapper .e5ojs-media-editor-load-wrapper {
+    position: relative;
+}
+
+.e5ojs-media-editor-wrapper .wrapper-float-btn {
+    position: absolute;
+    z-index: 1;
+    right: 15px;
+    bottom: 0px;
+    transition: none;
+    padding-top: 10px;
+}
+.e5ojs-media-editor-wrapper .wrapper-float-btn .e5ojs-media-editor-add-new {
+    top: 20px;
 }
 /* end gallery page */
 

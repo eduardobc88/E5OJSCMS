@@ -41,7 +41,6 @@ $(document).ready(function(){
                         // search id and replace
                         if( typeof media_id === 'undefined' ) {
                             // add to array
-                            console.log("NUEVO");
                             current_media_ids = current_media_ids.split(",");
                             current_media_ids.push(element.item.media_id);
                             urrent_media_ids = current_media_ids.toString();
@@ -129,10 +128,29 @@ $(document).ready(function(){
         e5ojs_media_start_action_gallery_meta();
     });
 
+
+
+
+
+
+
+    // button or image to open media for gallery
+    $(".e5ojs-media-editor-add-new").on("click",function(){
+        var media_gallery_image = e5ojs_media.init({
+            title:"Select or upload a image"
+        }).e5ojs_open_media().on("finish_upload",function(finish_upload){
+            if( finish_upload.finish_upload == true ) {
+                // reload media
+                e5ojs_media_editor.init({e5ojs_media_refresh:true});
+                e5ojs_media_editor.init({}).e5ojs_get_media_items();
+            }
+        });
+    });
+
+    // position media button add
+    e5ojs_media_postion_button();
 });
 $(window).load(function(){
-
-
     /* start media editor page */
     if( $(".e5ojs-media-editor-load-more-btn").length ) {
         e5ojs_media_editor.init({}).e5ojs_get_media_items();
@@ -141,7 +159,42 @@ $(window).load(function(){
         });
     }
     /* end media editor page */
+
+    e5ojs_media_postion_button();
 });
+$(window).resize(function(){
+    e5ojs_media_postion_button();
+});
+$( window ).scroll(function() {
+    e5ojs_media_postion_button();
+});
+function e5ojs_media_postion_button() {
+
+    window_height = $(window).height();
+    window_scroll = $(window).scrollTop();
+    document_heoght = $(document).height();
+    button_position = $(".e5ojs-media-editor-wrapper .e5ojs-media-editor-load-more-btn").offset().top + $(".e5ojs-media-editor-wrapper .wrapper-float-btn").height() + 30;
+    scroll_area = {start:window_scroll,end:window_scroll+window_height};
+    if( button_position > scroll_area.start && button_position < scroll_area.end ) {
+        $(".e5ojs-media-editor-wrapper .wrapper-float-btn").css({
+            'transition': 'none',
+            'position': 'absolute',
+            'bottom': '0px',
+            'right': '15px'
+        });
+    } else {
+        $(".e5ojs-media-editor-wrapper .wrapper-float-btn").css({
+            'transition': 'none',
+            'position': 'fixed',
+            'bottom': 100,
+            'right': $(".e5ojs-media-editor-wrapper .wrapper-float-btn").parent().offset().left + 15
+        });
+    }
+
+}
+
+
+
 
 
 
@@ -161,11 +214,19 @@ var e5ojs_media_editor = {
     e5ojs_media_api: e5ojs_media_api,
     e5ojs_media_current_page: 1,
     e5ojs_media_total_pages: 1,
+    e5ojs_media_refresh: false,
     init: function(init_data) {
+        if( init_data.e5ojs_media_refresh == true ) {
+            e5ojs_media_editor.e5ojs_media_refresh = false;
+            // clear content
+            $(e5ojs_media_editor.e5ojs_media_wrapper).find(e5ojs_media_editor.e5ojs_media_items_wrapper).find(".media-content").html("");
+            e5ojs_media_editor.e5ojs_media_editor_selected_items = [];
+            e5ojs_media_editor.e5ojs_media_current_page = 1;
+            e5ojs_media_editor.e5ojs_media_total_pages = 1;
+        }
         // init
         return {
             e5ojs_get_media_items: function() {
-
                 if( e5ojs_media_editor.e5ojs_media_current_page <= e5ojs_media_editor.e5ojs_media_total_pages ) {
                     $.getJSON(e5ojs_media_editor.e5ojs_media_api+e5ojs_media_editor.e5ojs_media_current_page+'/', null, function(e5ojs_response_json){
                         e5ojs_media_editor.e5ojs_media_current_page = e5ojs_media_editor.e5ojs_media_current_page + 1;
@@ -332,11 +393,12 @@ var e5ojs_media = {
     e5ojs_media_element_selected: {},
     e5ojs_media_sizes: {},
     e5ojs_timer_id: null,
+    e5ojs_finish_upload: false,
     init: function(init_data) {
+
         $(this.e5ojs_media_wrapper).find(".card-title").html(init_data.title);
         return {
             e5ojs_open_media: function() {
-                console.log("e5ojs_open_media");
                 // open close media wrapper
                 function e5ojs_open_media_popup() {
                     // show media popup
@@ -376,12 +438,14 @@ var e5ojs_media = {
                     e5ojs_check_for_upload();
                     e5ojs_upload_media_status('Choose a file :)');
                     $('#e5ojs-upload-form').submit(function() {
+                        e5ojs_media.e5ojs_finish_upload = false;
                         e5ojs_upload_media_status('Uploading...');
                         $(this).ajaxSubmit({
                             error: function(xhr) {
                                 $('#e5ojs-upload-form').resetForm();
                 		        e5ojs_upload_media_status('Error: ' + xhr.status);
                                 e5ojs_check_for_upload();
+                                e5ojs_media.e5ojs_finish_upload = false;
                             },
                             uploadProgress: function(event, position, total, percentComplete) {
                                 var percentVal = percentComplete + '%';
@@ -414,6 +478,7 @@ var e5ojs_media = {
                                 });
                                 $(e5ojs_media.e5ojs_media_wrapper).find("#e5ojs-upload-progress-bar-wrapper").find("p").html("");
                                 e5ojs_check_for_upload();
+                                e5ojs_media.e5ojs_finish_upload = true;
                             }
                         });
                         // Have to stop the form from submitting and causing
@@ -539,6 +604,17 @@ var e5ojs_media = {
                                     });
                                     callback({item:e5ojs_media.e5ojs_media_element_selected,sizes:url_sizes});
                                 });
+                            break;
+                            case 'finish_upload':
+                                setInterval(function(){
+                                    if( e5ojs_media.e5ojs_finish_upload == true ) {
+                                        // close media
+                                        $(e5ojs_media.e5ojs_media_wrapper).fadeOut();
+                                        e5ojs_media.e5ojs_media_open = false;
+                                        callback({finish_upload:e5ojs_media.e5ojs_finish_upload});
+                                        e5ojs_media.e5ojs_finish_upload = false;
+                                    }
+                                },1000);
                             break;
                         }
                     }
