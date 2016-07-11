@@ -1,15 +1,48 @@
 $(document).ready(function(){
     console.log("E5OJS","e5ojs-media-js");
-    // button or image to open media
+    // button or image to open media for large image
     $(".e5ojs-open-media").on("click",function(){
         var image_preview = $(this);
-        var input_media_id = $(".post_media_id");
+        var input_media_id = $(image_preview).parent().find(".post_media_id");
         var media_image = e5ojs_media.init({
             title:"Select or upload a image"
         }).e5ojs_open_media().on("select",function(element){
             $(input_media_id).val(element.item.media_id);
             $(image_preview).attr("src",element.sizes[3]);
         });
+    });
+    // 150x150 image
+    $(".e5ojs-open-media-small").on("click",function(){
+        var image_preview = $(this);
+        var input_media_id = $(image_preview).parent().find(".e5ojs_media_id");
+        var media_image = e5ojs_media.init({
+            title:"Select or upload a image"
+        }).e5ojs_open_media().on("select",function(element){
+            $(input_media_id).val(element.item.media_id);
+            $(image_preview).attr("src",element.sizes[0]);
+        });
+    });
+    // get image from ajax
+    $(".e5ojs-media-image-get").each(function(key,element){
+
+        var image_id = $(this).attr("e5ojs-image-get-id");
+        var image_element = $(this);
+        var image_size = $(this).attr("e5ojs-image-get-size");
+        if( image_id != "" ) {
+            $.getJSON( e5ojs_all_media_url+image_id, function( media_gallery_json ) {
+                var all_media = media_gallery_json[0];
+                if( all_media.status ) {
+                    var media_element = all_media.media_posts[0];
+                    e5ojs_media.e5ojs_media_sizes = all_media.sizes;
+                    //e5ojs_media_sizes
+                    var media_id = media_element.media_id;
+                    var media_url = e5ojs_media_sizes_url+media_element.media_file_name_clean+"-"+image_size+"."+(media_element.media_mime_type.split("/"))[1];
+                    var media_name = media_element.media_name;
+                    var media_date = media_element.media_date;
+                    $(image_element).attr("src",media_url);
+                }
+            });
+        }
     });
 
 
@@ -61,7 +94,7 @@ $(document).ready(function(){
     }
     e5ojs_media_start_action_gallery_meta();
 
-    // get image from id
+    // get image from id find
     $(".post-meta-image").each(function(key,element){
         var image_id = $(this).find(".meta-image-id").val();
         var image_element = $(this);
@@ -170,27 +203,28 @@ $( window ).scroll(function() {
 });
 function e5ojs_media_postion_button() {
 
-    window_height = $(window).height();
-    window_scroll = $(window).scrollTop();
-    document_heoght = $(document).height();
-    button_position = $(".e5ojs-media-editor-wrapper .e5ojs-media-editor-load-more-btn").offset().top + $(".e5ojs-media-editor-wrapper .wrapper-float-btn").height() + 30;
-    scroll_area = {start:window_scroll,end:window_scroll+window_height};
-    if( button_position > scroll_area.start && button_position < scroll_area.end ) {
-        $(".e5ojs-media-editor-wrapper .wrapper-float-btn").css({
-            'transition': 'none',
-            'position': 'absolute',
-            'bottom': '0px',
-            'right': '15px'
-        });
-    } else {
-        $(".e5ojs-media-editor-wrapper .wrapper-float-btn").css({
-            'transition': 'none',
-            'position': 'fixed',
-            'bottom': 100,
-            'right': $(".e5ojs-media-editor-wrapper .wrapper-float-btn").parent().offset().left + 15
-        });
+    if( $(".e5ojs-media-editor-wrapper").length ) {
+        window_height = $(window).height();
+        window_scroll = $(window).scrollTop();
+        document_heoght = $(document).height();
+        button_position = $(".e5ojs-media-editor-wrapper .e5ojs-media-editor-load-more-btn").offset().top + $(".e5ojs-media-editor-wrapper .wrapper-float-btn").height() + 30;
+        scroll_area = {start:window_scroll,end:window_scroll+window_height};
+        if( button_position > scroll_area.start && button_position < scroll_area.end ) {
+            $(".e5ojs-media-editor-wrapper .wrapper-float-btn").css({
+                'transition': 'none',
+                'position': 'absolute',
+                'bottom': '0px',
+                'right': '15px'
+            });
+        } else {
+            $(".e5ojs-media-editor-wrapper .wrapper-float-btn").css({
+                'transition': 'none',
+                'position': 'fixed',
+                'bottom': 100,
+                'right': $(".e5ojs-media-editor-wrapper .wrapper-float-btn").parent().offset().left + 15
+            });
+        }
     }
-
 }
 
 

@@ -1,14 +1,55 @@
 extends e5ojs-base-layout-admin
 block e5ojs_block_local_css_script
 block e5ojs_block_content
-            div(class="row no-padding")
-                div(class="col-xs-12 no-padding")
-                    div(class="card")
-                      div(class="card-content")
-                        span(class="card-title")='Users'
-                        p
-                          | I am a very simple card. I am good at containing small bits of information.
-                          | I am convenient because I require little markup to use effectively.
-                    
-                    
-                    
+    div(class="row top-page-options no-padding")
+        div(class="col-xs-12 no-padding")
+            a(href=e5ojs_global_data.admin_pages.users.url+e5ojs_global_data.admin_actions.users.pagination_all+"1/" class="waves-effect waves-dark "+(( post_status == "all" )?" current":""))='All'
+            a(href=e5ojs_global_data.admin_pages.users.url+e5ojs_global_data.admin_actions.users.pagination_active+"1/" class="waves-effect waves-dark "+(( post_status == "active" )?" current":""))='Active'
+            a(href=e5ojs_global_data.admin_pages.users.url+e5ojs_global_data.admin_actions.users.pagination_deactive+"1/" class="waves-effect waves-dark "+(( post_status == "deactive" )?" current":""))='Deactive'
+    div(class="row")
+        div(class="col-xs-12 no-padding")
+                - var post_type_name = e5ojs_global_data.e5ojs_current_post_type;
+                ul(class="collection custom-collection")
+                    li(class="collection-header")
+                        input(id="select-all" class="filled-in" type="checkbox" )
+                        label(for='select-all' class="checkbox-center")
+                        ul(id="dropdown2" class="dropdown-content bulk-actions")
+                            li
+                                a(href=e5ojs_global_data.admin_pages.users.url+e5ojs_global_data.admin_actions.users.action+"1/")="Active"
+                            li
+                                a(href=e5ojs_global_data.admin_pages.users.url+e5ojs_global_data.admin_actions.users.action+"0/")="Desactive"
+                            li
+                                a(href=e5ojs_global_data.admin_pages.users.url+e5ojs_global_data.admin_actions.users.action+"-1/")="Delete"
+                        a.btn.dropdown-button(href='#!', data-activates='dropdown2')='Bulk action'
+                          i.mdi-navigation-arrow-drop-down.right
+                        a(href=e5ojs_global_data.admin_pages.users.url+e5ojs_global_data.admin_actions.users.new class="waves-effect waves-dark btn")='Add new'
+                            i(class="material-icons")='add'
+                    - var e5ojs_posts = users_data;
+                    each post, index in e5ojs_posts
+                        - var letter = post.user_name.charAt(0).toUpperCase();
+                        - var color_hex = (( post.user_status == 1 )?"4CAF50": "F44336");
+                        li(class="collection-item avatar waves-effect waves-dark" data-collection-id=post.user_id)
+                            input(id="checkbox-"+post.user_id class="filled-in row-checkbox" type="checkbox")
+                            label(for='checkbox-'+post.user_id class="checkbox-center")
+                            img(src="https://placeholdit.imgix.net/~text?txtsize=50&bg="+color_hex+"&txtclr=FFFFFF&txt="+letter+"&w=100&h=100&txttrack=0" alt="" class="circle")
+                            p(class="title")
+                                span()=post.user_name+" "+post.user_last_name
+                                span(class="excerpt")=post.user_bio
+                            //- p(class="badge")=post.post_status
+                            div(class="secondary-content")
+                                a(href=e5ojs_global_data.admin_pages.users.url+e5ojs_global_data.admin_actions.users.edit+post.user_id+"/")
+                                    i(class="material-icons")='mode_edit'
+                                a(href=e5ojs_global_data.admin_pages.users.url+e5ojs_global_data.admin_actions.users.action+"1/"+post.user_id+"/")
+                                    i(class="material-icons")='public'
+                                a(href=e5ojs_global_data.admin_pages.users.url+e5ojs_global_data.admin_actions.users.action+"0/"+post.user_id+"/")
+                                    i(class="material-icons")='archive'
+                                a(href=e5ojs_global_data.admin_pages.users.url+e5ojs_global_data.admin_actions.users.action+"-1/"+post.user_id+"/")
+                                    i(class="material-icons")='delete_forever'
+                    li(class="collection-footer")
+                        ul(class="e5ojs-pagination")
+                            - for( var page_key in e5ojs_pagination ) {
+                                - page_data = e5ojs_pagination[page_key];
+                                a(href=page_data.url class=page_data.current)
+                                    li(class="item")
+                                        span=page_data.number
+                            - }

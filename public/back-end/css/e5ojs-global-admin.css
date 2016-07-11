@@ -1104,6 +1104,18 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 
 
 
+/* start users */
+#e5ojs-user-form-wrapper .input-field img {
+    position: relative;
+    margin-top: 30px;
+    overflow: hidden;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 15px;
+}
+/* end users */
+
+
 /* start card top options */
 .card .card-content .card-top-options {
     position: relative;

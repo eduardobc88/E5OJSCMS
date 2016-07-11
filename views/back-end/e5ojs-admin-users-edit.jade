@@ -1,0 +1,94 @@
+extends e5ojs-base-layout-admin
+block e5ojs_block_local_css_script
+block e5ojs_block_content
+    - if( typeof user_info === 'undefined' || user_info.length == 0 ) {
+        form(id="e5ojs-user-form-wrapper" action=e5ojs_global_data.admin_pages.users.url+e5ojs_global_data.admin_actions.users.edit method="post")
+            div(class="row")
+                div(class="col-xs-12 no-padding")
+                    div(class="card")
+                        div(class="card-image")
+                            img(class="e5ojs-open-media"  src=e5ojs_global_data.admin_res.media_default_image_url)
+                            span(class="card-title")='User info'
+                            input(type="hidden" name="user_bkg_media_id" class="post_media_id")
+                        div(class="card-content")
+                            div(class="input-field")
+                                input(id="user_name" type="text" class="validate" name="user_name")
+                                label(for="user_name")='Name'
+                            div(class="input-field")
+                                input(id="user_last_name" type="text" class="validate" name="user_last_name")
+                                label(for="user_last_name")='Last name'
+                            div(class="input-field")
+                                input(id="user_email" type="email" class="validate" name="user_email")
+                                label(for="user_email")='Email'
+                            div(class="input-field")
+                                input(id="user_login" type="text" class="validate" name="user_login")
+                                label(for="user_login")='Login name'
+                            div(class="input-field")
+                                input(id="user_pass" type="text" class="validate" name="user_pass")
+                                label(for="user_pass")='Password'
+                            div(class="input-field")
+                                textarea(id="user_bio" class="materialize-textarea" name="user_bio")
+                                label(for="user_bio")='Biography'
+                            div(class="input-field")
+                                img(class="e5ojs-open-media-small"  src=e5ojs_global_data.admin_res.media_default_image_gallery)
+                                label(for="user_avatar_media")='Avatar'
+                                input(type="hidden" name="user_avatar_media_id" class="e5ojs_media_id")
+                            div(class="switch")
+                                label
+                                    !='Desactive'
+                                    input(type="checkbox" name="user_status")
+                                    span(class="lever")
+                                    !='Active'
+                            div(class="aling-right")
+                                button( type="submit" class="waves-effect waves-dark btn")='SAVE'
+    - } else {
+        form(id="e5ojs-user-form-wrapper" action=e5ojs_global_data.admin_pages.users.url+e5ojs_global_data.admin_actions.users.edit+user_info.user_id+"/" method="post")
+            div(class="row")
+                div(class="col-xs-12 no-padding")
+                    div(class="card")
+                        div(class="card-image")
+                            img(class="e5ojs-open-media e5ojs-media-image-get"  src=e5ojs_global_data.admin_res.media_default_image_url e5ojs-image-get-size="800x200" e5ojs-image-get-id=user_info.user_bkg_media_id)
+                            span(class="card-title")='User info'
+                            input(type="hidden" name="user_bkg_media_id" class="post_media_id" value=user_info.user_bkg_media_id)
+                        div(class="card-content")
+                            div(class="input-field")
+                                input(id="user_name" type="text" class="validate" name="user_name" value=user_info.user_name)
+                                label(for="user_name")='Name'
+                            div(class="input-field")
+                                input(id="user_last_name" type="text" class="validate" name="user_last_name" value=user_info.user_last_name)
+                                label(for="user_last_name")='Last name'
+                            div(class="input-field")
+                                input(id="user_email" type="email" class="validate" name="user_email" disabled value=user_info.user_email)
+                                label(for="user_email")='Email'
+                            div(class="input-field")
+                                input(id="user_login" type="text" class="validate" name="user_login" disabled value=user_info.user_login)
+                                label(for="user_login")='Login name'
+                            div(class="input-field")
+                                input(id="user_pass" type="text" class="validate" name="user_pass")
+                                label(for="user_pass")='Password'
+                            div(class="input-field")
+                                textarea(id="user_bio" class="materialize-textarea" name="user_bio")=user_info.user_bio
+                                label(for="user_bio")='Biography'
+                            div(class="input-field")
+                                img(class="e5ojs-open-media-small e5ojs-media-image-get" src=e5ojs_global_data.admin_res.media_default_image_gallery e5ojs-image-get-size="150x150" e5ojs-image-get-id=user_info.user_avatar_media_id)
+                                label(for="user_avatar_media")='Avatar'
+                                input(type="hidden" name="user_avatar_media_id" class="e5ojs_media_id" value=user_info.user_avatar_media_id)
+                            div(class="switch")
+                                - var active = (( parseInt(user_info.user_status) == 1)?'checked':'');
+                                - if( parseInt(user_info.user_status) == 1 ) {
+                                    label
+                                        !='Deactive'
+                                        input(type="checkbox" name="user_status" checked)
+                                        span(class="lever")
+                                    !='Active'
+                                - } else {
+                                    label
+                                        !='Deactive'
+                                        input(type="checkbox" name="user_status")
+                                        span(class="lever")
+                                        !='Active'
+                                - }
+                            div(class="aling-right")
+                                button( type="submit" class="waves-effect waves-dark btn")='SAVE'
+        
+    - }
