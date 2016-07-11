@@ -1693,7 +1693,7 @@ router.get('/e5ojs-media-api/page/:number_page/', function(req, res, next){
 
     // get posts
     // get total pages
-    var limit_post = 12;
+    var limit_post = 40;
     var skip_posts = 0;
     var total_post = 0;
     if( parseInt(number_page) == 1 ) {
@@ -1765,32 +1765,6 @@ router.delete('/e5ojs-media-api/', function(req, res, next){
 
 });
 
-
-function e5ojs_media_api_get_media(media_ids, callback) {
-    db.e5ojs_media.find({'media_id':{$in:media_ids}},function(err, media_result){
-        if( err )
-            callback([]);
-        else
-            callback(media_result);
-    });
-}
-function e5ojs_media_api_delete_media(media_ids, callback) {
-    db.e5ojs_media.remove({'media_id':{$in:media_ids}},function(err, result_media_delete){
-        if( err )
-            callback([]);
-        else
-            callback(result_media_delete);
-    });
-};
-function e5ojs_media_api_delete_files(media_names, element_number, callback) {
-    for( element_key in media_names ) {
-        file_name = __dirname + '/../public/uploads/'+media_names[element_key];
-        //console.log("dir_file",file_name);
-        // sync
-        e5ojs_delete.sync(file_name, {force: true});
-    }
-    callback({status:1});
-}
 /* end e5ojs admin pages routers */
 
 
@@ -2309,6 +2283,36 @@ function e5ojs_get_post_meta(post_id,callback) {
 }
 /* start post meta DB function */
 
+
+
+
+
+
+
+
+
+
+/* start Media API DB functions */
+
+function e5ojs_media_api_get_media(media_ids, callback) {
+    db.e5ojs_media.find({'media_id':{$in:media_ids}},function(err, media_result){
+        if( err )
+            callback([]);
+        else
+            callback(media_result);
+    });
+}
+function e5ojs_media_api_delete_media(media_ids, callback) {
+    db.e5ojs_media.remove({'media_id':{$in:media_ids}},function(err, result_media_delete){
+        if( err )
+            callback([]);
+        else
+            callback(result_media_delete);
+    });
+};
+
+/* end Media API DB functions */
+
 /* ============== end e5ojs mongodb functions =============== */
 
 
@@ -2590,6 +2594,24 @@ function e5ojs_get_pagination(total_pages, current_page, total_post, base_url) {
 }
 
 /* end generate pagination */
+
+
+
+
+
+/* start Media functions for files */
+
+function e5ojs_media_api_delete_files(media_names, element_number, callback) {
+    for( element_key in media_names ) {
+        file_name = __dirname + '/../public/uploads/'+media_names[element_key];
+        //console.log("dir_file",file_name);
+        // sync
+        e5ojs_delete.sync(file_name, {force: true});
+    }
+    callback({status:1});
+}
+
+/* end Media functions for files */
 
 /* ============== end e5ojs function ============== */
 
