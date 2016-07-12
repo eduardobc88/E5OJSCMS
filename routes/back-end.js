@@ -1786,74 +1786,6 @@ router.get('/users/action/:user_action/:user_ids/', function(req, res, next) {
 
 
 
-
-
-
-function e5ojs_user_insert(user_data, callback) {
-    db.e5ojs_user.insert(user_data, function(err, result){
-        callback({'error':err, user_data:result});
-    });
-}
-function e5ojs_valid_user_email(user_login,user_email, callback) {
-    db.e5ojs_user.find({'user_login':user_login,'user_email':user_email}).count(function(q_req, q_res, q_next){
-        total_find = parseInt(q_res);
-        callback(total_find);
-    });
-}
-function e5ojs_user_get(user_id, callback) {
-    db.e5ojs_user.find({'user_id':parseInt(user_id)}, function(err, user_data){
-        callback({'error':err, 'user_data':user_data});
-    });
-}
-function e5ojs_user_update(user_data, callback) {
-    db.e5ojs_user.update({'user_id':parseInt(user_data.user_id)},{$set:user_data},{new:false},function(err, user_data){
-        callback({'error':err, 'user_data':user_data});
-    });
-}
-function e5ojs_change_user_status_multiple(user_ids,status,callback) {
-    var ids_array = Array();
-    user_ids.forEach(function(val,key){
-        ids_array.push( parseInt(user_ids[key]) );
-    });
-    db.e5ojs_user.update({'user_id':{$in:ids_array}},{$set:{'user_status':parseInt(status)}},{new:false, multi:true},function(err, result_data){
-        if( err ) {
-            callback({ok:0});
-        } else {
-            if( result_data.nModified > 0 ) {
-                e5ojs_init(function(){
-                    callback({status:1});
-                });
-            } else {
-                e5ojs_init(function(){
-                    callback({status:0});
-                });
-            }
-        }
-    });
-}
-function e5ojs_remove_user_status_multiple(user_ids,callback) {
-    var ids_array = Array();
-    user_ids.forEach(function(val,key){
-        ids_array.push( parseInt(user_ids[key]) );
-    });
-    db.e5ojs_user.remove({'user_id':{$in:ids_array}},function(err, result_data){
-        // result : WriteResult({ "nMatched" : 3, "nUpserted" : 0, "nModified" : 3 })
-        if( err ) {
-            callback({ok:0});
-        } else {
-            if( result_data.nModified > 0 ) {
-                e5ojs_init(function(){
-                    callback({status:1});
-                });
-            } else {
-                e5ojs_init(function(){
-                    callback({status:0});
-                });
-            }
-        }
-    });
-}
-
 /* end e5ojs users routers */
 
 
@@ -2607,6 +2539,89 @@ function e5ojs_get_post_meta(post_id,callback) {
     });
 }
 /* start post meta DB function */
+
+
+
+
+
+
+
+
+
+
+
+
+/* start users DB functions */
+
+function e5ojs_user_insert(user_data, callback) {
+    db.e5ojs_user.insert(user_data, function(err, result){
+        callback({'error':err, user_data:result});
+    });
+}
+function e5ojs_valid_user_email(user_login,user_email, callback) {
+    db.e5ojs_user.find({'user_login':user_login,'user_email':user_email}).count(function(q_req, q_res, q_next){
+        total_find = parseInt(q_res);
+        callback(total_find);
+    });
+}
+function e5ojs_user_get(user_id, callback) {
+    db.e5ojs_user.find({'user_id':parseInt(user_id)}, function(err, user_data){
+        callback({'error':err, 'user_data':user_data});
+    });
+}
+function e5ojs_user_update(user_data, callback) {
+    db.e5ojs_user.update({'user_id':parseInt(user_data.user_id)},{$set:user_data},{new:false},function(err, user_data){
+        callback({'error':err, 'user_data':user_data});
+    });
+}
+function e5ojs_change_user_status_multiple(user_ids,status,callback) {
+    var ids_array = Array();
+    user_ids.forEach(function(val,key){
+        ids_array.push( parseInt(user_ids[key]) );
+    });
+    db.e5ojs_user.update({'user_id':{$in:ids_array}},{$set:{'user_status':parseInt(status)}},{new:false, multi:true},function(err, result_data){
+        if( err ) {
+            callback({ok:0});
+        } else {
+            if( result_data.nModified > 0 ) {
+                e5ojs_init(function(){
+                    callback({status:1});
+                });
+            } else {
+                e5ojs_init(function(){
+                    callback({status:0});
+                });
+            }
+        }
+    });
+}
+function e5ojs_remove_user_status_multiple(user_ids,callback) {
+    var ids_array = Array();
+    user_ids.forEach(function(val,key){
+        ids_array.push( parseInt(user_ids[key]) );
+    });
+    db.e5ojs_user.remove({'user_id':{$in:ids_array}},function(err, result_data){
+        // result : WriteResult({ "nMatched" : 3, "nUpserted" : 0, "nModified" : 3 })
+        if( err ) {
+            callback({ok:0});
+        } else {
+            if( result_data.nModified > 0 ) {
+                e5ojs_init(function(){
+                    callback({status:1});
+                });
+            } else {
+                e5ojs_init(function(){
+                    callback({status:0});
+                });
+            }
+        }
+    });
+}
+
+/* end users DB functions */
+
+
+
 
 
 

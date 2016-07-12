@@ -50,6 +50,9 @@ html
                                             p=""
                                     div(class="media-wrapper")
                                         div(class="media-items")
+                                        div(class="aling-center")
+                                            button(class="waves-effect waves-dark btn e5ojs-media-popup-load-more-btn")='Load more'
+                                                i(class="material-icons")='expand_more'
                                 div(class="col-xs-12 col-md-12 content-media-bottom")
                                     div(class="media-info")
                                         div(class="no-padding")
@@ -105,9 +108,35 @@ html
                         - } else {
                             li
                                 a(href=e5ojs_global_data.admin_pages[property_key].url class="e5ojs-btn option-btn waves-effect waves-dark")=e5ojs_global_data.admin_pages[property_key].title
-                                    i(class="material-icons")=e5ojs_global_data.admin_pages[property_key].icon_name
+                                    i(class="material-icons")=e5ojs_global_data.admin_pages[property_key].icon_name            
                         - }
                     - }
+                    li
+                        a(href="#!" class="e5ojs-btn option-btn waves-effect waves-dark sub-options-btn")='Sub options'
+                            i(class="material-icons")='settings'
+                            i(class="material-icons")='add'
+                        ul(class="sub-options")
+                            li
+                                a(href="#!")='option'
+                            li
+                                a(href="#!")='option'
+                            li
+                                a(href="#!")='option'
+                            li
+                                a(href="#!")='option'
+                    li
+                        a(href="#!" class="e5ojs-btn option-btn waves-effect waves-dark sub-options-btn")='Sub options'
+                            i(class="material-icons")='settings'
+                            i(class="material-icons")='add'
+                        ul(class="sub-options")
+                            li
+                                a(href="#!")='option'
+                            li
+                                a(href="#!")='option'
+                            li
+                                a(href="#!")='option'
+                            li
+                                a(href="#!")='option'
             div(class="container e5ojs-content-right-wrapper")
                 - if( typeof(e5ojs_message) !== 'undefined' && e5ojs_message.status )
                     div(class="row no-padding")

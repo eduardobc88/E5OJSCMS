@@ -7,6 +7,7 @@ $(document).ready(function(){
         var media_image = e5ojs_media.init({
             title:"Select or upload a image"
         }).e5ojs_open_media().on("select",function(element){
+            //console.log("element",element);
             $(input_media_id).val(element.item.media_id);
             $(image_preview).attr("src",element.sizes[3]);
         });
@@ -428,11 +429,18 @@ var e5ojs_media = {
     e5ojs_media_sizes: {},
     e5ojs_timer_id: null,
     e5ojs_finish_upload: false,
+    e5ojs_media_api: e5ojs_media_api,
+    e5ojs_media_total_pages: 1,
+    e5ojs_media_current_page: 1,
     init: function(init_data) {
 
         $(this.e5ojs_media_wrapper).find(".card-title").html(init_data.title);
         return {
             e5ojs_open_media: function() {
+                e5ojs_media.e5ojs_media_total_pages = 1;
+                e5ojs_media.e5ojs_media_current_page = 1;
+                $(e5ojs_media.e5ojs_media_wrapper).find(".media-items").html("");
+
                 // open close media wrapper
                 function e5ojs_open_media_popup() {
                     // show media popup
@@ -441,14 +449,7 @@ var e5ojs_media = {
 
                     e5ojs_upload_media();
                     e5ojs_set_size();
-                    // resize
-                    e5ojs_print_all_media(function(){
-                        $(window).resize(function(){
-                            setTimeout(function(){
-                                e5ojs_set_size();
-                            },300);
-                        });
-                    });
+                    e5ojs_media_json_request_media();
 
                 }
                 // Check to see when a user has selected a file
@@ -537,28 +538,7 @@ var e5ojs_media = {
                         $(e5ojs_media.e5ojs_media_wrapper).find(".upload-wrapper").height(window_height-(content_media_bottom_height+180));
                     }
                 }
-                // ajax request
-                function e5ojs_print_all_media(callback) {
-                    // request json
-                    $.getJSON( e5ojs_all_media_url, function( media_gallery_json ) {
-                        var all_media = media_gallery_json[0];
-                        if( all_media.status ) {
-                            e5ojs_media.e5ojs_media_sizes = all_media.sizes;
-                            //e5ojs_media_sizes
-                            $(e5ojs_media.e5ojs_media_wrapper).find(".media-items").html("");
-                            $.each(all_media.media_posts,function(key,media_element){
-                                var media_id = media_element.media_id;
-                                var media_url = e5ojs_media_sizes_url+media_element.media_file_name_clean+"-150x150."+(media_element.media_mime_type.split("/"))[1];
-                                var media_name = media_element.media_name;
-                                var media_date = media_element.media_date;
-                                var element = '<div class="card-image waves-effect waves-dark"><img src="'+media_url+'" class="img-responsive item" data-media-id="'+media_id+'" data-media-name="'+media_name+'" data-media-date="'+media_date+'"/></div>';
-                                $(e5ojs_media.e5ojs_media_wrapper).find(".media-items").prepend(element);
-                            });
-                            e5ojs_select_item();
-                        }
-                    });
-                    callback();
-                }
+
                 // options actions
                 function e5ojs_options() {
                     $(e5ojs_media.e5ojs_media_wrapper+" .media-options .option").unbind();
@@ -617,7 +597,47 @@ var e5ojs_media = {
                         $(e5ojs_media.e5ojs_media_wrapper).find(".media-info").find(".extra").html(e5ojs_media.e5ojs_media_element_selected.media_date);
                     });
                 }
+                // button load more
+                function e5ojs_load_more_btn() {
+                    $(e5ojs_media.e5ojs_media_wrapper).find(".e5ojs-media-popup-load-more-btn").unbind();
+                    $(e5ojs_media.e5ojs_media_wrapper).find(".e5ojs-media-popup-load-more-btn").on('click', function(){
+                        e5ojs_media_json_request_media();
+                    });
+                }
+
+                function e5ojs_media_json_request_media() {
+                    if( e5ojs_media.e5ojs_media_current_page <= e5ojs_media.e5ojs_media_total_pages ) {
+                        $.getJSON(e5ojs_media.e5ojs_media_api+e5ojs_media.e5ojs_media_current_page+'/', null, function(e5ojs_response_json){
+                            e5ojs_media.e5ojs_media_current_page = e5ojs_media.e5ojs_media_current_page + 1;
+                            e5ojs_media_api = e5ojs_response_json.e5ojs_media_api;
+                            e5ojs_total_media_items = e5ojs_media_api.e5ojs_total_media_items;
+                            e5ojs_media_uploads_url = e5ojs_media_api.e5ojs_media_uploads_url;
+                            e5ojs_media_uploads_sizes_url = e5ojs_media_api.e5ojs_media_uploads_sizes_url;
+
+                            e5ojs_media.e5ojs_media_sizes = e5ojs_media_api.e5ojs_media_sizes;
+                            e5ojs_media.e5ojs_total_pages = e5ojs_media_api.e5ojs_total_pages;
+                            e5ojs_media.e5ojs_media_total_pages = e5ojs_media_api.e5ojs_total_pages;
+                            // generate items
+                            $.each(e5ojs_media_api.e5ojs_media_items, function(item_key, media_element){
+                                var media_id = media_element.media_id;
+                                var media_url = e5ojs_media_uploads_sizes_url+media_element.media_file_name_clean+"-150x150."+(media_element.media_mime_type.split("/"))[1];
+                                var media_name = media_element.media_name;
+                                var media_date = media_element.media_date;
+                                var media_item = '<div class="card-image waves-effect waves-dark"><img src="'+media_url+'" class="img-responsive item" data-media-id="'+media_id+'" data-media-name="'+media_name+'" data-media-date="'+media_date+'"/></div>';
+                                $(e5ojs_media.e5ojs_media_wrapper).find(".media-items").append(media_item);
+                            });
+                            e5ojs_select_item();
+                            // set size
+                            $(window).resize(function(){
+                                setTimeout(function(){
+                                    e5ojs_set_size();
+                                },300);
+                            });
+                        });
+                    }
+                }
                 // init all
+                e5ojs_load_more_btn();
                 e5ojs_open_media_popup();
                 e5ojs_option_to_media();
 

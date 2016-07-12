@@ -25,8 +25,8 @@ block e5ojs_block_content
                             a(href=e5ojs_global_data.admin_pages.admin_post_types[post_type_name].url+e5ojs_global_data.admin_actions.post_type.action+"trash/")="Trash"
                         li
                             a(href=e5ojs_global_data.admin_pages.admin_post_types[post_type_name].url+e5ojs_global_data.admin_actions.post_type.action+"delete/")="Delete"
-                    a.btn.dropdown-button(href='#!', data-activates='dropdown2')='Bulk action'
-                      i.mdi-navigation-arrow-drop-down.right
+                    a(class="btn dropdown-button" href='#!' data-activates='dropdown2')='Bulk action'
+                        i(class="material-icons")='list'
                     a(href=e5ojs_global_data.admin_pages.admin_post_types[post_type_name].url+e5ojs_global_data.admin_actions.post_type.new class="waves-effect waves-dark btn")='Add new'
                         i(class="material-icons")='add'
                 - var e5ojs_posts = result_query_data;

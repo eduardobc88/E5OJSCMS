@@ -8,10 +8,26 @@ $(document).ready(function(){
     e5ojs_custom_collection();
     e5ojs_custom_post_actions();
     $('select').material_select();
+    e5ojs_left_menu_actions();
 });
 $(window).load(function(){
     e5ojs_summernote();
 });
+
+
+function e5ojs_left_menu_actions() {
+    $(".e5ojs-menu-left-wrapper ul.options li .sub-options-btn").on('click',function(event){
+        event.preventDefault();
+        if( $(this).hasClass("open") ) {
+            $(this).removeClass("open");
+            $(this).parent().find(".sub-options").slideUp(100);
+        } else {
+            $(this).addClass("open");
+            $(this).parent().find(".sub-options").slideDown(100);
+        }
+
+    });
+}
 function e5ojs_summernote() {
     $(".custom-collapsible .collapsible-body .post-content").each(function(key,element){
         $(this).html($(this).text());

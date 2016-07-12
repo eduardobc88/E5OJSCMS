@@ -135,16 +135,8 @@ input:not([type]).valid, input:not([type]):focus.valid, input[type=text].valid, 
     background-color: #FFF;
 }
 .custom-collection .collection-header a {
-    font-size: 12px;
-    position: relative;
-    padding-right: 30px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 15px;
-    margin-right: 15px;
     color: #FFF;
-    line-height: 18px;
-    font-weight: 500;
+    margin-right: 15px;
 }
 .custom-collection .dropdown-content li {
     min-height: auto;
@@ -153,14 +145,7 @@ input:not([type]).valid, input:not([type]):focus.valid, input[type=text].valid, 
     color: #0288d1;
 }
 .custom-collection .collection-header a i {
-    font-size: 20px;
-    position: absolute;
-    margin: auto;
-    z-index: 2;
-    right: 5px;
-    top: 0;
-    bottom: 0;
-    display: table;
+
 }
 .custom-collection .collection-header .checkbox-center {
     position: relative;
@@ -205,8 +190,6 @@ input:not([type]).valid, input:not([type]):focus.valid, input[type=text].valid, 
 
 .custom-collection .collection-header .dropdown-button {
     color: #FFF;
-    padding: 10px;
-    line-height: 18px;
 }
 
 .collection-item span.badge {
@@ -317,16 +300,8 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     background-color: #FFF;
 }
 .custom-collapsible .custom-collapsible-header a {
-    font-size: 12px;
-    position: relative;
-    padding-right: 30px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 15px;
     margin-right: 15px;
     color: #FFF;
-    line-height: 18px;
-    font-weight: 500;
 }
 .custom-collapsible .custom-collapsible-header .dropdown-content li {
     min-height: auto;
@@ -356,8 +331,6 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 }
 .custom-collapsible .custom-collapsible-header .dropdown-button {
     color: #FFF;
-    padding: 10px;
-    line-height: 18px;
 }
 .custom-collapsible.popout>li {
     margin: 0 0px;
@@ -496,6 +469,32 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     border: 2px solid #0288d1;
 }
 /* end checkbox */
+
+
+
+/* start button icon */
+.btn, .dropdown-button {
+    font-size: 12px;
+    position: relative;
+    padding-right: 30px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    color: #FFF;
+    line-height: 18px;
+    font-weight: 500;
+}
+.btn i, .dropdown-button i {
+    font-size: 20px;
+    position: absolute;
+    margin: auto;
+    z-index: 2;
+    right: 5px;
+    top: 0;
+    bottom: 0;
+    display: table;
+}
+/* end button icon*/
 
 /* end override materialize elements */
 
@@ -832,7 +831,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     font-weight: 500;
     position: relative;
     font-size: 12px;
-    text-transform: uppercase;
+    text-transform: capitalize;
 }
 .e5ojs-menu-left-wrapper ul.options li .option-btn i {
     position: absolute;
@@ -845,6 +844,33 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 }
 .e5ojs-menu-left-wrapper ul.options li .option-btn:hover {
     background-color: rgba(0, 0, 0, 0.1);
+}
+
+
+/*sub-options*/
+
+.e5ojs-menu-left-wrapper ul.options li .sub-options li a {
+    width: 100%;
+    padding: 8px 20px 8px 45px;
+    display: block;
+    color: #919191;
+    font-weight: 500;
+    position: relative;
+    font-size: 12px;
+    text-transform: capitalize;
+}
+.e5ojs-menu-left-wrapper ul.options li .sub-options {
+    display: none;
+}
+.e5ojs-menu-left-wrapper ul.options li .sub-options li:hover a {
+    color: #616161;
+}
+.e5ojs-menu-left-wrapper ul.options li .sub-options-btn {
+    padding: 14px 45px 14px 45px !important;
+}
+.e5ojs-menu-left-wrapper ul.options li .sub-options-btn .material-icons:nth-child(2) {
+    left: inherit !important;
+    right: 15px;
 }
 /* end menu left wrapper */
 
@@ -896,25 +922,11 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 }
 .e5ojs-media-editor-wrapper .btn {
     font-size: 12px;
-    position: relative;
-    padding-right: 30px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 15px;
-    margin-right: 15px;
     color: #FFF;
-    line-height: 18px;
-    font-weight: 500;
+    margin-right: 15px;
 }
 .e5ojs-media-editor-wrapper .btn i {
-    font-size: 20px;
-    position: absolute;
-    margin: auto;
-    z-index: 2;
-    right: 5px;
-    top: 0;
-    bottom: 0;
-    display: table;
+
 }
 .e5ojs-media-editor-wrapper .e5ojs-media-editor-load-wrapper {
     position: relative;
@@ -1246,6 +1258,22 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     margin: 2px;
     max-width: 100px;
 }
+.e5ojs-media-popup-wrapper .container-fluid .media-wrapper .e5ojs-media-popup-load-more-btn {
+    font-size: 12px;
+    position: relative;
+    padding-right: 30px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 15px;
+    margin-right: 15px;
+    color: #FFF;
+    line-height: 18px;
+    font-weight: 500;
+    margin-top: 30px;
+}
+.e5ojs-media-popup-wrapper .container-fluid .media-wrapper .e5ojs-media-popup-load-more-btn i {
+    position: absolute;
+}
 .e5ojs-media-popup-wrapper .container-fluid .card .card-content .media-info .img-responsive {
     max-width: 100px;
 }
@@ -1272,7 +1300,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     position: absolute;
     right: 0;
     top: 0;
-    font-size: 40px;
+    font-size: 30px;
     cursor: pointer;
 }
 .e5ojs-media-popup-wrapper .container-fluid .aling-right {
@@ -1292,7 +1320,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     text-transform: uppercase;
     text-align: center;
     font-size: 18px;
-    font-weight: 500;
+    font-weight: 400;
     border-radius: 2px;
     position: absolute;
     top: -36px;
