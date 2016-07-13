@@ -141,14 +141,22 @@ function e5ojs_global_data_init() {
 
     //  three sections
     e5ojs_global_data.admin_pages = {
-        dashboard: {title:"dashboard",description:"Lorem ipsum...",url:host_url+"/admin/", icon_name:"dashboard",position:1},
-        pages: {title:"pages",description:"Lorem ipsum...",url:host_url+"/admin/page/", icon_name:"filter_none",position:2},
+        dashboard: {title:"dashboard",description:"Lorem ipsum...",url:host_url+"/admin/", icon_name:"dashboard", position:1},
+        pages: {title:"pages",description:"Lorem ipsum...",url:host_url+"/admin/page/", icon_name:"filter_none", position:2},
         admin_post_types: {},
-        media: {title:"media",description:"Lorem ipsum...",url:host_url+"/admin/media/", icon_name:"collections",position:3},
-        post_type: {title:"post types",description:"Lorem ipsum...",url:host_url+"/admin/post-type/", icon_name:"settings",position:4},
-        users: {title:"users",description:"Lorem ipsum...",url:host_url+"/admin/users/", icon_name:"supervisor_account",position:5},
-        settings: {title:"settings",description:"Lorem ipsum...",url:host_url+"/admin/settings/", icon_name:"settings",position:6},
+        media: {title:"media",description:"Lorem ipsum...",url:host_url+"/admin/media/", icon_name:"collections", position:3},
+        post_type: {title:"post types",description:"Lorem ipsum...",url:host_url+"/admin/post-types/", icon_name:"settings", position:4},
+        users: {title:"users",description:"Lorem ipsum...",url:host_url+"/admin/users/", icon_name:"supervisor_account", position:5},
+        settings: {title:"settings",description:"Lorem ipsum...",url:host_url+"/admin/settings/", icon_name:"settings", position:6},
     };
+    e5ojs_global_data.current_page_key = "dashboard";
+    e5ojs_global_data.current_post_type_key = "";
+    e5ojs_global_data.admin_sub_pages = {
+        pages: [{title:"All",url:host_url+"/admin/page/all/page/1/"},{title:"publish",url:host_url+"/admin/page/publish/page/1/"},{title:"Pending",url:host_url+"/admin/page/pending/page/1/"},{title:"Trash",url:host_url+"/admin/page/trash/page/1/"},{title:'New',url:host_url+"/admin/page/action/new/"}],
+        post_type: [{title:"All",url:host_url+"/admin/post-types/all/page/1/"},{title:"Active",url:host_url+"/admin/post-types/active/page/1/"},{title:"Deactive",url:host_url+"/admin/post-types/deactive/page/1/"},{title:'New',url:host_url+"/admin/post-types/action/new/"}],
+        users: [{title:"All",url:host_url+"/admin/users/all/page/1/"},{title:"Active",url:host_url+"/admin/users/active/page/1/"},{title:"Deactive",url:host_url+"/admin/users/deactive/page/1/"},{title:'New',url:host_url+"/admin/users/action/new/"}],
+    };
+    e5ojs_global_data.admin_post_type_sub_pages = [{title:"All",url:"all/page/1/"},{title:"publish",url:"publish/page/1/"},{title:"Pending",url:"pending/page/1/"},{title:"Trash",url:"trash/page/1/"},{title:'New',url:"action/new/"}];
     e5ojs_global_data.admin_other_pages = {
         login: {title:"Login",description:"Lorem ipsum...",url:host_url+"/admin/login/", icon_name:"dashboard",position:1},
         new_post: {title:"New post",description:"Lorem ipsum...",url:host_url+"/admin/", icon_name:"dashboard",position:1},
@@ -296,6 +304,85 @@ e5ojs_global_data_init();
 
 
 /* ============== start e5ojs router ============== */
+
+
+/* start get current page request */
+router.get('*', function(req, res, next) {
+    //console.log( " === REQUEST PAGE === ", req.originalUrl );
+    var original_url = req.originalUrl;
+    var element_page_key = "dashboard";
+    e5ojs_global_data.current_post_type_key = "";
+    for( admin_page_key in e5ojs_global_data.admin_pages ) {
+        var admin_page = e5ojs_global_data.admin_pages[admin_page_key];
+        var admin_page_url = admin_page.url;
+        admin_page = admin_page.url;
+        if( admin_page !== undefined ) {
+            admin_page = admin_page.replace("http://nodejs.dev/admin","");
+            if( original_url.indexOf(admin_page) >= 0 && admin_page.length > 1) {
+                element_page_key = admin_page_key;
+            }
+        }
+        // check for post type
+        if( admin_page_key == "admin_post_types" ) {
+            var post_type_elements = e5ojs_global_data.admin_pages[admin_page_key];
+            for( post_type_key in post_type_elements ) {
+
+                admin_page = post_type_elements[post_type_key].url;
+                //console.log("POST TYPE NAME = "+admin_page);
+                if( admin_page !== undefined ) {
+                    admin_page = admin_page.replace("http://nodejs.dev/admin","");
+                    if( original_url.indexOf(admin_page) >= 0 && admin_page.length > 1) {
+                        element_page_key = admin_page_key;
+                        // get post type key
+                        e5ojs_global_data.current_post_type_key = admin_page.split("/")[2]; // /post-type/blogcito/
+                    }
+                }
+            }
+        }
+    }
+    e5ojs_global_data.current_page_key = element_page_key;
+    //console.log(" == admin_page_key == ",element_page_key);
+    next();
+});
+router.post('*', function(req, res, next) {
+    //console.log( " === REQUEST PAGE === ", req.originalUrl );
+    var original_url = req.originalUrl;
+    var element_page_key = "dashboard";
+    e5ojs_global_data.current_post_type_key = "";
+    for( admin_page_key in e5ojs_global_data.admin_pages ) {
+        var admin_page = e5ojs_global_data.admin_pages[admin_page_key];
+        var admin_page_url = admin_page.url;
+        admin_page = admin_page.url;
+        if( admin_page !== undefined ) {
+            admin_page = admin_page.replace("http://nodejs.dev/admin","");
+            if( original_url.indexOf(admin_page) >= 0 && admin_page.length > 1) {
+                element_page_key = admin_page_key;
+            }
+        }
+        // check for post type
+        if( admin_page_key == "admin_post_types" ) {
+            var post_type_elements = e5ojs_global_data.admin_pages[admin_page_key];
+            for( post_type_key in post_type_elements ) {
+
+                admin_page = post_type_elements[post_type_key].url;
+                //console.log("POST TYPE NAME = "+admin_page);
+                if( admin_page !== undefined ) {
+                    admin_page = admin_page.replace("http://nodejs.dev/admin","");
+                    if( original_url.indexOf(admin_page) >= 0 && admin_page.length > 1) {
+                        element_page_key = admin_page_key;
+                        // get post type key
+                        e5ojs_global_data.current_post_type_key = admin_page.split("/")[2]; // /post-type/blogcito/
+                    }
+                }
+            }
+        }
+    }
+    e5ojs_global_data.current_page_key = element_page_key;
+    //console.log(" == admin_page_key == ",element_page_key);
+    next();
+});
+/* end current page request */
+
 
 /*  start e5ojs login session routers */
 router.get('/', function(req, res, next) {
@@ -1293,7 +1380,7 @@ router.get('/page/action/:page_status/:page_ids/', function(req, res, next) {
 
 
 /* start e5ojs post type routers */
-router.get('/post-type/action/new/', function(req, res, next) {
+router.get('/post-types/action/new/', function(req, res, next) {
     // get page with validate session
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         e5ojs_post_type_get_all(function(post_types){
@@ -1310,7 +1397,7 @@ router.get('/post-type/action/new/', function(req, res, next) {
         });
     });
 });
-router.post('/post-type/action/edit/', function(req, res, next) {
+router.post('/post-types/action/edit/', function(req, res, next) {
     // save the new post type
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
@@ -1336,11 +1423,11 @@ router.post('/post-type/action/edit/', function(req, res, next) {
             // redirect to de same page
             // set true for front-end refresh routers
             req.app.locals.e5ojs_refresh_router = true;
-            res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/action/edit/"+post_type_data.post_type_id);
+            res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-types/action/edit/"+post_type_data.post_type_id);
         });
     });
 });
-router.get('/post-type/action/edit/:post_type_id/', function(req, res, next) {
+router.get('/post-types/action/edit/:post_type_id/', function(req, res, next) {
     // get the current post
     var post_type_id = req.params.post_type_id;
     // get page with validate session
@@ -1359,7 +1446,7 @@ router.get('/post-type/action/edit/:post_type_id/', function(req, res, next) {
         });
     });
 });
-router.post('/post-type/action/edit/:post_type_id/', function(req, res, next) {
+router.post('/post-types/action/edit/:post_type_id/', function(req, res, next) {
     // save the current post type
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
@@ -1412,7 +1499,7 @@ router.post('/post-type/action/edit/:post_type_id/', function(req, res, next) {
                 // set true for front-end refresh routers
                 req.app.locals.e5ojs_refresh_router = true;
                 // redirect to de same page
-                res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/action/edit/"+post_type_id);
+                res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-types/action/edit/"+post_type_id);
             });
         } else {
             // remove post type
@@ -1426,12 +1513,12 @@ router.post('/post-type/action/edit/:post_type_id/', function(req, res, next) {
                 // set true for front-end refresh routers
                 req.app.locals.e5ojs_refresh_router = true;
                 // redirect to de same page
-                res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/");
+                res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-types/");
             });
         }
     });
 });
-router.get('/post-type/action/:post_type_action/:post_type_id/', function(req, res, next) {
+router.get('/post-types/action/:post_type_action/:post_type_id/', function(req, res, next) {
     var post_type_action = req.params.post_type_action;
     var post_type_id = req.params.post_type_id.split(",");
     // get page with validate session
@@ -1449,7 +1536,7 @@ router.get('/post-type/action/:post_type_action/:post_type_id/', function(req, r
                 // set true for front-end refresh routers
                 req.app.locals.e5ojs_refresh_router = true;
                 // redirect to de same page
-                res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/all/page/1/");
+                res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-types/all/page/1/");
             });
         } else {
             // remove post types
@@ -1463,19 +1550,19 @@ router.get('/post-type/action/:post_type_action/:post_type_id/', function(req, r
                 // set true for front-end refresh routers
                 req.app.locals.e5ojs_refresh_router = true;
                 // redirect to de same page
-                res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/all/page/1/");
+                res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-types/all/page/1/");
             });
         }
     });
 });
-router.get('/post-type/', function(req, res, next) {
+router.get('/post-types/', function(req, res, next) {
     // get page with validate session
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // redirect to de same page
-        res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/all/page/1/");
+        res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-types/all/page/1/");
     });
 });
-router.get('/post-type/:post_type_status/page/:number_page/', function(req, res, next) {
+router.get('/post-types/:post_type_status/page/:number_page/', function(req, res, next) {
     // get page with validate session
     e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // e5ojs_global_data  and e5ojs_user_data default

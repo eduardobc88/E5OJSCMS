@@ -821,7 +821,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     padding: 0;
     overflow: auto;
     height: 100%;
-    padding-bottom: 150px;
+    padding-bottom: 175px;
 }
 .e5ojs-menu-left-wrapper ul.options li .option-btn {
     width: 100%;
@@ -845,7 +845,12 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 .e5ojs-menu-left-wrapper ul.options li .option-btn:hover {
     background-color: rgba(0, 0, 0, 0.1);
 }
-
+.e5ojs-menu-left-wrapper ul .current_page .e5ojs-btn {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+.e5ojs-menu-left-wrapper ul .current_page .sub-options {
+    display: block;
+}
 
 /*sub-options*/
 
@@ -868,9 +873,19 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 .e5ojs-menu-left-wrapper ul.options li .sub-options-btn {
     padding: 14px 45px 14px 45px !important;
 }
-.e5ojs-menu-left-wrapper ul.options li .sub-options-btn .material-icons:nth-child(2) {
+.e5ojs-menu-left-wrapper ul.options li .sub-options-btn .material-icons.add, .e5ojs-menu-left-wrapper ul.options li .sub-options-btn .material-icons.remove {
     left: inherit !important;
     right: 15px;
+}
+.e5ojs-menu-left-wrapper ul.options li .sub-options-btn .material-icons.remove {
+    display: none;
+}
+
+.e5ojs-menu-left-wrapper ul.options li.current_page .material-icons.add {
+    display: none;
+}
+.e5ojs-menu-left-wrapper ul.options li.current_page .material-icons.remove {
+    display: table;
 }
 /* end menu left wrapper */
 

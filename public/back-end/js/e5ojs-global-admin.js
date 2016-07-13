@@ -16,16 +16,23 @@ $(window).load(function(){
 
 
 function e5ojs_left_menu_actions() {
+    $(".e5ojs-menu-left-wrapper ul .current_page .sub-options-btn").addClass("open");
+    $(".e5ojs-menu-left-wrapper ul .current_page .sub-options-btn").parent().find(".sub-options").slideDown(100);
+    $(".e5ojs-menu-left-wrapper ul .current_page .sub-options-btn").find(".material-icons.add").css({'display':'none'});
+    $(".e5ojs-menu-left-wrapper ul .current_page .sub-options-btn").find(".material-icons.remove").css({'display':'table'});
     $(".e5ojs-menu-left-wrapper ul.options li .sub-options-btn").on('click',function(event){
         event.preventDefault();
         if( $(this).hasClass("open") ) {
             $(this).removeClass("open");
             $(this).parent().find(".sub-options").slideUp(100);
+            $(this).parent().find(".material-icons.add").css({'display':'table'});
+            $(this).parent().find(".material-icons.remove").css({'display':'none'});
         } else {
             $(this).addClass("open");
             $(this).parent().find(".sub-options").slideDown(100);
+            $(this).parent().find(".material-icons.add").css({'display':'none'});
+            $(this).parent().find(".material-icons.remove").css({'display':'table'});
         }
-
     });
 }
 function e5ojs_summernote() {

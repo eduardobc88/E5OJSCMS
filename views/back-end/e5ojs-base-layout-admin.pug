@@ -100,43 +100,60 @@ html
                     - for (var property_key in e5ojs_global_data.admin_pages) {
                         - if( property_key == "admin_post_types" ) {
                             - for (var post_type_key in e5ojs_global_data.admin_pages.admin_post_types) {
+                                - var admin_post_type_sub_pages = cloneObject(e5ojs_global_data.admin_post_type_sub_pages); // clone object
+                                - var current_page_class = (( post_type_key == e5ojs_global_data.current_post_type_key )?"current_page":"");
                                 - var post_type = e5ojs_global_data.admin_pages.admin_post_types[post_type_key];
-                                li
-                                    a(href=post_type.url class="e5ojs-btn option-btn waves-effect waves-dark")=post_type.title
+                                li(class=current_page_class)
+                                    a(href=post_type.url class="e5ojs-btn option-btn waves-effect waves-dark sub-options-btn")=post_type.title
                                         i(class="material-icons")=post_type.icon_name
+                                        i(class="material-icons add")='add'
+                                        i(class="material-icons remove")='remove'
+                                    - var elements = "";
+                                    - elements = admin_post_type_sub_pages;// refresh to original object data
+                                    - for( elements_key in elements ) {
+                                        - elements[elements_key].url = post_type.url.concat(elements[elements_key].url);
+                                    - }
+                                    - e5ojs_get_submenu(elements);
                             - }
                         - } else {
-                            li
-                                a(href=e5ojs_global_data.admin_pages[property_key].url class="e5ojs-btn option-btn waves-effect waves-dark")=e5ojs_global_data.admin_pages[property_key].title
-                                    i(class="material-icons")=e5ojs_global_data.admin_pages[property_key].icon_name            
+                            - var current_page_class = (( property_key == e5ojs_global_data.current_page_key )?"current_page":"");
+                            li(class=current_page_class)
+                                - var has_submenu = false;
+                                - for( submenu_key in e5ojs_global_data.admin_sub_pages ) {
+                                    - var elements = e5ojs_global_data.admin_sub_pages[submenu_key];
+                                    - if( property_key == submenu_key ) {
+                                        - has_submenu = true;
+                                        a(href=e5ojs_global_data.admin_pages[property_key].url class="e5ojs-btn option-btn waves-effect waves-dark sub-options-btn")=e5ojs_global_data.admin_pages[property_key].title
+                                            i(class="material-icons")=e5ojs_global_data.admin_pages[property_key].icon_name
+                                            i(class="material-icons add")='add'
+                                            i(class="material-icons remove")='remove'
+                                        - e5ojs_get_submenu(elements);
+                                    - }
+                                - }
+                                - if( has_submenu == false ) {
+                                    a(href=e5ojs_global_data.admin_pages[property_key].url class="e5ojs-btn option-btn waves-effect waves-dark")=e5ojs_global_data.admin_pages[property_key].title
+                                        i(class="material-icons")=e5ojs_global_data.admin_pages[property_key].icon_name
+                                - }
                         - }
                     - }
-                    li
-                        a(href="#!" class="e5ojs-btn option-btn waves-effect waves-dark sub-options-btn")='Sub options'
-                            i(class="material-icons")='settings'
-                            i(class="material-icons")='add'
+                    - function e5ojs_get_submenu(elements) {
                         ul(class="sub-options")
-                            li
-                                a(href="#!")='option'
-                            li
-                                a(href="#!")='option'
-                            li
-                                a(href="#!")='option'
-                            li
-                                a(href="#!")='option'
-                    li
-                        a(href="#!" class="e5ojs-btn option-btn waves-effect waves-dark sub-options-btn")='Sub options'
-                            i(class="material-icons")='settings'
-                            i(class="material-icons")='add'
-                        ul(class="sub-options")
-                            li
-                                a(href="#!")='option'
-                            li
-                                a(href="#!")='option'
-                            li
-                                a(href="#!")='option'
-                            li
-                                a(href="#!")='option'
+                            - for( element_key in elements ){
+                                - var element = elements[element_key];
+                                li
+                                    a(href=element.url)=element.title
+                            - }
+                    - }
+                    - function cloneObject(obj) {
+                    -    if (obj === null || typeof obj !== 'object') {
+                    -        return obj;
+                    -    }
+                    -    var temp = obj.constructor(); // give temp the original obj's constructor
+                    -    for (var key in obj) {
+                    -        temp[key] = cloneObject(obj[key]);
+                    -    }
+                    -    return temp;
+                    - }
             div(class="container e5ojs-content-right-wrapper")
                 - if( typeof(e5ojs_message) !== 'undefined' && e5ojs_message.status )
                     div(class="row no-padding")
