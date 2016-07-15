@@ -71,9 +71,10 @@ html
                             div(class="container no-padding")
                                 div(class="row no-padding")
                                     div(class="col-xs-12 no-padding")
-                                        form(method="get")
+                                        form(method="get" action="/admin/search/")
                                             i(class="material-icons")='search'
-                                            input(id="header_bar_search" class="header_bar_search" type="text" name="header_bar_search" placeholder="Search")
+                                            input(id="header_bar_search" class="header_bar_search" type="text" name="search" placeholder="Search")
+                                            div(class="search-result")
                         div(class="col-xs-12")
                             ul(class="content")
                                 li(class="content-left")

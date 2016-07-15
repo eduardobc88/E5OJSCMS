@@ -676,6 +676,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     border-bottom: none !important;
     box-shadow: none !important;
 }
+
 /* end search bar */
 
 /* end header bar*/
@@ -1069,16 +1070,20 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     letter-spacing: inherit !important;
     transition: none !important;
     box-shadow: none !important;
-    border: 1px solid #ccc !important;
     font-size: 12px !important;
-    padding: 5px 10px !important;
     line-height: 1.5 !important;
-    height: inherit !important;
     text-transform: inherit !important;
     border: 0px !important;
+    position: relative !important;
+    padding-left: 15px;
+    padding-right: 15px;
 }
 .summernote-wrapper .btn i {
     font-size: 12px !important;
+    right: inherit !important;
+    display: inline-block !important;
+    position: relative !important;
+
 }
 .summernote-wrapper .note-editor.note-frame {
     border: 0px solid #a9a9a9 !important;

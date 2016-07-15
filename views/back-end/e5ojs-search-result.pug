@@ -1,0 +1,17 @@
+extends e5ojs-base-layout-admin
+block e5ojs_block_local_css_script
+block e5ojs_block_content
+    div(class="row")
+        div(class="col-xs-12 no-padding")
+                ul(class="collection custom-collection")
+                    - var e5ojs_posts = result_search;
+                    each post, index in e5ojs_posts
+                        - var letter = post.title.charAt(0).toUpperCase();
+                        - var color_hex = "4CAF50";
+                        li(class="collection-item avatar waves-effect waves-dark" data-collection-id=post.id)
+                            img(src="https://placeholdit.imgix.net/~text?txtsize=50&bg="+color_hex+"&txtclr=FFFFFF&txt="+letter+"&w=100&h=100&txttrack=0" alt="" class="circle")
+                            p(class="title")
+                                span()=post.title
+                            div(class="secondary-content")
+                                a(href=post.url)
+                                    i(class="material-icons")='mode_edit'
