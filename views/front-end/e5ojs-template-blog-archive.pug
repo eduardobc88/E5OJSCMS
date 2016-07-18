@@ -1,0 +1,32 @@
+extends e5ojs-base-layout
+block e5ojs_block_local_css_script
+    link(rel='stylesheet', href=e5ojs_global_data.res.base_url+'/front-end/css/e5ojs-global.css')
+    script(type='text/javascript', src=e5ojs_global_data.res.base_url+'/front-end/js/e5ojs-global.js')
+    //- link(rel='stylesheet', href=e5ojs_global_data.res.base_url+'/front-end/css/e5ojs-contact.css')
+    //- script(type='text/javascript', src=e5ojs_global_data.res.base_url+'/front-end/js/e5ojs-contact.js')
+    div(class="container")
+        div(class="row")
+            div(class="col-xs-12")
+                //- console.log(" ==== e5ojs_global_data ==== ",e5ojs_global_data);
+                //- console.log(" ==== e5ojs_archive_data ==== ",e5ojs_archive_data);
+                //- console.log(" ==== e5ojs_archive_post_data ==== ",e5ojs_archive_post_data);
+                //- console.log(" ==== e5ojs_archive_pagination_data ==== ",e5ojs_archive_pagination_data);
+                h1=e5ojs_archive_data.page_title
+                h2="Template ARCHIVE BLOG"
+        //- e5ojs posts
+        div(class="row")
+            - for( post_key in e5ojs_archive_post_data ) {
+                div(class="col-xs-12")
+                    //- console.log(" === POST === ",e5ojs_archive_post_data[post_key]);
+                    p
+                        a(href=e5ojs_global_data.res.base_url+"/"+e5ojs_archive_data.post_type_slug+"/"+e5ojs_archive_post_data[post_key].post_name)=e5ojs_archive_post_data[post_key].post_name
+                    //-p=e5ojs_archive_post_data[post_key].post_excerpt
+                    hr
+            - }
+        //- e5ojs pagination
+        div(class="row")
+            ul(class="pagination")
+            - for( page_key in e5ojs_archive_pagination_data ) {
+                li
+                    a(href=e5ojs_archive_pagination_data[page_key].url class=e5ojs_archive_pagination_data[page_key].current)=e5ojs_archive_pagination_data[page_key].number
+            - }

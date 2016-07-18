@@ -977,7 +977,7 @@ router.get('/page/', function(req, res, next) {
         res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/page/all/page/1/");
     });
 });
-router.get('/page/:page_status/page/:number_page', function(req, res, next) {
+router.get('/page/:page_status/page/:number_page/', function(req, res, next) {
 
 
     // get page with validate session
@@ -1137,7 +1137,6 @@ router.get('/page/action/edit/:page_id/', function(req, res, next) {
                             // add meta data
                             post_meta_data.push({meta_title:post_type_meta[key_meta].page_meta_title,meta_type:post_type_meta[key_meta].page_meta_type,meta_name:post_type_meta[key_meta].page_meta_name,post_meta_value:""});
                         }
-
                     }
 
 

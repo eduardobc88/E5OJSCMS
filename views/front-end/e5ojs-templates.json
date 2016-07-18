@@ -2,6 +2,10 @@
     "templates": {
         "e5ojs-template-default": true,
         "e5ojs-template-home": true,
-        "e5ojs-template-contact": true
+        "e5ojs-template-contact": true,
+        "e5ojs-template-proyect-archive": true,
+        "e5ojs-template-proyect-single": true,
+        "e5ojs-template-blog-archive": true,
+        "e5ojs-template-blog-single": true
     }
 }

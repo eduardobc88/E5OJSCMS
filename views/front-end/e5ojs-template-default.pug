@@ -1,10 +1,10 @@
 extends e5ojs-base-layout
-block e5ojs_block_global_css_script
-    link(rel='stylesheet', href=e5ojs_global_data.res.base_url+'/front-end/css/e5ojs-index.css')
-    script(type='text/javascript', src=e5ojs_global_data.res.base_url+'/front-end/js/e5ojs-index.js')
 block e5ojs_block_local_css_script
+    link(rel='stylesheet', href=e5ojs_global_data.res.base_url+'/front-end/css/e5ojs-global.css')
+    script(type='text/javascript', src=e5ojs_global_data.res.base_url+'/front-end/js/e5ojs-global.js')
     div(class="container")
         div(class="row")
             div(class="col-xs-12")
                 h1=page_data.page_title
                 p=page_data.page_content
+                h2="Template Default"
