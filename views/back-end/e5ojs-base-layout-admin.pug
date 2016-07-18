@@ -118,23 +118,25 @@ html
                             - }
                         - } else {
                             - var current_page_class = (( property_key == e5ojs_global_data.current_page_key )?"current_page":"");
-                            li(class=current_page_class)
-                                - var has_submenu = false;
-                                - for( submenu_key in e5ojs_global_data.admin_sub_pages ) {
-                                    - var elements = e5ojs_global_data.admin_sub_pages[submenu_key];
-                                    - if( property_key == submenu_key ) {
-                                        - has_submenu = true;
-                                        a(href=e5ojs_global_data.admin_pages[property_key].url class="e5ojs-btn option-btn waves-effect waves-dark sub-options-btn")=e5ojs_global_data.admin_pages[property_key].title
-                                            i(class="material-icons")=e5ojs_global_data.admin_pages[property_key].icon_name
-                                            i(class="material-icons add")='add'
-                                            i(class="material-icons remove")='remove'
-                                        - e5ojs_get_submenu(elements);
+                            - if( e5ojs_global_data.admin_pages[property_key].show_menu == 1 ) {
+                                li(class=current_page_class)
+                                    - var has_submenu = false;
+                                    - for( submenu_key in e5ojs_global_data.admin_sub_pages ) {
+                                        - var elements = e5ojs_global_data.admin_sub_pages[submenu_key];
+                                        - if( property_key == submenu_key ) {
+                                            - has_submenu = true;
+                                            a(href=e5ojs_global_data.admin_pages[property_key].url class="e5ojs-btn option-btn waves-effect waves-dark sub-options-btn")=e5ojs_global_data.admin_pages[property_key].title
+                                                i(class="material-icons")=e5ojs_global_data.admin_pages[property_key].icon_name
+                                                i(class="material-icons add")='add'
+                                                i(class="material-icons remove")='remove'
+                                            - e5ojs_get_submenu(elements);
+                                        - }
                                     - }
-                                - }
-                                - if( has_submenu == false ) {
-                                    a(href=e5ojs_global_data.admin_pages[property_key].url class="e5ojs-btn option-btn waves-effect waves-dark")=e5ojs_global_data.admin_pages[property_key].title
-                                        i(class="material-icons")=e5ojs_global_data.admin_pages[property_key].icon_name
-                                - }
+                                    - if( has_submenu == false ) {
+                                        a(href=e5ojs_global_data.admin_pages[property_key].url class="e5ojs-btn option-btn waves-effect waves-dark")=e5ojs_global_data.admin_pages[property_key].title
+                                            i(class="material-icons")=e5ojs_global_data.admin_pages[property_key].icon_name
+                                    - }
+                            - }
                         - }
                     - }
                     - function e5ojs_get_submenu(elements) {

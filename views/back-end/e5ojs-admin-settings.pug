@@ -3,7 +3,7 @@ block e5ojs_block_local_css_script
 block e5ojs_block_content
     - var settings = { settings_host_url: "", settings_home_page_template: "", settings_page_metas: [],settings_pages: settings_data.public_pages };
     - for( settings_key in settings_data.current_settings ) {
-        
+
         - if( settings_data.current_settings[settings_key].settings_id == "settings_host_url" ) {
             - settings.settings_host_url = settings_data.current_settings[settings_key].settings_value;
         - }
@@ -53,7 +53,7 @@ block e5ojs_block_content
                         div(class="aling-right")
                             button( type="submit" class="waves-effect waves-dark btn")='SAVE'
                                 i(class="material-icons")='save'
-        
+
         div(class="row no-padding")
             div(class="col-xs-12 no-padding")
                 div(class="card")
@@ -89,10 +89,16 @@ block e5ojs_block_content
                         div(class="input-field")
                             textarea(id="settings_users_page_description" class="materialize-textarea" name="settings_users_page_description")=settings.settings_admin_pages_data.settings_users_page_description
                             label(for="settings_users_page_description")='Users description'
+                        div(class="input-field")
+                            input(id="settings_search_page_title" type="text" class="validate" name="settings_search_page_title" value=settings.settings_admin_pages_data.settings_search_page_title)
+                            label(for="settings_search_page_title")='Search title'
+                        div(class="input-field")
+                            textarea(id="settings_search_page_description" class="materialize-textarea" name="settings_search_page_description")=settings.settings_admin_pages_data.settings_search_page_description
+                            label(for="settings_search_page_description")='Search description'
                         div(class="aling-right")
                             button( type="submit" class="waves-effect waves-dark btn")='SAVE'
                                 i(class="material-icons")='save'
-        
+
         div(class="row no-padding")
             div(class="col-xs-12 no-padding")
                 div(class="card")
@@ -118,11 +124,11 @@ block e5ojs_block_content
                         div(class="aling-right")
                             button( type="submit" class="waves-effect waves-dark btn")='SAVE'
                                 i(class="material-icons")='save'
-                            
-                            
-    
-    
-    
+
+
+
+
+
     - function print_row_meta_data() {
         div(class="input-field")
             input(id="settings_page_meta_title" type="text" class="validate" name="settings_page_meta_title")
@@ -202,5 +208,3 @@ block e5ojs_block_content
                     option(value="calendar")&attributes(attributes)='calendar'
                 label='Meta type'
     - }
-
-                
