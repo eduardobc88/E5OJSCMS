@@ -1126,6 +1126,7 @@ router.get('/page/action/edit/:page_id/', function(req, res, next) {
                         for( key_current_meta in current_post_meta ) {
                             //- console.log("meta - ",post_type_meta[key_meta]);
                             if( "meta_"+post_type_meta[key_meta].page_meta_name == current_post_meta[key_current_meta].post_meta_name ) {
+                                current_post_meta[key_current_meta].meta_page_id = post_type_meta[key_meta].page_meta_page_id;
                                 current_post_meta[key_current_meta].meta_name = post_type_meta[key_meta].page_meta_name;
                                 current_post_meta[key_current_meta].meta_type = post_type_meta[key_meta].page_meta_type;
                                 current_post_meta[key_current_meta].meta_title = post_type_meta[key_meta].page_meta_title;
@@ -1135,7 +1136,7 @@ router.get('/page/action/edit/:page_id/', function(req, res, next) {
                         }
                         if( find == 0 ) {
                             // add meta data
-                            post_meta_data.push({meta_title:post_type_meta[key_meta].page_meta_title,meta_type:post_type_meta[key_meta].page_meta_type,meta_name:post_type_meta[key_meta].page_meta_name,post_meta_value:""});
+                            post_meta_data.push({meta_page_id:post_type_meta[key_meta].page_meta_page_id,meta_title:post_type_meta[key_meta].page_meta_title,meta_type:post_type_meta[key_meta].page_meta_type,meta_name:post_type_meta[key_meta].page_meta_name,post_meta_value:""});
                         }
                     }
 
@@ -1922,9 +1923,11 @@ router.post('/settings/', function(req, res, next) {
         var settings_home_page_template = parseInt(req.body.settings_home_page_template);
         // settings pages
         // for new meta
+        var settings_page_meta_post_id = req.body.settings_page_meta_page_id;
         var settings_page_meta_title = req.body.settings_page_meta_title;
         var settings_page_meta_name = req.body.settings_page_meta_name;
         var settings_page_meta_type = req.body.settings_page_meta_type;
+
 
         // for admin pages info
         var settings_admin_pages_data = {}
@@ -1952,13 +1955,13 @@ router.post('/settings/', function(req, res, next) {
             // each current post meta
             for( var meta_key = 0; meta_key<=parseInt(req.body.update_finish); meta_key++ ) {
                 page_type_current_metas.push({
+                    page_meta_page_id:req.body[meta_key+"_meta_page_id"],
                     page_meta_title:req.body[meta_key+"_meta_title"],
                     page_meta_name:req.body[meta_key+"_meta_name"],
                     page_meta_type:req.body[meta_key+"_meta_type"],
                 });
             }
         }
-
 
         // get current settings
         e5ojs_settings_get_all(function(current_settings){
@@ -1988,13 +1991,12 @@ router.post('/settings/', function(req, res, next) {
                 if( settings[settings_key].settings_id == 'settings_admin_pages_data' ) {
                     settings[settings_key].settings_value = settings_admin_pages_data;
                 }
-
             }
             // validate for page new meta
-            if( settings_page_meta_title != "" && settings_page_meta_name != "" && settings_page_meta_type != "" ) {
+            if( settings_page_meta_title != "" && settings_page_meta_name != "" && settings_page_meta_type != "" && settings_page_meta_post_id != "" ) {
                 for( settings_key in settings ) {
                     if( settings[settings_key].settings_id == 'settings_page_metas' ) {
-                        settings[settings_key].settings_value.push( {'page_meta_title':settings_page_meta_title, 'page_meta_name':settings_page_meta_name, 'page_meta_type':settings_page_meta_type} );
+                        settings[settings_key].settings_value.push( {'page_meta_page_id':settings_page_meta_post_id, 'page_meta_title':settings_page_meta_title, 'page_meta_name':settings_page_meta_name, 'page_meta_type':settings_page_meta_type} );
                         break;
                     }
                 }

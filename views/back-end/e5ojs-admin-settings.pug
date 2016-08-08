@@ -131,6 +131,13 @@ block e5ojs_block_content
 
     - function print_row_meta_data() {
         div(class="input-field")
+            select(name="settings_page_meta_page_id")
+                - for( key_page in settings.settings_pages ) {
+                    - var page = settings.settings_pages[key_page];
+                    option(value=page.page_id)&attributes(attributes)=page.page_title
+                - }
+            label(for="settings_page_meta_page_id")='Choose page for this meta'
+        div(class="input-field")
             input(id="settings_page_meta_title" type="text" class="validate" name="settings_page_meta_title")
             label(for="settings_page_meta_title")='Title'
         div(class="input-field")
@@ -151,12 +158,35 @@ block e5ojs_block_content
         p
             input(name="settings_page_meta_type" type="radio" id="calendar" value="calendar")
             label(for="calendar")='Calendar'
+        p
+            input(name="settings_page_meta_type" type="radio" id="map" value="map")
+            label(for="map")='Map'
+        p
+            input(name="settings_page_meta_type" type="radio" id="textcollection" value="textcollection" checked)
+            label(for="textcollection")='Text Collection'
+        p
+            input(name="settings_page_meta_type" type="radio" id="textareacollection" value="textareacollection" checked)
+            label(for="textareacollection")='Textarea Collection'
+        p
+            input(name="settings_page_meta_type" type="radio" id="imagetext" value="imagetext")
+            label(for="imagetext")='Image & Text'
+        p
+            input(name="settings_page_meta_type" type="radio" id="gallerytext" value="gallerytext")
+            label(for="gallerytext")='Gallery & Text'
+        p
+            input(name="settings_page_meta_type" type="radio" id="calendarcollection" value="calendarcollection")
+            label(for="calendarcollection")='Calendar Collection'
+        p
+            input(name="settings_page_meta_type" type="radio" id="mapcollection" value="mapcollection")
+            label(for="mapcollection")='Map Collection'
+
     - }
 
     - function print_row_meta_data_update(settings_page_meta_key,meta_data) {
-        - var post_meta_data = {meta_title:"",meta_name:"",meta_type:"",};
+        - var post_meta_data = {meta_pade_id:"",meta_title:"",meta_name:"",meta_type:"",};
         - var settings_page_meta_type = "";
         - if( meta_data !== undefined ) {
+            - post_meta_data.meta_page_id = meta_data.page_meta_page_id;
             - post_meta_data.meta_title = meta_data.page_meta_title;
             - post_meta_data.meta_name = meta_data.page_meta_name;
             - if( String(meta_data.page_meta_type) == "text" )
@@ -169,16 +199,33 @@ block e5ojs_block_content
                     - settings_page_meta_type = "gallery";
             - else if( String(meta_data.page_meta_type) == "calendar" )
                     - settings_page_meta_type = "calendar";
+            - else if( String(meta_data.page_meta_type) == "map" )
+                    - settings_page_meta_type = "map";
         - }
-        div(class="col-xs-12 col-md-4")
+
+
+        div(class="col-xs-12 col-md-3")
+            div(class="input-field")
+                select(name=settings_page_meta_key+"_meta_page_id")
+                    option(value="")="Choose page for this meta"
+                    - for( key_page in settings.settings_pages ) {
+                        - var page = settings.settings_pages[key_page];
+                        - attributes = "";
+                        - if( post_meta_data.meta_page_id == page.page_id ) {
+                            - attributes = {"selected":"selected"};
+                        - }
+                        option(value=page.page_id)&attributes(attributes)=page.page_title
+                    - }
+                label(for=settings_page_meta_key+"_meta_page_id")='Choose page for this meta'
+        div(class="col-xs-12 col-md-3")
             div(class="input-field")
                 input(id=settings_page_meta_key+"_meta_title" type="text" class="validate" name=settings_page_meta_key+"_meta_title" value=post_meta_data.meta_title)
                 label(for=settings_page_meta_key+"_meta_title")='Title'
-        div(class="col-xs-12 col-md-4")
+        div(class="col-xs-12 col-md-3")
             div(class="input-field")
                 input(id=settings_page_meta_key+"_meta_name" type="text" class="validate" name=settings_page_meta_key+"_meta_name" value=post_meta_data.meta_name)
                 label(for=settings_page_meta_key+"_meta_name")='Name (ID)'
-        div(class="col-xs-12 col-md-4")
+        div(class="col-xs-12 col-md-3")
             div(class="input-field")
                 select(name=settings_page_meta_key+"_meta_type")
                     - var attributes = "";
@@ -206,5 +253,10 @@ block e5ojs_block_content
                         - attributes = {"selected":"selected"};
                     - }
                     option(value="calendar")&attributes(attributes)='calendar'
+                    - attributes = "";
+                    - if( settings_page_meta_type == "map" ) {
+                        - attributes = {"selected":"selected"};
+                    - }
+                    option(value="map")&attributes(attributes)='map'
                 label='Meta type'
     - }

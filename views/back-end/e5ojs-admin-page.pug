@@ -2,6 +2,7 @@ extends e5ojs-base-layout-admin
 block e5ojs_block_local_css_script
     link(rel='stylesheet', href=e5ojs_global_data.admin_res.base_url+'/back-end/css/summernote.css')
     script(type='text/javascript', src=e5ojs_global_data.admin_res.base_url+'/back-end/js/summernote.js')
+    script(type='text/javascript' src='http://maps.googleapis.com/maps/api/js')
     script(type='text/javascript', src=e5ojs_global_data.admin_res.base_url+'/back-end/js/e5ojs-new-edit-post.js')
 block e5ojs_block_content
     - if( pages_data == null ) {
@@ -12,7 +13,7 @@ block e5ojs_block_content
                         a(data-status="publish" class="waves-effect waves-dark "+(( page_status == "publish" )?" current":""))='Publish'
                         a(data-status="pending" class="waves-effect waves-dark "+(( page_status == "pending" )?" current":""))='Pending'
                         a(data-status="trash" class="waves-effect waves-dark "+(( page_status == "trash" )?" current":""))='Trash'
-            div(class="row") 
+            div(class="row")
                 div(class="col-xs-12 col-md-12 no-padding")
                     div(class="card")
                         div(class="card-image")
@@ -83,38 +84,46 @@ block e5ojs_block_content
                                         option(value=key_template)&attributes(attributes)=key_template
                                     - }
                                 label(for="page_template")='Page template'
-        
+
             - if( page_data_object.settings_page_metas.length > 0 ) {
                 div(class="row")
                     div(class="col-xs-12 col-md-12 no-padding")
                         div(class="card")
                             div(class="card-content post-meta-content")
                                 span(class="card-title")='Page Meta'
+
                                 //- metas { meta_title: 'aaa', meta_name: 'aaa', meta_type: 'text' }
-                                - console.log(" === PAGE METAS === ",page_data_object.settings_page_metas);
+                                //- console.log(" === PAGE METAS === ",page_data_object.settings_page_metas);
                                 - for( var meta_key in page_data_object.settings_page_metas ) {
                                     - var meta = page_data_object.settings_page_metas[meta_key];
-                                    
-                                    - if( meta.meta_type == "text" ) {
-                                        - set_meta_text(meta);
+
+                                    //- get only page metas
+                                    - if( meta.meta_page_id == page_data_object.page_id ) {
+                                        - if( meta.meta_type == "text" ) {
+                                            - set_meta_text(meta);
+                                        - }
+                                        - if( meta.meta_type == "textarea" ) {
+                                            - set_meta_textarea(meta);
+                                        - }
+                                        - if( meta.meta_type == "calendar" ) {
+                                            - set_meta_calendar(meta);
+                                        - }
+                                        - if( meta.meta_type == "image" ) {
+                                            - set_meta_image(meta);
+                                        - }
+                                        - if( meta.meta_type == "gallery" ) {
+                                            - set_meta_gallery(meta);
+                                        - }
+                                        - if( meta.meta_type == "map" ) {
+                                            - set_meta_map(meta_key,meta);
+                                        - }
                                     - }
-                                    - if( meta.meta_type == "textarea" ) {
-                                        - set_meta_textarea(meta);
-                                    - }
-                                    - if( meta.meta_type == "calendar" ) {
-                                        - set_meta_calendar(meta);
-                                    - }
-                                    - if( meta.meta_type == "image" ) {
-                                        - set_meta_image(meta);
-                                    - }
-                                    - if( meta.meta_type == "gallery" ) {
-                                        - set_meta_gallery(meta);
-                                    - }
+
                                 - }
             - }
     - }
-    
-    
+
+
     - function set_meta_text(meta_data) {
         //- console.log(" === meta_data === ",meta_data);
         div(class="input-field")
@@ -148,4 +157,10 @@ block e5ojs_block_content
             input(id="meta_"+meta_data.meta_name class="meta-image-id" type="hidden" name="meta_"+meta_data.meta_name value=meta_data.post_meta_value)
             label(for="meta_"+meta_data.meta_name)=meta_data.meta_title
     - }
-                        
+    - function set_meta_map(meta_key,meta_data) {
+        - console.log(" === meta_data === ",meta_data);
+        div(class="input-map")
+            input(id="meta_"+meta_data.meta_name type="text" class="map-data" data-meta-key-map=meta_key name="meta_"+meta_data.meta_name value=meta_data.post_meta_value)
+            label(for="meta_"+meta_data.meta_name)=meta_data.meta_title
+            div(class="e5ojs-map")
+    - }

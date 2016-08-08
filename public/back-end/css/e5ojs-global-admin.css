@@ -1445,3 +1445,24 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 }
 
 /* end post type new form */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* start meta map */
+.input-map .e5ojs-map {
+    width: 100%;
+    height: 250px;
+}
+/* end meta map */
