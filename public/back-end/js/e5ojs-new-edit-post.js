@@ -19,7 +19,7 @@ $(document).ready(function(){
 var array_map = [];
 var array_marks = [];
 
-var bounds = new google.maps.LatLngBounds();
+
 var max_marks = 2;
 
 function e5ojs_map_ini() {
@@ -155,11 +155,12 @@ function e5ojs_map_resize(map) {
     if( map.array_marks.length == 0 ) {
         map.setCenter({lat: 19.6871377, lng: -101.1899671});
     } else {
+        var bounds = new google.maps.LatLngBounds();
         for (var i = 0; i < map.array_marks.length; i++) {
             if( map.array_marks[i] === undefined ) {
                 console.log("undefined mark");
             } else {
-                console.log("MARK",map.array_marks[i]);
+                //console.log("MARK",map.array_marks[i]);
                 bounds.extend(map.array_marks[i].getPosition());
             }
         }
