@@ -162,23 +162,11 @@ block e5ojs_block_content
             input(name="settings_page_meta_type" type="radio" id="map" value="map")
             label(for="map")='Map'
         p
-            input(name="settings_page_meta_type" type="radio" id="textcollection" value="textcollection" checked)
-            label(for="textcollection")='Text Collection'
-        p
-            input(name="settings_page_meta_type" type="radio" id="textareacollection" value="textareacollection" checked)
-            label(for="textareacollection")='Textarea Collection'
-        p
             input(name="settings_page_meta_type" type="radio" id="imagetext" value="imagetext")
-            label(for="imagetext")='Image & Text'
+            label(for="imagetext")='Image with text'
         p
             input(name="settings_page_meta_type" type="radio" id="gallerytext" value="gallerytext")
-            label(for="gallerytext")='Gallery & Text'
-        p
-            input(name="settings_page_meta_type" type="radio" id="calendarcollection" value="calendarcollection")
-            label(for="calendarcollection")='Calendar Collection'
-        p
-            input(name="settings_page_meta_type" type="radio" id="mapcollection" value="mapcollection")
-            label(for="mapcollection")='Map Collection'
+            label(for="gallerytext")='Gallery with text'
 
     - }
 
@@ -201,6 +189,10 @@ block e5ojs_block_content
                     - settings_page_meta_type = "calendar";
             - else if( String(meta_data.page_meta_type) == "map" )
                     - settings_page_meta_type = "map";
+            - else if( String(meta_data.page_meta_type) == "imagetext" )
+                    - settings_page_meta_type = "imagetext";
+            - else if( String(meta_data.page_meta_type) == "gallerytext" )
+                    - settings_page_meta_type = "gallerytext";
         - }
 
 
@@ -232,31 +224,41 @@ block e5ojs_block_content
                     - if( settings_page_meta_type == "text" ) {
                         - attributes = {"selected":"selected"};
                     - }
-                    option(value="text")&attributes(attributes)='text'
+                    option(value="text")&attributes(attributes)='Text'
                     - attributes = "";
                     - if( settings_page_meta_type == "textarea" ) {
                         - attributes = {"selected":"selected"};
                     - }
-                    option(value="textarea")&attributes(attributes)='textarea'
+                    option(value="textarea")&attributes(attributes)='Textarea'
                     - attributes = "";
                     - if( settings_page_meta_type == "image" ) {
                         - attributes = {"selected":"selected"};
                     - }
-                    option(value="image")&attributes(attributes)='image'
+                    option(value="image")&attributes(attributes)='Image'
                     - attributes = "";
                     - if( settings_page_meta_type == "gallery" ) {
                         - attributes = {"selected":"selected"};
                     - }
-                    option(value="gallery")&attributes(attributes)='gallery'
+                    option(value="gallery")&attributes(attributes)='Gallery'
                     - attributes = "";
                     - if( settings_page_meta_type == "calendar" ) {
                         - attributes = {"selected":"selected"};
                     - }
-                    option(value="calendar")&attributes(attributes)='calendar'
+                    option(value="calendar")&attributes(attributes)='Calendar'
                     - attributes = "";
                     - if( settings_page_meta_type == "map" ) {
                         - attributes = {"selected":"selected"};
                     - }
-                    option(value="map")&attributes(attributes)='map'
+                    option(value="map")&attributes(attributes)='Map'
+                    - attributes = "";
+                    - if( settings_page_meta_type == "imagetext" ) {
+                        - attributes = {"selected":"selected"};
+                    - }
+                    option(value="imagetext")&attributes(attributes)='Image with text'
+                    - attributes = "";
+                    - if( settings_page_meta_type == "gallerytext" ) {
+                        - attributes = {"selected":"selected"};
+                    - }
+                    option(value="gallerytext")&attributes(attributes)='Gallery with text'
                 label='Meta type'
     - }

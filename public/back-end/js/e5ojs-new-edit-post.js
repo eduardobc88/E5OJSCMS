@@ -16,11 +16,22 @@ $(document).ready(function(){
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 var array_map = [];
 var array_marks = [];
-
-
-var max_marks = 2;
+var max_marks = 30;
 
 function e5ojs_map_ini() {
 
@@ -70,11 +81,7 @@ function e5ojs_map_ini() {
             }
         });
     });
-
-
 }
-
-
 function e5ojs_map_draw_marker(map, key_mark, location, is_new) {
     var marker = new google.maps.Marker({
         position: location,
@@ -150,7 +157,6 @@ function e5ojs_map_draw_marker(map, key_mark, location, is_new) {
         e5ojs_map_set_value(map);
     });
 }
-
 function e5ojs_map_resize(map) {
     if( map.array_marks.length == 0 ) {
         map.setCenter({lat: 19.6871377, lng: -101.1899671});
@@ -167,7 +173,6 @@ function e5ojs_map_resize(map) {
         map.fitBounds(bounds);
     }
 }
-
 function e5ojs_map_set_value(map) {
     $(".e5ojs-map").each(function(key,val){
         if( map.map_index == key ) {

@@ -2,10 +2,20 @@ extends e5ojs-base-layout-admin
 block e5ojs_block_local_css_script
     link(rel='stylesheet', href=e5ojs_global_data.admin_res.base_url+'/back-end/css/summernote.css')
     script(type='text/javascript', src=e5ojs_global_data.admin_res.base_url+'/back-end/js/summernote.js')
+    script(type='text/javascript' src='http://maps.googleapis.com/maps/api/js')
     script(type='text/javascript', src=e5ojs_global_data.admin_res.base_url+'/back-end/js/e5ojs-new-edit-post.js')
 block e5ojs_block_content
     - var post_type_name = e5ojs_global_data.e5ojs_current_post_type;
     - var post_data = result_query_data;
+    div(id="page-modal" class="modal")
+        div(class="modal-content")
+            h4="Edit value"
+            div(class="input-field")
+                input(type="text" class="modal-value" value="-")
+                label(for="modaltext")="Text"
+        div(class="modal-footer")
+            a(href="#!" class="modal-close waves-effect waves-light btn")="Agree"
+                i(class="material-icons")="done"
     form(id="e5ojs-post-form-wrapper" action=e5ojs_global_data.admin_pages.admin_post_types[post_type_name].url+e5ojs_global_data.admin_actions.post_type.edit+post_data.post_id+"/" method="post")
         div(class="row top-page-options no-padding")
             div(class="col-xs-12 no-padding")
@@ -59,6 +69,12 @@ block e5ojs_block_content
                                 - if( meta.meta_type == "gallery" ) {
                                     - set_meta_gallery(meta);
                                 - }
+                                - if( meta.meta_type == "map" ) {
+                                    - set_meta_map(meta_key,meta);
+                                - }
+                                - if( meta.meta_type == "imagetext" ) {
+                                    - set_meta_imagetext(meta);
+                                -}
                             - }
         - }
 
@@ -92,5 +108,21 @@ block e5ojs_block_content
                     - if( meta_data.post_meta_value == "" )
                         img(class="e5ojs-open-media-meta" src=e5ojs_global_data.admin_res.media_default_image_gallery update_media_id="0" post-meta-value-id="meta_"+meta_data.meta_name post-meta-value-type="json")
                 input(id="meta_"+meta_data.meta_name class="meta-image-id" type="hidden" name="meta_"+meta_data.meta_name value=meta_data.post_meta_value)
+                label(for="meta_"+meta_data.meta_name)=meta_data.meta_title
+        - }
+        - function set_meta_map(meta_key,meta_data) {
+            div(class="input-map post-meta-map")
+                input(id="meta_"+meta_data.meta_name type="hidden" class="map-data" data-meta-key-map=meta_key name="meta_"+meta_data.meta_name value=meta_data.post_meta_value)
+                label(for="meta_"+meta_data.meta_name)=meta_data.meta_title
+                div(class="e5ojs-map")
+        - }
+        - function set_meta_imagetext(meta_data) {
+            div(class="input-field post-meta-imagetext")
+                div(class="imagetext-wrapper")
+                    img(class="e5ojs-open-media-imagetext-meta" src=e5ojs_global_data.admin_res.media_default_image_gallery update_media_id="0" post-meta-value-id="meta_"+meta_data.meta_name post-meta-value-type="json")
+                    input(id="meta_"+meta_data.meta_name class="meta-image-id" type="hidden" name="meta_"+meta_data.meta_name value=meta_data.post_meta_value)
+                    input(class="meta-imagetext" type="hidden" value="")
+                    a(class="waves-effect waves-light btn modal-trigger imagetext-modal-btn" href="#modal1")="Text"
+                        i(class="material-icons")="short_text"
                 label(for="meta_"+meta_data.meta_name)=meta_data.meta_title
         - }

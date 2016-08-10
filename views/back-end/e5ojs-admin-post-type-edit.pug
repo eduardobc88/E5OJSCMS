@@ -120,7 +120,7 @@ block e5ojs_block_content
                                 button( type="submit" class="waves-effect waves-dark btn")='SAVE'
                                     i(class="material-icons")='save'
     - }
-    
+
     - function print_row_meta_data() {
         div(class="input-field")
             input(id="post_type_meta_title" type="text" class="validate" name="post_type_meta_title")
@@ -143,8 +143,14 @@ block e5ojs_block_content
         p
             input(name="post_type_meta_type" type="radio" id="calendar" value="calendar")
             label(for="calendar")='Calendar'
+        p
+            input(name="post_type_meta_type" type="radio" id="map" value="map")
+            label(for="map")='Map'
+        p
+            input(name="post_type_meta_type" type="radio" id="imagetext" value="imagetext")
+            label(for="imagetext")='Image with text'
     - }
-    
+
     - function print_row_meta_data_update(post_type_meta_key,meta_data) {
         - var post_meta_data = {meta_title:"",meta_name:"",meta_type:"",};
         - var post_type_meta_type = "";
@@ -161,6 +167,10 @@ block e5ojs_block_content
                     - post_type_meta_type = "gallery";
             - else if( String(meta_data.meta_type) == "calendar" )
                     - post_type_meta_type = "calendar";
+            - else if( String(meta_data.meta_type) == "map" )
+                    - post_type_meta_type = "map";
+            - else if( String(meta_data.meta_type) == "imagetext" )
+                    - post_type_meta_type = "imagetext";
         - }
         div(class="col-xs-12 col-md-4")
             div(class="input-field")
@@ -177,26 +187,37 @@ block e5ojs_block_content
                     - if( post_type_meta_type == "text" ) {
                         - attributes = {"selected":"selected"};
                     - }
-                    option(value="text")&attributes(attributes)='text'
+                    option(value="text")&attributes(attributes)='Text'
                     - attributes = "";
                     - if( post_type_meta_type == "textarea" ) {
                         - attributes = {"selected":"selected"};
                     - }
-                    option(value="textarea")&attributes(attributes)='textarea'
+                    option(value="textarea")&attributes(attributes)='Textarea'
                     - attributes = "";
                     - if( post_type_meta_type == "image" ) {
                         - attributes = {"selected":"selected"};
                     - }
-                    option(value="image")&attributes(attributes)='image'
+                    option(value="image")&attributes(attributes)='Image'
                     - attributes = "";
                     - if( post_type_meta_type == "gallery" ) {
                         - attributes = {"selected":"selected"};
                     - }
-                    option(value="gallery")&attributes(attributes)='gallery'
+                    option(value="gallery")&attributes(attributes)='Gallery'
                     - attributes = "";
                     - if( post_type_meta_type == "calendar" ) {
                         - attributes = {"selected":"selected"};
                     - }
-                    option(value="calendar")&attributes(attributes)='calendar'
+                    option(value="calendar")&attributes(attributes)='Calendar'
+                    - attributes = "";
+                    - if( post_type_meta_type == "map" ) {
+                        - attributes = {"selected":"selected"};
+                    - }
+                    option(value="map")&attributes(attributes)='Map'
+                    - attributes = "";
+                    - if( post_type_meta_type == "imagetext" ) {
+                        - attributes = {"selected":"selected"};
+                    - }
+                    option(value="imagetext")&attributes(attributes)='Image with text'
+
                 label='Meta type'
     - }

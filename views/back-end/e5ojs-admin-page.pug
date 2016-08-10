@@ -5,6 +5,15 @@ block e5ojs_block_local_css_script
     script(type='text/javascript' src='http://maps.googleapis.com/maps/api/js')
     script(type='text/javascript', src=e5ojs_global_data.admin_res.base_url+'/back-end/js/e5ojs-new-edit-post.js')
 block e5ojs_block_content
+    div(id="page-modal" class="modal")
+        div(class="modal-content")
+            h4="Edit value"
+            div(class="input-field")
+                input(type="text" class="modal-value" value="-")
+                label(for="modaltext")="Text"
+        div(class="modal-footer")
+            a(href="#!" class="modal-close waves-effect waves-light btn")="Agree"
+                i(class="material-icons")="done"
     - if( pages_data == null ) {
         form(id="e5ojs-post-form-wrapper" action=e5ojs_global_data.admin_pages.pages.url+e5ojs_global_data.admin_actions.page.action+"edit/" method="post")
             div(class="row top-page-options no-padding")
@@ -117,6 +126,12 @@ block e5ojs_block_content
                                         - if( meta.meta_type == "map" ) {
                                             - set_meta_map(meta_key,meta);
                                         - }
+                                        - if( meta.meta_type == "imagetext" ) {
+                                            - set_meta_imagetext(meta);
+                                        - }
+                                        - if( meta.meta_type == "gallerytext" ) {
+                                            - set_meta_gallerytext(meta);
+                                        - }
                                     - }
 
                                 - }
@@ -158,8 +173,34 @@ block e5ojs_block_content
             label(for="meta_"+meta_data.meta_name)=meta_data.meta_title
     - }
     - function set_meta_map(meta_key,meta_data) {
-        div(class="input-map")
+        div(class="input-map post-meta-map")
             input(id="meta_"+meta_data.meta_name type="hidden" class="map-data" data-meta-key-map=meta_key name="meta_"+meta_data.meta_name value=meta_data.post_meta_value)
             label(for="meta_"+meta_data.meta_name)=meta_data.meta_title
             div(class="e5ojs-map")
+    - }
+    - function set_meta_imagetext(meta_data) {
+        div(class="input-field post-meta-imagetext")
+            div(class="imagetext-wrapper")
+                img(class="e5ojs-open-media-imagetext-meta" src=e5ojs_global_data.admin_res.media_default_image_gallery update_media_id="0" post-meta-value-id="meta_"+meta_data.meta_name post-meta-value-type="json")
+                input(id="meta_"+meta_data.meta_name class="meta-image-id" type="hidden" name="meta_"+meta_data.meta_name value=meta_data.post_meta_value)
+                input(class="meta-imagetext" type="hidden" value="")
+                a(class="waves-effect waves-light btn modal-trigger imagetext-modal-btn" href="#modal1")="Text"
+                    i(class="material-icons")="short_text"
+            label(for="meta_"+meta_data.meta_name)=meta_data.meta_title
+    - }
+    - function set_meta_gallerytext(meta_data) {
+        div(class="input-field post-meta-gallerytext")
+            input(type="hidden" class="default-gallery-image-data" post-meta-image-url=e5ojs_global_data.admin_res.media_default_image_gallery post-meta-value-id="meta_"+meta_data.meta_name)
+            a(class="btn-floating btn-large waves-effect waves-dark post-meta-gallerytext-add-new")
+                i(class="material-icons")='add'
+
+            div(class="post-meta-gallerytext-items")
+            - if( meta_data.post_meta_value == "" )
+                div(class="imagetext-wrapper")
+                    img(class="e5ojs-open-media-gallerytext-meta" src=e5ojs_global_data.admin_res.media_default_image_gallery)
+                    a(class="waves-effect waves-light btn modal-trigger imagetext-modal-btn" href="#modal1")="Text"
+                        i(class="material-icons")="short_text"
+            input(id="meta_"+meta_data.meta_name class="meta-gallerytext-id" type="text" name="meta_"+meta_data.meta_name value=meta_data.post_meta_value)
+            label(for="meta_"+meta_data.meta_name)=meta_data.meta_title
+
     - }
