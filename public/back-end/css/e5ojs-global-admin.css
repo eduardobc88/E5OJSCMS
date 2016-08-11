@@ -513,14 +513,41 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 /* start custom modal */
 
 
+/* margin bottom for contents */
+.post-meta-image, .post-meta-map, .post-meta-gallerytext {
+    margin-bottom: 15px;
+    margin-top: 0px;
+    padding-top: 0px;
+}
+.post-meta-gallerytext-items {
+    margin-bottom: 30px;
+}
+.post-meta-imagetext {
+    margin-top: 0px !important;
+}
+
 
 /* start imagetext */
-.post-meta-gallery .imagetext-wrapper, .post-meta-imagetext .imagetext-wrapper, .post-meta-gallerytext .imagetext-wrapper {
-    display: inline-block;
-    width: 101px;
+.post-meta-imagetext {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
 }
-.post-meta-gallery .imagetext-wrapper .btn, .post-meta-imagetext .imagetext-wrapper .btn, .post-meta-gallerytext .imagetext-wrapper .btn {
+.post-meta-imagetext .imagetext-wrapper {
+    width: 101px;
+    height: 166px;
+}
+.post-meta-gallery .imagetext-wrapper .btn, .post-meta-imagetext .imagetext-wrapper .btn {
     width: 100px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+.post-meta-gallerytext .imagetext-wrapper .btn {
+    width: 100px;
+    position: absolute;
+    left: 0;
+    bottom: 0;
 }
 /* end imagetext */
 
@@ -1141,16 +1168,59 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     color: #0288d1 !important;
 }
 
-.post-meta-content .post-meta-image img, .post-meta-content .post-meta-imagetext img, .post-meta-gallerytext .imagetext-wrapper img {
+.post-meta-content .input-field label {
+    line-height: 12px !important;
+}
+.post-meta-content .post-meta-imagetext img {
     position: relative;
-    margin-top: 30px;
     overflow: hidden;
     width: 100px;
     height: 100px;
 }
-.post-meta-gallery, .post-meta-map, .post-meta-gallerytext-items {
+.post-meta-image .image-ajax-load-wrapper {
     position: relative;
+    width: 100px;
+    height: 100px;
+    display: inline-flex;
+}
+.margin-top-field {
     padding-top: 30px;
+}
+.post-meta-content .post-meta-image img {
+    width: 100px;
+    height: 100px;
+    margin: 0px;
+    padding: 0px;
+}
+.post-meta-gallery {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+}
+.post-meta-gallery .image-ajax-load-wrapper {
+    position: relative;
+    width: 100px;
+    height: 102px;
+    margin-right: 2px;
+}
+.post-meta-gallerytext-items {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+}
+.post-meta-gallerytext .imagetext-wrapper {
+    height: 136px !important;
+    width: 100px !important;
+    position: relative;
+    overflow: hidden;
+    margin-right: 2px;
+    margin-top: 2px;
+}
+.post-meta-gallerytext .imagetext-wrapper img {
+    position: relative;
+    overflow: hidden;
+    width: 100px;
+    height: 100px;
 }
 .post-meta-gallery .post-meta-gallery-add-new, .post-meta-gallerytext .post-meta-gallerytext-add-new {
     position: absolute;

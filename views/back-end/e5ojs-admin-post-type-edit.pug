@@ -149,6 +149,9 @@ block e5ojs_block_content
         p
             input(name="post_type_meta_type" type="radio" id="imagetext" value="imagetext")
             label(for="imagetext")='Image with text'
+        p
+            input(name="post_type_meta_type" type="radio" id="gallerytext" value="gallerytext")
+            label(for="gallerytext")='Gallery with text'
     - }
 
     - function print_row_meta_data_update(post_type_meta_key,meta_data) {
@@ -171,6 +174,8 @@ block e5ojs_block_content
                     - post_type_meta_type = "map";
             - else if( String(meta_data.meta_type) == "imagetext" )
                     - post_type_meta_type = "imagetext";
+            - else if( String(meta_data.meta_type) == "gallerytext" )
+                    - post_type_meta_type = "gallerytext";
         - }
         div(class="col-xs-12 col-md-4")
             div(class="input-field")
@@ -218,6 +223,11 @@ block e5ojs_block_content
                         - attributes = {"selected":"selected"};
                     - }
                     option(value="imagetext")&attributes(attributes)='Image with text'
+                    - attributes = "";
+                    - if( post_type_meta_type == "gallerytext" ) {
+                        - attributes = {"selected":"selected"};
+                    - }
+                    option(value="gallerytext")&attributes(attributes)='Gallery with text'
 
                 label='Meta type'
     - }

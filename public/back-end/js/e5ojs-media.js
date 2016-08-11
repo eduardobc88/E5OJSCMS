@@ -23,27 +23,7 @@ $(document).ready(function(){
             $(image_preview).attr("src",element.sizes[0]);
         });
     });
-    // get image from ajax
-    $(".e5ojs-media-image-get").each(function(key,element){
-        var image_id = $(this).attr("e5ojs-image-get-id");
-        var image_element = $(this);
-        var image_size = $(this).attr("e5ojs-image-get-size");
-        if( image_id != "" ) {
-            $.getJSON( e5ojs_all_media_url+image_id, function( media_gallery_json ) {
-                var all_media = media_gallery_json[0];
-                if( all_media.status ) {
-                    var media_element = all_media.media_posts[0];
-                    e5ojs_media.e5ojs_media_sizes = all_media.sizes;
-                    //e5ojs_media_sizes
-                    var media_id = media_element.media_id;
-                    var media_url = e5ojs_media_sizes_url+media_element.media_file_name_clean+"-"+image_size+"."+(media_element.media_mime_type.split("/"))[1];
-                    var media_name = media_element.media_name;
-                    var media_date = media_element.media_date;
-                    $(image_element).attr("src",media_url);
-                }
-            });
-        }
-    });
+
 
 
 
@@ -96,87 +76,30 @@ $(document).ready(function(){
 
 
 
-    // get image from id find
-    $(".post-meta-image").each(function(key,element){
-        var image_id = $(this).find(".meta-image-id").val();
-        var image_element = $(this);
-        if( image_id != "" ) {
-            $.getJSON( e5ojs_all_media_url+image_id, function( media_gallery_json ) {
-                var all_media = media_gallery_json[0];
-                if( all_media.status ) {
-                    var media_element = all_media.media_posts[0];
-                    e5ojs_media.e5ojs_media_sizes = all_media.sizes;
-                    //e5ojs_media_sizes
-                    var media_id = media_element.media_id;
-                    var media_url = e5ojs_media_sizes_url+media_element.media_file_name_clean+"-150x150."+(media_element.media_mime_type.split("/"))[1];
-                    var media_name = media_element.media_name;
-                    var media_date = media_element.media_date;
-                    //console.log("image_element",image_element);
-                    $(image_element).find("img").attr("src",media_url);
-                }
-            });
-        }
-    });
+
     // get images from ids
     $(".post-meta-gallery").each(function(key,element){
         // get ids"
         var id_data = "#"+$(this).find(".default-gallery-image-data").attr("post-meta-value-id");
+        var image_default_id = $(this).find(".default-gallery-image-data").attr("post-meta-value-id");
+        var image_default_url = $(this).find(".default-gallery-image-data").attr("post-meta-image-url");
+
         var image_ids = $(id_data).val();
-        var image_element = $(this);
+        var image_element_wrapper = $(this);
         if( image_ids != "" ) {
-            $.getJSON( e5ojs_all_media_url+image_ids, function( media_gallery_json ) {
-                var all_media = media_gallery_json[0];
-                if( all_media.status ) {
-                    $.each(all_media.media_posts,function(key,element){
-                        var media_element = element;
-                        e5ojs_media.e5ojs_media_sizes = all_media.sizes;
-                        //e5ojs_media_sizes
-                        var media_id = media_element.media_id;
-                        var media_url = e5ojs_media_sizes_url+media_element.media_file_name_clean+"-150x150."+(media_element.media_mime_type.split("/"))[1];
-                        var media_name = media_element.media_name;
-                        var media_date = media_element.media_date;
+            // print all elements from json value
 
-                        var image_default_id = $(image_element).find(".default-gallery-image-data").attr("post-meta-value-id");
-                        var element = '<img class="e5ojs-open-media-meta" src="'+media_url+'" media-id="'+media_id+'" post-meta-value-id="'+image_default_id+'" post-meta-value-type="json")>';
-                        $(image_element).prepend(element);
-                    });
-                    // set actions again
-                    e5ojs_media_start_action_gallery_meta();
-                }
-            });
+            var image_ids = image_ids.split(",");
+            if( image_ids.length > 0 ) {
+                $.each(image_ids,function(key,media_id){
+                    var element = '<div class="image-ajax-load-wrapper"><img class="e5ojs-open-media-meta e5ojs-get-ajax-image" src="'+image_default_url+'" media-id="'+media_id+'" post-meta-value-id="'+image_default_id+'" post-meta-value-type="json"></div>';
+                    $(image_element_wrapper).prepend(element);
+                });
+                // set actions again
+                e5ojs_media_start_action_gallery_meta();
+            }
         }
     });
-    // get imagetext from id find json
-    $(".post-meta-imagetext").each(function(key,element){
-        var imagetext_id = $(this).find(".meta-image-id").val();
-        var image_element = $(this);
-        if( imagetext_id != "" ) {
-            imagetext_json = jQuery.parseJSON(imagetext_id);
-            //console.log("imagetext_id",imagetext_json);
-            // set text on input
-            $(this).parent().find(".meta-imagetext").val(imagetext_json.image_text);
-            $.getJSON( e5ojs_all_media_url+imagetext_json.image_id, function( media_gallery_json ) {
-                var all_media = media_gallery_json[0];
-                if( all_media.status ) {
-                    var media_element = all_media.media_posts[0];
-                    e5ojs_media.e5ojs_media_sizes = all_media.sizes;
-                    //e5ojs_media_sizes
-                    var media_id = media_element.media_id;
-                    var media_url = e5ojs_media_sizes_url+media_element.media_file_name_clean+"-150x150."+(media_element.media_mime_type.split("/"))[1];
-                    var media_name = media_element.media_name;
-                    var media_date = media_element.media_date;
-                    //console.log("image_element",image_element);
-                    $(image_element).find("img").attr("src",media_url);
-                }
-            });
-        }
-    });
-
-
-
-
-
-
 
     // add new image to gallery
     $(".post-meta-gallery-add-new").on('click',function(event){
@@ -185,7 +108,7 @@ $(document).ready(function(){
         var element_parent = $(this).closest(".post-meta-gallery");
         var image_default_url = $(element_parent).find(".default-gallery-image-data").attr("post-meta-image-url");
         var image_default_id = $(element_parent).find(".default-gallery-image-data").attr("post-meta-value-id");
-        var element = '<img class="e5ojs-open-media-meta" src="'+image_default_url+'" post-meta-value-id="'+image_default_id+'" post-meta-value-type="json")>';
+        var element = '<div class="image-ajax-load-wrapper"><img class="e5ojs-open-media-meta" src="'+image_default_url+'" post-meta-value-id="'+image_default_id+'" post-meta-value-type="json"></div>';
         $(element_parent).prepend(element);
         // remove actions and add again
         $(element_parent).find(".e5ojs-open-media-meta").unbind();
@@ -235,6 +158,9 @@ $(window).load(function(){
     /* end media editor page */
 
     e5ojs_media_postion_button();
+
+    // get all images on page
+    e5ojs_get_ajax_image();
 });
 $(window).resize(function(){
     e5ojs_media_postion_button();
@@ -248,8 +174,49 @@ $( window ).scroll(function() {
 
 
 
+
+
+
+function e5ojs_get_ajax_image() {
+    /* get image with media-id attribute in image */
+    $(".e5ojs-get-ajax-image").each(function(){
+        var image_element = $(this);
+        var image_id = $(image_element).attr("media-id");
+        if( image_id != "" ) {
+            $.getJSON( e5ojs_all_media_url+image_id, function( media_gallery_json ) {
+                var all_media = media_gallery_json[0];
+                if( all_media.status ) {
+                    $.each(all_media.media_posts,function(key,element){
+
+                        var media_element = element;
+                        e5ojs_media.e5ojs_media_sizes = all_media.sizes;
+                        //e5ojs_media_sizes
+                        var media_id = media_element.media_id;
+                        var media_url = e5ojs_media_sizes_url+media_element.media_file_name_clean+"-150x150."+(media_element.media_mime_type.split("/"))[1];
+                        var media_name = media_element.media_name;
+                        var media_date = media_element.media_date;
+
+                        // replace image src
+                        $(image_element).fadeOut(300,function(){
+                            setTimeout(function(){
+                                $(image_element).attr("src",media_url);
+                                $(image_element).fadeIn(300);
+                            },e5ojs_get_random_int(min=300, max=1000));
+                        });
+                    });
+                }
+            });
+        }
+    });
+}
+
+
+
+
+
 /* start e5ojs imagetext */
 function e5ojs_imagetext_init() {
+
     // imagetext single
     $(".e5ojs-open-media-imagetext-meta").unbind();
     $(".e5ojs-open-media-imagetext-meta").on('click',function(){
@@ -277,14 +244,15 @@ function e5ojs_imagetext_init() {
         });
     });
     // modal imagetext
-    $(".imagetext-modal-btn").unbind();
-    $(".imagetext-modal-btn").on('click',function(){
+    $(".post-meta-imagetext .imagetext-modal-btn").unbind();
+    $(".post-meta-imagetext .imagetext-modal-btn").on('click',function(){
         var imagetext_wrapper = $(this).parent();
         // get value for modal
         var imagetext_id = $(imagetext_wrapper).find(".meta-image-id").val();
 
         var imagetext_image_value = "";
         var imagetext_text_value = "";
+        console.log("imagetext-modal-btn",imagetext_id);
         if( imagetext_id != "" ) {
             var imagetext_json = jQuery.parseJSON(imagetext_id);
             imagetext_image_value = imagetext_json.image_id;
@@ -293,6 +261,9 @@ function e5ojs_imagetext_init() {
 
         $("#page-modal").find(".modal-value").val(imagetext_text_value);
         $("#page-modal").openModal();
+        setTimeout(function(){
+            $("#page-modal").find(".modal-value").focus();
+        },500);
         $("#page-modal").find(".modal-close").unbind();
         $("#page-modal").find(".modal-close").on('click',function(){
             // get value and set on image value
@@ -311,42 +282,18 @@ function e5ojs_gallerytext_init() {
     $(".post-meta-gallerytext").each(function(key,element){
         // get ids"
         var id_data = "#"+$(this).find(".default-gallery-image-data").attr("post-meta-value-id");
+        var image_default = $(this).find(".default-gallery-image-data").attr("post-meta-image-url");
         var image_ids = $(id_data).val();
         if( image_ids != "" ) {
             var image_ids = jQuery.parseJSON(image_ids);
             var gallerytext_wrapper = $(this).find(".post-meta-gallerytext-items");
             format_image_ids = "";
             $.each(image_ids,function(key, val){
-                if( key+1 < image_ids.length ) {
-                    format_image_ids = format_image_ids+val.image_id+",";
-                } else {
-                    format_image_ids = format_image_ids+val.image_id;
-                }
-            });
-            $.getJSON( e5ojs_all_media_url+format_image_ids, function( media_gallery_json ) {
-                var all_media = media_gallery_json[0];
-                if( all_media.status ) {
-                    $.each(all_media.media_posts,function(key,element){
-
-                        var media_element = element;
-                        e5ojs_media.e5ojs_media_sizes = all_media.sizes;
-                        //e5ojs_media_sizes
-                        var media_id = media_element.media_id;
-                        var media_url = e5ojs_media_sizes_url+media_element.media_file_name_clean+"-150x150."+(media_element.media_mime_type.split("/"))[1];
-                        var media_name = media_element.media_name;
-                        var media_date = media_element.media_date;
-
-                        // create element gallerytext
-                        var element = '<div class="imagetext-wrapper"><img class="e5ojs-open-media-gallerytext-meta" src="'+media_url+'" media-id="'+media_id+'"><a class="waves-effect waves-light btn modal-trigger imagetext-modal-btn" href="#modal1">Text<i class="material-icons"></i></a></div>';
-                        $(gallerytext_wrapper).prepend(element);
-
-                    });
-                    // set actions again
-                    e5ojs_media_start_action_gallerytext_meta();
-                }
+                // create element gallerytext
+                var element = '<div class="imagetext-wrapper"><img class="e5ojs-open-media-gallerytext-meta e5ojs-get-ajax-image" src="'+image_default+'" media-key="'+key+'" media-id="'+val.image_id+'"><a class="waves-effect waves-light btn modal-trigger imagetext-modal-btn" href="#modal1">Text<i class="material-icons">short_text</i></a></div>';
+                $(gallerytext_wrapper).prepend(element);
             });
         }
-
     });
 
     // button add new
@@ -357,8 +304,24 @@ function e5ojs_gallerytext_init() {
         var element_parent = $(this).closest(".post-meta-gallerytext");
         var image_default_url = $(element_parent).find(".default-gallery-image-data").attr("post-meta-image-url");
         var image_default_id = $(element_parent).find(".default-gallery-image-data").attr("post-meta-value-id");
-        var element = '<div class="imagetext-wrapper"><img class="e5ojs-open-media-gallerytext-meta" src="'+image_default_url+'")><a class="waves-effect waves-light btn modal-trigger imagetext-modal-btn" href="#modal1">Text<i class="material-icons"></i></a></div>';
+        // get total items on this gallery text
+        var media_key = $(element_parent).find(".imagetext-wrapper").length;
+        var element = '<div class="imagetext-wrapper"><img class="e5ojs-open-media-gallerytext-meta" src="'+image_default_url+'" media-key="'+media_key+'"><a class="waves-effect waves-light btn modal-trigger imagetext-modal-btn" href="#modal1">Text<i class="material-icons">short_text</i></a></div>';
         $(element_parent).find(".post-meta-gallerytext-items").prepend(element);
+
+        // add new item to value json
+        var input_media_id = "#"+$(this).closest(".post-meta-gallerytext").find(".default-gallery-image-data").attr("post-meta-value-id");
+        var media_current_json_val =  $(input_media_id).val();
+        var imagetext_json = "";
+        if( media_current_json_val != "" ) {
+            imagetext_json = jQuery.parseJSON(media_current_json_val);
+        } else {
+            imagetext_json = [];
+        }
+        meta_data_json = {'image_id':'','image_text':''};
+        imagetext_json.push( meta_data_json );
+        imagetext_json = JSON.stringify(imagetext_json);
+        $(input_media_id).val(imagetext_json);
 
         // set actions again
         e5ojs_media_start_action_gallerytext_meta();
@@ -372,6 +335,7 @@ function e5ojs_gallerytext_init() {
             var image_preview = $(this);
             var input_media_id = "#"+$(this).closest(".post-meta-gallerytext").find(".default-gallery-image-data").attr("post-meta-value-id");
             var media_id = $(this).attr("media-id");
+            var media_key = $(this).attr("media-key");
             var media_current_json_val =  $(input_media_id).val();
 
             var imagetext_image_value = "";
@@ -382,12 +346,8 @@ function e5ojs_gallerytext_init() {
             if( media_current_json_val != "" ) {
                 imagetext_json = jQuery.parseJSON(media_current_json_val);
                 // search the position element
-                $.each(imagetext_json,function(key,val){
-                    if( val.image_id == media_id ) {
-                        imagetext_image_value = val.image_id;
-                        imagetext_text_value = val.image_text;
-                    }
-                });
+                imagetext_image_value = imagetext_json[media_key].image_id;
+                imagetext_text_value = imagetext_json[media_key].image_text;
             }
 
 
@@ -404,39 +364,25 @@ function e5ojs_gallerytext_init() {
                     // set actions again
                     e5ojs_media_start_action_gallerytext_meta();
                 } else {
-                    // is new image
-                    if( media_id === undefined ) {
-                        meta_data_json = {'image_id':image_selected_id,'image_text':imagetext_text_value};
-                        imagetext_json.push( meta_data_json );
-                        imagetext_json = JSON.stringify(imagetext_json);
-                        $(input_media_id).val(imagetext_json);
-                        // set actions again
-                        e5ojs_media_start_action_gallerytext_meta();
-                    } else {
-                        // search item on json
-                        $.each(imagetext_json,function(key,val){
-                            if( val.image_id == media_id ) {
-                                val.image_id = image_selected_id;
-                            }
-                        });
-                        // set on input value
-                        imagetext_json = JSON.stringify(imagetext_json);
-                        $(input_media_id).val(imagetext_json);
-                        $(image_preview).attr("media-id",image_selected_id);
-                    }
-
+                    // already exist
+                    // search item on json
+                    imagetext_json[media_key].image_id = image_selected_id;
+                    // set on input value
+                    imagetext_json = JSON.stringify(imagetext_json);
+                    $(input_media_id).val(imagetext_json);
+                    $(image_preview).attr("media-id",image_selected_id);
                 }
-
                 $(image_preview).attr("src",element.sizes[0]);
-
             });
         });
         // modal imagetext
-        $(".imagetext-modal-btn").unbind();
-        $(".imagetext-modal-btn").on('click',function(){
+        $(".post-meta-gallerytext .imagetext-modal-btn").unbind();
+        $(".post-meta-gallerytext .imagetext-modal-btn").on('click',function(){
             var input_media_id = "#"+$(this).closest(".post-meta-gallerytext").find(".default-gallery-image-data").attr("post-meta-value-id");
             var media_id = $(this).parent().find(".e5ojs-open-media-gallerytext-meta").attr("media-id");
+            var media_key = $(this).parent().find(".e5ojs-open-media-gallerytext-meta").attr("media-key");
             var media_current_json_val =  $(input_media_id).val();
+
 
             var imagetext_image_value = "";
             var imagetext_text_value = "";
@@ -445,28 +391,25 @@ function e5ojs_gallerytext_init() {
             if( media_current_json_val != "" ) {
                 imagetext_json = jQuery.parseJSON(media_current_json_val);
                 // search the position element
-                $.each(imagetext_json,function(key,val){
-                    if( val.image_id == media_id ) {
-                        imagetext_image_value = val.image_id;
-                        imagetext_text_value = val.image_text;
-                    }
-                });
+                imagetext_image_value = imagetext_json[media_key].image_id;
+                imagetext_text_value = imagetext_json[media_key].image_text;
             }
 
             $("#page-modal").find(".modal-value").val(imagetext_text_value);
             $("#page-modal").openModal();
+            setTimeout(function(){
+                $("#page-modal").find(".modal-value").focus();
+            },500);
             $("#page-modal").find(".modal-close").unbind();
             $("#page-modal").find(".modal-close").on('click',function(){
-                // get value and set on image value
-                /*
-                meta_data_json = JSON.stringify({'image_id':imagetext_image_value,'image_text':$("#page-modal").find(".modal-value").val()});
-                $(imagetext_wrapper).find(".meta-gallerytext-id").val(meta_data_json);
-                */
-
+                // search item on json
+                imagetext_json[media_key].image_text = $("#page-modal").find(".modal-value").val();
+                // set on input value
+                imagetext_json = JSON.stringify(imagetext_json);
+                $(input_media_id).val(imagetext_json);
                 $("#page-modal").closeModal();
             });
         });
-
     }
     e5ojs_media_start_action_gallerytext_meta();
 }
@@ -960,3 +903,13 @@ var e5ojs_media = {
 }
 
 /* end E%OJS MEDIA PICKER UPLOAD */
+
+
+
+
+
+
+/* generate ramdom number range */
+function e5ojs_get_random_int(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}

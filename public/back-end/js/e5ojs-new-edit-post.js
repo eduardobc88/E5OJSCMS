@@ -64,6 +64,7 @@ function e5ojs_map_ini() {
         });
         array_map.push( map );
 
+
         // draw marks
         for( key_mark in array_marks_source ) {
             mark_data = array_marks_source[key_mark];
@@ -76,12 +77,14 @@ function e5ojs_map_ini() {
         google.maps.event.addListener(array_map[key], 'click', function(event) {
             //console.log("map clicked",array_map[key]);
             if( array_map[key].map_total_marks < max_marks ) {
-                array_map[key].map_total_marks = array_map[key].map_total_marks + 1;
-                e5ojs_map_draw_marker(array_map[key],array_map[key].map_total_marks-1,event.latLng,true);
+                array_map[key].map_total_marks = parseInt(array_map[key].map_total_marks) + 1;
+                e5ojs_map_draw_marker(array_map[key],parseInt(array_map[key].map_total_marks)-1,event.latLng,true);
             }
         });
     });
+
 }
+
 function e5ojs_map_draw_marker(map, key_mark, location, is_new) {
     var marker = new google.maps.Marker({
         position: location,
@@ -93,16 +96,17 @@ function e5ojs_map_draw_marker(map, key_mark, location, is_new) {
     if( is_new ) {
         map.array_marks_source.push({'position':location,'text':''});
         e5ojs_map_set_value(map);
+    } else {
+        map.map_total_marks = map.map_total_marks+1;
     }
 
-
-
+    // set input value
     var contentString = '<div id="content" style="width: 300px;">'+
-      '<div class="input-field validate">'+
-      '<input type="text" class="marker-text">'+
+      '<div class="input-field">'+
+      '<input type="text" class="marker-text" placeholder="Your text here" value="'+map.array_marks_source[key_mark].text+'">'+
       '<label for="input-'+key_mark+'">Some text</label>'+
       '</div>'+
-      '<div id="input-'+key_mark+'" class="aling-right"><button class="waves-effect waves-dark btn marker-close-btn" mark-position="'+key_mark+'" mark-map-index="'+map.map_index+'">Accept<i class="material-icons">save</i></button></div>'+
+      '<div id="input-'+key_mark+'" class="aling-right"><button class="waves-effect waves-dark btn marker-close-btn" mark-position="'+key_mark+'" mark-map-index="'+map.map_index+'">Agree<i class="material-icons">save</i></button></div>'+
       '</div>';
 
 
@@ -114,7 +118,6 @@ function e5ojs_map_draw_marker(map, key_mark, location, is_new) {
 
     // marker listeners
     marker.addListener('click', function() {
-
         if( map.last_info_window_open_key != -1 ) {
             map.array_infowindow[map.last_info_window_open_key].close();
             map.last_info_window_open_key = marker.marker_position;
@@ -122,9 +125,9 @@ function e5ojs_map_draw_marker(map, key_mark, location, is_new) {
             map.last_info_window_open_key = marker.marker_position;
         }
         map.array_infowindow[map.last_info_window_open_key].open(map, marker);
-
-
-
+        setTimeout(function(){
+            $(".marker-text").focus();
+        },500);
 
         $(".marker-close-btn").unbind();
         $(".marker-close-btn").on('click',function(e){
@@ -132,7 +135,6 @@ function e5ojs_map_draw_marker(map, key_mark, location, is_new) {
 
             mark_position = $(this).attr("mark-position");
             map_id = mark_position = $(this).attr("mark-map-index");
-
             array_map[map_id].array_marks_source[marker.marker_position].text = $(this).parent().parent().find(".marker-text").val();
             // remove this mark
             /*
@@ -151,7 +153,7 @@ function e5ojs_map_draw_marker(map, key_mark, location, is_new) {
         console.log("marker",marker.marker_position);
         console.log("marker position",marker.getPosition());
         */
-        mark_text = map.array_marks_source[marker.marker_position].mark_text;
+        mark_text = map.array_marks_source[marker.marker_position].text;
         map.array_marks_source[marker.marker_position] = {'position':marker.getPosition(),'text':mark_text};
         //console.log("map.array_marks_source",map.array_marks_source);
         e5ojs_map_set_value(map);
