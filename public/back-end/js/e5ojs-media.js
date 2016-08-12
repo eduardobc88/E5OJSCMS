@@ -197,17 +197,23 @@ function e5ojs_get_ajax_image() {
                         var media_date = media_element.media_date;
 
                         // replace image src
-                        $(image_element).fadeOut(300,function(){
-                            setTimeout(function(){
-                                $(image_element).attr("src",media_url);
-                                $(image_element).fadeIn(300);
-                            },e5ojs_get_random_int(min=300, max=1000));
-                        });
+                        e5ojs_replace_img_src($(image_element), media_url);
                     });
                 }
             });
         }
     });
+
+    function e5ojs_replace_img_src(image_element, media_url) {
+        setTimeout(function(){
+            $(image_element).fadeOut(300,function(){
+                setTimeout(function(){
+                    $(image_element).attr("src",media_url);
+                    $(image_element).fadeIn(300);
+                },e5ojs_get_random_int(min=300, max=1000));
+            });
+        }, e5ojs_get_random_int(min=300, max=1000));
+    }
 }
 
 
