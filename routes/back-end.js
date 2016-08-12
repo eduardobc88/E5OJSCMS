@@ -58,7 +58,7 @@ var upload = multer({
     storage: storage,
     limits: { fileSize: maxSize },
     fileFilter: function (req, file, cb) {
-        if( file.mimetype !== 'image/png' && file.mimetype !== 'image/jpeg' ) {
+        if( file.mimetype !== 'image/png' && file.mimetype !== 'image/jpeg' && file.mimetype !== 'image/gif' ) {
             req.e5ojs_file_validation_error = true;
             return cb(null, false); // no save file
         } else {

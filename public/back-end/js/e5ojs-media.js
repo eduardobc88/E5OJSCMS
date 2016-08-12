@@ -177,6 +177,7 @@ $( window ).scroll(function() {
 
 
 
+
 function e5ojs_get_ajax_image() {
     /* get image with media-id attribute in image */
     $(".e5ojs-get-ajax-image").each(function(){
@@ -192,7 +193,14 @@ function e5ojs_get_ajax_image() {
                         e5ojs_media.e5ojs_media_sizes = all_media.sizes;
                         //e5ojs_media_sizes
                         var media_id = media_element.media_id;
-                        var media_url = e5ojs_media_sizes_url+media_element.media_file_name_clean+"-150x150."+(media_element.media_mime_type.split("/"))[1];
+                        // check for image size
+                        var image_size = $(image_element).attr("e5ojs-image-get-size");
+                        if( image_size === undefined ) {
+                            image_size = "-150x150.";
+                        } else {
+                            image_size = "-"+image_size+".";
+                        }
+                        var media_url = e5ojs_media_sizes_url+media_element.media_file_name_clean+image_size+(media_element.media_mime_type.split("/"))[1];
                         var media_name = media_element.media_name;
                         var media_date = media_element.media_date;
 
@@ -205,12 +213,29 @@ function e5ojs_get_ajax_image() {
     });
 
     function e5ojs_replace_img_src(image_element, media_url) {
+
+        if( $(image_element).closest(".card-image").hasClass("card-image") ) {
+            wrapper_height = $(image_element).parent().height();
+            wrapper_width = $(image_element).parent().width();
+            $(image_element).parent().css({
+                height: wrapper_height,
+                width: wrapper_width,
+            });
+        }
         setTimeout(function(){
             $(image_element).fadeOut(300,function(){
-                setTimeout(function(){
+                //setTimeout(function(){
                     $(image_element).attr("src",media_url);
-                    $(image_element).fadeIn(300);
-                },e5ojs_get_random_int(min=300, max=1000));
+                    $(image_element).fadeIn(300, function(){
+                        if( $(image_element).closest(".card-image").hasClass("card-image") ) {
+                            $(image_element).parent().removeClass("temp-card-image-wrapper");
+                            $(image_element).parent().css({
+                                height: "auto",
+                                width: "auto",
+                            });
+                        }
+                    });
+                //},e5ojs_get_random_int(min=300, max=1000));
             });
         }, e5ojs_get_random_int(min=300, max=1000));
     }

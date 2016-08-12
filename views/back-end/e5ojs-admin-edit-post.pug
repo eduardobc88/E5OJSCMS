@@ -27,7 +27,7 @@ block e5ojs_block_content
             div(class="col-xs-12 col-md-12 no-padding")
                 div(class="card")
                     div(class="card-image")
-                        img(class="e5ojs-open-media"  src=post_data.post_media_attachment_url+"")
+                        img(class="e5ojs-open-media e5ojs-get-ajax-image" media-id=post_data.post_media_attachment_id e5ojs-image-get-size="800x200" src=e5ojs_global_data.admin_res.media_default_image_url)
                         span(class="card-title")='Post Info'
                         input(type="hidden" name="post_media_id" class="post_media_id" value=post_data.post_media_attachment_id)
                     div(class="card-content")

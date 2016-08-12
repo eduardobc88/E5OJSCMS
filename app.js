@@ -44,10 +44,10 @@ app.set('view engine', 'pug');
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 
-app.use(bodyParser.json({limit: '1mb'}));
+app.use(bodyParser.json({limit: '2mb'})); // check limit file size on nginx config too
 app.use(bodyParser.urlencoded({ extended: false, limit: '2mb' }));
 app.use(cookieParser());
-app.use(session({resave: false, saveUninitialized: true, secret: 'E5OA5A', cookie: { secure: false, maxAge: 600000 }})); // express session
+app.use(session({resave: false, saveUninitialized: true, secret: 'E5OA5A', cookie: { secure: false, maxAge: 6000000 }})); // express session
 app.use(express.static(path.join(__dirname, 'public')));
 
 //  root routes for different access

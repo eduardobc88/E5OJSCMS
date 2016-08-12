@@ -515,17 +515,21 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 
 /* margin bottom for contents */
 .post-meta-image, .post-meta-map, .post-meta-gallerytext {
-    margin-bottom: 15px;
     margin-top: 0px;
     padding-top: 0px;
 }
-.post-meta-gallerytext-items {
-    margin-bottom: 30px;
+.post-meta-map {
+    margin-top: 10px;
 }
 .post-meta-imagetext {
     margin-top: 0px !important;
 }
-
+.input-field < input[type="text"] {
+    margin-top: 20px !important;
+}
+.post-meta-content .input-field input {
+    margin: 0px;
+}
 
 /* start imagetext */
 .post-meta-imagetext {
@@ -1237,12 +1241,19 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
 
 /* start users */
 #e5ojs-user-form-wrapper .input-field img {
-    position: relative;
-    margin-top: 30px;
-    overflow: hidden;
     width: 100px;
     height: 100px;
-    margin-bottom: 15px;
+    margin: 0px;
+    padding: 0px;
+}
+#e5ojs-user-form-wrapper .input-field .image-ajax-load-wrapper {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    display: inline-flex;
+}
+.temp-card-image-wrapper {
+    position: relative;
 }
 /* end users */
 

@@ -103,7 +103,7 @@ function e5ojs_map_draw_marker(map, key_mark, location, is_new) {
     // set input value
     var contentString = '<div id="content" style="width: 300px;">'+
       '<div class="input-field">'+
-      '<input type="text" class="marker-text" placeholder="Your text here" value="'+map.array_marks_source[key_mark].text+'">'+
+      '<input type="text" class="marker-text marker_'+key_mark+'" placeholder="Your text here" value="'+map.array_marks_source[key_mark].text+'">'+
       '<label for="input-'+key_mark+'">Some text</label>'+
       '</div>'+
       '<div id="input-'+key_mark+'" class="aling-right"><button class="waves-effect waves-dark btn marker-close-btn" mark-position="'+key_mark+'" mark-map-index="'+map.map_index+'">Agree<i class="material-icons">save</i></button></div>'+
@@ -126,7 +126,7 @@ function e5ojs_map_draw_marker(map, key_mark, location, is_new) {
         }
         map.array_infowindow[map.last_info_window_open_key].open(map, marker);
         setTimeout(function(){
-            $(".marker-text").focus();
+            $(".marker_"+marker.marker_position).focus();
         },500);
 
         $(".marker-close-btn").unbind();
