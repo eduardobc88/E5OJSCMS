@@ -5,9 +5,9 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var front_end = require('./routes/front-end');
-var back_end = require('./routes/back-end');
-var api = require('./routes/api');
+var front_end = require('./controller/front-end');
+var back_end = require('./controller/back-end');
+var api = require('./controller/api');
 var session = require("express-session");
 
 
@@ -37,7 +37,7 @@ app.locals.e5ojs = {
 
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'view'));
 app.set('view engine', 'pug');
 
 // uncomment after placing your favicon in /public
@@ -50,7 +50,7 @@ app.use(cookieParser());
 app.use(session({resave: false, saveUninitialized: true, secret: 'E5OA5A', cookie: { secure: false, maxAge: 6000000 }})); // express session
 app.use(express.static(path.join(__dirname, 'public')));
 
-//  root routes for different access
+//  root controller for different access
 app.use('/', front_end);
 app.use('/admin', back_end);
 app.use('/api', api);

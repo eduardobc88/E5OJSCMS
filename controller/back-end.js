@@ -2133,12 +2133,16 @@ router.delete('/e5ojs-media-api/', function(req, res, next){
 
 
 /* start e5ojs admin search routers */
+var e5ojs_search = require('../model/e5ojs-search/');
+//e5ojs_search = new e5ojs_search();
+console.log(" ========== e5ojs_search ========= ",e5ojs_search);
+console.log(" ========== e5ojs_search ========= ",e5ojs_search.test());
 router.get('/search/', function(req, res, next) {
     // get page with validate session
     var search_word = req.param('search','');
     if( search_word !== 'undefined' && search_word.length > 1 ) {
         e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-            e5ojs_search(search_word, function(result_search){
+            e5ojs_search.search(search_word, function(result_search){
                 res.render('back-end/e5ojs-search-result', { page_data: e5ojs_global_data.admin_pages['search'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_search:result_search });
             });
         });
