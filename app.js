@@ -11,8 +11,8 @@ var api = require('./controller/api');
 var session = require("express-session");
 
 
-
-
+// e5ojs global settings
+var e5ojs_settings = require("./e5ojs-settings.js");
 
 
 /*
@@ -24,17 +24,8 @@ The backup will be created on current terminal location on dump/ Folder
 */
 
 
-
+// init express
 var app = express();
-
-/* start global app var */
-app.locals.e5ojs = {
-    host_url: "http://nodejs.dev",
-    e5ojs_refresh_router: false,
-};
-/* end global app var */
-
-
 
 // view engine setup
 app.set('views', path.join(__dirname, 'view'));
@@ -57,10 +48,10 @@ app.use('/api', api);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  //res.render('error', { title: 'Error 404!', description_err:"Not Found" });
-  next(err);
+    var err = new Error('Not Found');
+    err.status = 404;
+    //res.render('error', { title: 'Error 404!', description_err:"Not Found" });
+    next(err);
 });
 
 // error handlers
@@ -68,23 +59,23 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
+    app.use(function(err, req, res, next) {
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: err
+        });
     });
-  });
 }
 
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
+    res.status(err.status || 500);
+    res.render('error', {
+        message: err.message,
+        error: {}
+    });
 });
 
 

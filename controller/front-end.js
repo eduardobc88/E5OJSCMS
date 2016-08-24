@@ -1,4 +1,7 @@
 /* ============== start e5ojs requires ============== */
+// e5ojs start local requires settings
+var e5ojs_settings = require("../e5ojs-settings.js");
+// e5ojs end local requires settings
 
 var express = require('express');
 var router = express.Router();
@@ -57,7 +60,7 @@ var e5ojs_global_data = {};
 /* start e5ojs generate global data */
 function e5ojs_global_data_init() {
     //var host_url = req.protocol+"://"+req.get('host');
-    var host_url = "http://nodejs.dev"; // change for current host ip or domain
+    var host_url = e5ojs_settings.host_url; // change for current host ip or domain
     e5ojs_global_data.home_page = "";
     e5ojs_global_data.pages = [];
     e5ojs_global_data.post_types = [];
@@ -87,12 +90,14 @@ function e5ojs_regenetate_routers() {
     // for pages
     for( var current_route_key in e5ojs_global_data.pages ) {
         var route_slug = e5ojs_global_data.pages[current_route_key];
-        remove_route_stack(route_slug);
+        remove_route_stack(route_slug); // remove page route
     }
     // for post types
     for( var current_route_key in e5ojs_global_data.post_types ) {
         var route_slug = e5ojs_global_data.post_types[current_route_key];
-        remove_route_stack(route_slug);
+        remove_route_stack(route_slug); // remove post type route
+        remove_route_stack(route_slug+"/page"); // remove pagination route
+        remove_route_stack(route_slug+"/:post_name"); // remove single post type route
     }
     // slug from router stack
     function remove_route_stack(route_slug) {
@@ -100,10 +105,10 @@ function e5ojs_regenetate_routers() {
             var route = router.stack[key_router];
             if( route.route.path.toString().indexOf(route_slug) > 0 ) {
                 router.stack.splice(key_router, 1);
+                break;
             }
         }
     }
-    //console.log(" ======== ROUTER ======== ",router.stack);
     e5ojs_global_data_init();
 }
 /* start e5ojs regenerate page routers */
@@ -425,10 +430,9 @@ function e5ojs_generate_router_post_type(post_type_data) {
 
 /* start catch all GET request to check if refresh routers */
 router.get('*', function(req, res, next) {
-
     // check for refresh routers
-    if( req.app.locals.e5ojs_refresh_router == true ) {
-        req.app.locals.e5ojs_refresh_router = false;
+    if( e5ojs_settings.e5ojs_refresh_router == true ) {
+        e5ojs_settings.e5ojs_refresh_router = false;
         e5ojs_regenetate_routers();
         next();
     } else {

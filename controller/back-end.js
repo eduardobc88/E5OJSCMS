@@ -1,4 +1,7 @@
 /* ============== start e5ojs requires ============== */
+// e5ojs start local requires settings
+var e5ojs_settings = require("../e5ojs-settings.js");
+// e5ojs end local requires settings
 
 var express = require('express');
 var router = express.Router();
@@ -32,7 +35,7 @@ var multer = require('multer');
 
 /* ============== start e5ojs global var ============== */
 
-var host_url = "http://nodejs.dev"; // change for current host ip or domain
+var host_url = e5ojs_settings.host_url; // change for current host ip or domain
 var e5ojs_global_data = {}; // contains all urls for admin
 // for image processing
 var e5ojs_image_sizes = new Array({width:150,height:150},{width:200,height:200},{width:300,height:150},{width:800,height:200});
@@ -812,7 +815,7 @@ function e5ojs_add_post_type_router(post_type_data) {
                                 // save message on session var
                                 e5ojs_push_session_message(req,e5ojs_message);
                                 // set true for front-end refresh routers
-                                req.app.locals.e5ojs_refresh_router = true;
+                                e5ojs_settings.e5ojs_refresh_router = true;
                                 // redirect to edit post with ID
                                 res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/"+post_type_data.post_type_name+"/action/edit/"+result_data.post_id);
                             });
@@ -1088,7 +1091,7 @@ router.post('/page/action/edit/:page_status/', function(req, res, next) {
             // save message on session var
             e5ojs_push_session_message(req,e5ojs_message);
             // set true for front-end refresh routers
-            req.app.locals.e5ojs_refresh_router = true;
+            e5ojs_settings.e5ojs_refresh_router = true;
             // response
             res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/page/action/edit/"+page_data_result.page_id+"/");
         });
@@ -1288,7 +1291,7 @@ router.post('/page/action/edit/:page_id/:page_status/',function(req, res, next){
                             // save message on session var
                             e5ojs_push_session_message(req,e5ojs_message);
                             // set true for front-end refresh routers
-                            req.app.locals.e5ojs_refresh_router = true;
+                            e5ojs_settings.e5ojs_refresh_router = true;
                             // response
                             res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/page/action/edit/"+page_id+"/");
                         });
@@ -1340,7 +1343,7 @@ router.get('/page/action/:page_status/:page_ids/', function(req, res, next) {
                 // save message on session var
                 e5ojs_push_session_message(req,e5ojs_message);
                 // set true for front-end refresh routers
-                req.app.locals.e5ojs_refresh_router = true;
+                e5ojs_settings.e5ojs_refresh_router = true;
                 // redirect to posts archive
                 res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/page/all/page/1/");
             });
@@ -1361,7 +1364,7 @@ router.get('/page/action/:page_status/:page_ids/', function(req, res, next) {
                 // save message on session var
                 e5ojs_push_session_message(req,e5ojs_message);
                 // set true for front-end refresh routers
-                req.app.locals.e5ojs_refresh_router = true;
+                e5ojs_settings.e5ojs_refresh_router = true;
                 // redirect to posts archive
                 res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/page/all/page/1/");
             });
@@ -1429,7 +1432,7 @@ router.post('/post-types/action/edit/', function(req, res, next) {
             e5ojs_push_session_message(req,e5ojs_message);
             // redirect to de same page
             // set true for front-end refresh routers
-            req.app.locals.e5ojs_refresh_router = true;
+            e5ojs_settings.e5ojs_refresh_router = true;
             res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-types/action/edit/"+post_type_data.post_type_id);
         });
     });
@@ -1504,7 +1507,7 @@ router.post('/post-types/action/edit/:post_type_id/', function(req, res, next) {
                 // save message on session var
                 e5ojs_push_session_message(req,e5ojs_message);
                 // set true for front-end refresh routers
-                req.app.locals.e5ojs_refresh_router = true;
+                e5ojs_settings.e5ojs_refresh_router = true;
                 // redirect to de same page
                 res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-types/action/edit/"+post_type_id);
             });
@@ -1518,7 +1521,7 @@ router.post('/post-types/action/edit/:post_type_id/', function(req, res, next) {
                 // save message on session var
                 e5ojs_push_session_message(req,e5ojs_message);
                 // set true for front-end refresh routers
-                req.app.locals.e5ojs_refresh_router = true;
+                e5ojs_settings.e5ojs_refresh_router = true;
                 // redirect to de same page
                 res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-types/");
             });
@@ -1541,7 +1544,7 @@ router.get('/post-types/action/:post_type_action/:post_type_id/', function(req, 
                 // save message on session var
                 e5ojs_push_session_message(req,e5ojs_message);
                 // set true for front-end refresh routers
-                req.app.locals.e5ojs_refresh_router = true;
+                e5ojs_settings.e5ojs_refresh_router = true;
                 // redirect to de same page
                 res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-types/all/page/1/");
             });
@@ -1555,7 +1558,7 @@ router.get('/post-types/action/:post_type_action/:post_type_id/', function(req, 
                 // save message on session var
                 e5ojs_push_session_message(req,e5ojs_message);
                 // set true for front-end refresh routers
-                req.app.locals.e5ojs_refresh_router = true;
+                e5ojs_settings.e5ojs_refresh_router = true;
                 // redirect to de same page
                 res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-types/all/page/1/");
             });
@@ -2006,7 +2009,7 @@ router.post('/settings/', function(req, res, next) {
             // save settings
             e5ojs_settings_update(settings, index=0,function(update_result) {
                 // set true for front-end refresh routers
-                req.app.locals.e5ojs_refresh_router = true;
+                e5ojs_settings.e5ojs_refresh_router = true;
                 // refresh admin pages data
                 e5ojs_refresh_admin_pages_data(function(){
                     // redirect to settings page
@@ -2134,14 +2137,12 @@ router.delete('/e5ojs-media-api/', function(req, res, next){
 
 /* start e5ojs admin search routers */
 var e5ojs_search = require('../model/e5ojs-search.js');
-
-console.log(" ========== e5ojs_search ========= ",e5ojs_search.test());
 router.get('/search/', function(req, res, next) {
     // get page with validate session
     var search_word = req.param('search','');
     if( search_word !== 'undefined' && search_word.length > 1 ) {
         e5ojs_validate_admin_session_callback(req, res, function(user_data) {
-            e5ojs_search.search(host_url, search_word, function(result_search){
+            e5ojs_search.search(search_word, function(result_search){
                 res.render('back-end/e5ojs-search-result', { page_data: e5ojs_global_data.admin_pages['search'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_search:result_search });
             });
         });
@@ -3120,7 +3121,7 @@ function e5ojs_clear_session_message(req) {
 /* start for files */
 function e5ojs_read_template_files_json(callback) {
     fs = require('fs');
-    fs.readFile(__dirname+'/../views/front-end/e5ojs-templates.json', 'utf8', function (err,file_data) {
+    fs.readFile(__dirname+'/../view/front-end/e5ojs-templates.json', 'utf8', function (err,file_data) {
         if (err) {
             callback(null);
         } else {

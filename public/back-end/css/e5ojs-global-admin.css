@@ -113,8 +113,8 @@ input:not([type]).valid, input:not([type]):focus.valid, input[type=text].valid, 
     top: 5px;
 }
 .custom-collection .collection-item.avatar .circle {
-    max-width: 40px;
-    height: 40px;
+    max-width: 30px;
+    height: 30px;
     display: inline-block;
     position: relative;
     margin-top: 10px;
@@ -348,7 +348,7 @@ input:not([type]), input[type=text], input[type=password], input[type=email], in
     top: 5px;
 }
 .custom-collapsible .custom-collapsible-item .circle {
-    max-width: 40px;
+    max-width: 30px;
     display: inline-block;
     position: relative;
     padding-top: 10px;
