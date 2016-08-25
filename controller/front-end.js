@@ -1,6 +1,6 @@
 /* ============== start e5ojs requires ============== */
 // e5ojs start local requires settings
-var e5ojs_settings = require("../e5ojs-settings.js");
+var e5ojs_config = require("../e5ojs-config.js");
 // e5ojs end local requires settings
 
 var express = require('express');
@@ -60,7 +60,7 @@ var e5ojs_global_data = {};
 /* start e5ojs generate global data */
 function e5ojs_global_data_init() {
     //var host_url = req.protocol+"://"+req.get('host');
-    var host_url = e5ojs_settings.host_url; // change for current host ip or domain
+    var host_url = e5ojs_config.e5ojs_host_url; // change for current host ip or domain
     e5ojs_global_data.home_page = "";
     e5ojs_global_data.pages = [];
     e5ojs_global_data.post_types = [];
@@ -272,19 +272,19 @@ function e5ojs_generate_router_page(page_data_param) {
                 for( key_meta in settings_page_metas ) {
                     var find = 0;
                     for( key_current_meta in page_meta_data ) {
-                        //- console.log("meta - ",post_type_meta[key_meta]);
                         if( "meta_"+settings_page_metas[key_meta].page_meta_name == page_meta_data[key_current_meta].post_meta_name ) {
                             page_meta_data[key_current_meta].meta_name = settings_page_metas[key_meta].page_meta_name;
                             page_meta_data[key_current_meta].meta_type = settings_page_metas[key_meta].page_meta_type;
                             page_meta_data[key_current_meta].meta_title = settings_page_metas[key_meta].page_meta_title;
                             post_meta_data.push(page_meta_data[key_current_meta]);
+                            //- console.log("meta - ",page_meta_data[key_current_meta]);
                             find = 1;
                         }
                     }
-                    if( find == 0 ) {
+                    /*if( find == 0 ) {
                         // add meta data
                         post_meta_data.push({meta_title:settings_page_metas[key_meta].page_meta_title,meta_type:settings_page_metas[key_meta].page_meta_type,meta_name:settings_page_metas[key_meta].page_meta_name,post_meta_value:""});
-                    }
+                    }*/
                 }
                 // render page with data
                 res.render('front-end/'+page_data_param.page_template, { e5ojs_global_data:e5ojs_global_data, e5ojs_page_data:page_data, e5ojs_page_meta_data:post_meta_data });
@@ -431,8 +431,9 @@ function e5ojs_generate_router_post_type(post_type_data) {
 /* start catch all GET request to check if refresh routers */
 router.get('*', function(req, res, next) {
     // check for refresh routers
-    if( e5ojs_settings.e5ojs_refresh_router == true ) {
-        e5ojs_settings.e5ojs_refresh_router = false;
+    if( e5ojs_config.e5ojs_refresh_router == true ) {
+        e5ojs_config.e5ojs_refresh_router = false;
+        console.log("==============e5ojs_regenetate_routers================");
         e5ojs_regenetate_routers();
         next();
     } else {

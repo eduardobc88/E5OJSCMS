@@ -12,7 +12,7 @@ var session = require("express-session");
 
 
 // e5ojs global settings
-var e5ojs_settings = require("./e5ojs-settings.js");
+var e5ojs_settings = require("./e5ojs-config.js");
 
 
 /*

@@ -1,6 +1,27 @@
+'use strict';
+var file_name = "e5ojs-media.js";
+console.log(file_name,"Module loaded...");
+
+// e5ojs start local requires settings
+var e5ojs_config = require("../e5ojs-config.js");
+// e5ojs end local requires settings
+
+
+// MD5
+var md5 = require('md5');
+// mongojs
+var mongojs = require('mongojs');
+var db = mongojs("e5ojs_db");
+
+
+// get global data from config
+var e5ojs_global_data = e5ojs_config.e5ojs_global_data;
+
+
+
 
 /* start media DB function */
-function e5ojs_get_all_media(callback) {
+exports.e5ojs_get_all_media = function e5ojs_get_all_media(callback) {
     db.e5ojs_media.find({},function(err, media_data){
         // validate error
         if( err ) {
@@ -10,13 +31,13 @@ function e5ojs_get_all_media(callback) {
         }
     });
 }
-function e5ojs_insert_new_media(post_data,callback) {
+exports.e5ojs_insert_new_media = function e5ojs_insert_new_media(post_data,callback) {
     db.e5ojs_media.insert(post_data,function(err, result_data){
         // validate error
         callback(result_data);
     });
 }
-function e5ojs_get_media(media_ids,callback) {
+exports.e5ojs_get_media = function e5ojs_get_media(media_ids,callback) {
     if( media_ids === undefined ) {
         callback(false);
     }
@@ -44,7 +65,7 @@ function e5ojs_get_media(media_ids,callback) {
 
 /* start Media API DB functions */
 
-function e5ojs_media_api_get_media(media_ids, callback) {
+exports.e5ojs_media_api_get_media = function e5ojs_media_api_get_media(media_ids, callback) {
     db.e5ojs_media.find({'media_id':{$in:media_ids}},function(err, media_result){
         if( err )
             callback([]);
@@ -52,7 +73,7 @@ function e5ojs_media_api_get_media(media_ids, callback) {
             callback(media_result);
     });
 }
-function e5ojs_media_api_delete_media(media_ids, callback) {
+exports.e5ojs_media_api_delete_media = function e5ojs_media_api_delete_media(media_ids, callback) {
     db.e5ojs_media.remove({'media_id':{$in:media_ids}},function(err, result_media_delete){
         if( err )
             callback([]);

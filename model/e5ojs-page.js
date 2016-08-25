@@ -1,6 +1,25 @@
+'use strict';
+var file_name = "e5ojs-page.js";
+console.log(file_name,"Module loaded...");
+
+// e5ojs start local requires settings
+var e5ojs_config = require("../e5ojs-config.js");
+var e5ojs_counter = require('../model/e5ojs-counter.js');
+// e5ojs end local requires settings
+
+
+
+// remove diacritics
+var remove_diacritics = require('diacritics').remove;
+// generate slug from string
+var getSlug = require('speakingurl');
+// mongojs
+var mongojs = require('mongojs');
+var db = mongojs("e5ojs_db");
+
 
 /* start page DB function */
-function e5ojs_page_get_all(page_status, callback) {
+exports.e5ojs_page_get_all = function e5ojs_page_get_all(page_status, callback) {
     db.e5ojs_page.find({'page_status':page_status},function(err, result_pages){
         if( err )
             callback(null);
@@ -8,9 +27,9 @@ function e5ojs_page_get_all(page_status, callback) {
             callback(result_pages);
     });
 }
-function e5ojs_page_insert_new(page_data, callback) {
+exports.e5ojs_page_insert_new = function e5ojs_page_insert_new(page_data, callback) {
     // get increment e5ojs_media
-    e5ojs_get_next_id('page',function(data){
+    e5ojs_counter.e5ojs_get_next_id('page',function(data){
         // increment post_type counter
         var next_id = data.seq;
         page_data.page_id = parseInt(next_id);
@@ -23,7 +42,7 @@ function e5ojs_page_insert_new(page_data, callback) {
         });
     });
 }
-function e5ojs_page_get_page(page_id, callback) {
+exports.e5ojs_page_get_page = function e5ojs_page_get_page(page_id, callback) {
     db.e5ojs_page.find({'page_id':parseInt(page_id)},function(err,result_data){
         if( err )
             callback(null);
@@ -31,7 +50,7 @@ function e5ojs_page_get_page(page_id, callback) {
             callback(result_data);
     });
 }
-function e5ojs_page_update(page_data, callback) {
+exports.e5ojs_page_update = function e5ojs_page_update(page_data, callback) {
     page_data.page_id = parseInt(page_data.page_id);
     page_data.page_slug = getSlug(remove_diacritics( page_data.page_title ));
     db.e5ojs_page.update({'page_id':parseInt(page_data.page_id)},{$set:page_data},{new:false},function(err,result_data){
@@ -41,7 +60,7 @@ function e5ojs_page_update(page_data, callback) {
             callback(result_data);
     });
 }
-function e5ojs_delete_page_status_multiple(page_ids,callback) {
+exports.e5ojs_delete_page_status_multiple = function e5ojs_delete_page_status_multiple(page_ids,callback) {
     var ids_array = Array();
     page_ids.forEach(function(val,key){
         ids_array.push( parseInt(page_ids[key]) );
@@ -59,7 +78,7 @@ function e5ojs_delete_page_status_multiple(page_ids,callback) {
         }
     });
 }
-function e5ojs_change_page_status_multiple(page_ids,status,callback) {
+exports.e5ojs_change_page_status_multiple = function e5ojs_change_page_status_multiple(page_ids,status,callback) {
 
     var ids_array = Array();
     page_ids.forEach(function(val,key){

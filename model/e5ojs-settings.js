@@ -1,6 +1,21 @@
-/* start settings function */
-function e5ojs_settings_update(settings, settings_count, callback) {
+'use strict';
+var file_name = "e5ojs-settings.js";
+console.log(file_name,"Module loaded...");
 
+// e5ojs start local requires settings
+var e5ojs_config = require("../e5ojs-config.js");
+// e5ojs end local requires settings
+
+// mongojs
+var mongojs = require('mongojs');
+var db = mongojs("e5ojs_db");
+
+
+
+
+
+/* start settings function */
+exports.e5ojs_settings_update = function e5ojs_settings_update(settings, settings_count, callback) {
     var settings_id = settings[settings_count].settings_id;
     var settings_value = settings[settings_count].settings_value;
     e5ojs_settings_update_multiple(settings_id, settings_value,function(err, result_settings){
@@ -13,9 +28,7 @@ function e5ojs_settings_update(settings, settings_count, callback) {
         }
     });
 }
-
-
-function e5ojs_settings_get_by_id(settings_id, callback) {
+exports.e5ojs_settings_get_by_id = function e5ojs_settings_get_by_id(settings_id, callback) {
     db.e5ojs_settings.find({'settings_id':parseInt(settings_id)},function(err, result_settings){
         if( err )
             callback(null);
@@ -23,7 +36,7 @@ function e5ojs_settings_get_by_id(settings_id, callback) {
             callback(result_settings);
     });
 }
-function e5ojs_settings_get_all(callback) {
+exports.e5ojs_settings_get_all = function e5ojs_settings_get_all(callback) {
     db.e5ojs_settings.find({},function(err, result_settings){
         if( err )
             callback(null);
@@ -31,6 +44,7 @@ function e5ojs_settings_get_all(callback) {
             callback(result_settings);
     });
 }
+// private function
 function e5ojs_settings_update_multiple(settings_id, settings_value, callback) {
     db.e5ojs_settings.update({'settings_id':settings_id},{$set:{'settings_value':settings_value}},{new:false},function(err, result_settings){
         if( err )

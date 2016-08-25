@@ -1,25 +1,43 @@
+'use strict';
+var file_name = "e5ojs-post.js";
+console.log(file_name,"Module loaded...");
+
+// e5ojs start local requires settings
+var e5ojs_config = require("../e5ojs-config.js");
+// e5ojs end local requires settings
+
+
+
+
+// mongojs
+var mongojs = require('mongojs');
+var db = mongojs("e5ojs_db");
+
+
+
+
 
 /* start post DB function */
-function e5ojs_insert_new_post(post_data,callback) {
+exports.e5ojs_insert_new_post = function e5ojs_insert_new_post(post_data,callback) {
     db.e5ojs_post.insert(post_data,function(err, result_data){
         // validate error
         callback(result_data);
     });
 }
-function e5ojs_get_post(post_id,callback) {
+exports.e5ojs_get_post = function e5ojs_get_post(post_id,callback) {
     db.e5ojs_post.find({'post_id':parseInt(post_id)},function(err,post_data){
         // validate error
         callback(post_data);
     });
 }
-function e5ojs_update_post(post_data,callback) {
+exports.e5ojs_update_post = function e5ojs_update_post(post_data,callback) {
     // param new: true to return the modification post
     db.e5ojs_post.findAndModify({query: { 'post_id': parseInt(post_data.post_id) },update: post_data,new: false},function(err, result_data){
         // validate error
         callback(result_data);
     });
 }
-function e5ojs_change_post_status(post_id,status,callback) {
+exports.e5ojs_change_post_status = function e5ojs_change_post_status(post_id,status,callback) {
     db.e5ojs_post.update( {'post_id':parseInt(post_id)}, { $set: {'post_status': status} }, {new: false,multi: true}, function(err, result_data){
         // return : { ok: 1, nModified: 1, n: 1 } mod
         // return : { ok: 1, nModified: 0, n: 0 } no mod
@@ -34,7 +52,7 @@ function e5ojs_change_post_status(post_id,status,callback) {
         }
     });
 }
-function e5ojs_change_post_status_multiple(post_ids,status,callback) {
+exports.e5ojs_change_post_status_multiple = function e5ojs_change_post_status_multiple(post_ids,status,callback) {
     var ids_array = Array();
     post_ids.forEach(function(val,key){
         ids_array.push( parseInt(post_ids[key]) );
@@ -52,7 +70,7 @@ function e5ojs_change_post_status_multiple(post_ids,status,callback) {
         }
     });
 }
-function e5ojs_delete_post_status_multiple(post_ids,callback) {
+exports.e5ojs_delete_post_status_multiple = function e5ojs_delete_post_status_multiple(post_ids,callback) {
     var ids_array = Array();
     post_ids.forEach(function(val,key){
         ids_array.push( parseInt(post_ids[key]) );
