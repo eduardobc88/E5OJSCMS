@@ -1,6 +1,7 @@
 /* ============== start e5ojs requires ============== */
 // e5ojs start local requires settings
 var e5ojs_config = require("../e5ojs-config.js");
+var e5ojs_session = require('../model/e5ojs-session.js');
 var e5ojs_search = require('../model/e5ojs-search.js');
 var e5ojs_settings = require('../model/e5ojs-settings.js');
 var e5ojs_counter = require('../model/e5ojs-counter.js');
@@ -209,7 +210,6 @@ function e5ojs_refresh_admin_pages_data(callback) {
         }
         callback();
         // get post types
-        //e5ojs_init(function(){});
     });
 }
 e5ojs_global_data_init();
@@ -320,7 +320,7 @@ router.post('*', function(req, res, next) {
 /*  start e5ojs login session routers */
 router.get('/', function(req, res, next) {
     // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
         res.render('back-end/e5ojs-admin', { page_data: e5ojs_global_data.admin_pages['dashboard'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
@@ -328,7 +328,7 @@ router.get('/', function(req, res, next) {
 });
 router.post('/', function(req, res, next) {
     // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
         res.render('back-end/e5ojs-admin', { page_data: e5ojs_global_data.admin_pages['dashboard'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
@@ -336,7 +336,7 @@ router.post('/', function(req, res, next) {
 });
 router.get('/admin/', function(req, res, next) {
     // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
         //console.log("e5ojs_global_data",e5ojs_global_data);
@@ -365,7 +365,7 @@ router.get('/log-out/', function(req, res, next) {
 
 /*  start e5ojs media upload routers */
 router.post('/upload/', function(req, res, next) {
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
         //res.render('back-end/e5ojs-admin-new-post', { title: 'NEW POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
@@ -397,7 +397,7 @@ router.post('/upload/', function(req, res, next) {
 });
 // get all media return json
 router.get('/all-media/',function(req, res, next){
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
         //res.render('back-end/e5ojs-admin-new-post', { title: 'NEW POST', e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0] });
@@ -417,7 +417,7 @@ router.get('/all-media/',function(req, res, next){
 });
 // get all media return json
 router.get('/all-media/:media_id',function(req, res, next){
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         var media_id = req.params.media_id;
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
@@ -452,7 +452,7 @@ function e5ojs_add_post_type_router(post_type_data) {
     // start routers
     router.get('/post-type/'+post_type_data.post_type_name+'/', function(req, res, next) {
         // redirect to post/all
-        e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
             res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-type/"+post_type_data.post_type_name+"/all/page/1/");
         });
     });
@@ -462,7 +462,7 @@ function e5ojs_add_post_type_router(post_type_data) {
         */
 
         // get page with validate session
-        e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
             // set current page
             e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
             // get post type info
@@ -522,7 +522,7 @@ function e5ojs_add_post_type_router(post_type_data) {
         get template for add new post
         */
         // get page with validate session
-        e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
             // set current page
             e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
             // return template with user data
@@ -535,7 +535,7 @@ function e5ojs_add_post_type_router(post_type_data) {
         get template with post data it will be edited
         */
         // get post data to show and edit
-        e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
             // set current page
             e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
             // get post type data
@@ -623,7 +623,7 @@ function e5ojs_add_post_type_router(post_type_data) {
         */
         // update post data
         // get page with validate session
-        e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
             // set current page
             e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
             // get post type info
@@ -753,7 +753,7 @@ function e5ojs_add_post_type_router(post_type_data) {
         insert a new post with post status passed by URL
         */
         // get page with validate session
-        e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
             // set current page
             e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
             // get post type info
@@ -815,7 +815,7 @@ function e5ojs_add_post_type_router(post_type_data) {
 
         // change post status to dynamically
         // get page with validate session
-        e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
             // set current page
             e5ojs_global_data.e5ojs_current_post_type = post_type_data.post_type_name;
             // return template with user data
@@ -897,7 +897,7 @@ function e5ojs_add_post_type_router(post_type_data) {
 /* start e5ojs pages routers */
 router.get('/page/', function(req, res, next) {
     // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
         res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/page/all/page/1/");
@@ -907,7 +907,7 @@ router.get('/page/:page_status/page/:number_page/', function(req, res, next) {
 
 
     // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
         // get all pages paginated
@@ -962,7 +962,7 @@ router.get('/page/:page_status/page/:number_page/', function(req, res, next) {
 router.get('/page/action/new/', function(req, res, next) {
     // return the template to add new page
     // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
         e5ojs_read_template_files_json(function(templates_json){
@@ -978,7 +978,7 @@ router.get('/page/action/new/', function(req, res, next) {
 router.post('/page/action/edit/:page_status/', function(req, res, next) {
     // save the new page and redirect to edit/:page_id
     // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
 
@@ -1023,7 +1023,7 @@ router.post('/page/action/edit/:page_status/', function(req, res, next) {
 router.get('/page/action/edit/:page_id/', function(req, res, next) {
     // return the page data to edit
     // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
             // return template with user data
             // e5ojs_global_data  and e5ojs_user_data default
             // get page id
@@ -1103,7 +1103,7 @@ router.get('/page/action/edit/:page_id/', function(req, res, next) {
 });
 router.post('/page/action/edit/:page_id/:page_status/',function(req, res, next){
     // update page data
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // get page id
         var page_id = req.params.page_id;
         // get post data
@@ -1229,7 +1229,7 @@ router.get('/page/action/:page_status/:page_ids/', function(req, res, next) {
 
     // change post status to dynamically
     // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
         // get action
@@ -1315,7 +1315,7 @@ router.get('/page/action/:page_status/:page_ids/', function(req, res, next) {
 /* start e5ojs post type routers */
 router.get('/post-types/action/new/', function(req, res, next) {
     // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         e5ojs_post_type.e5ojs_post_type_get_all(function(post_types){
             // e5ojs_global_data  and e5ojs_user_data default
             e5ojs_read_template_files_json(function(templates_json){
@@ -1332,7 +1332,7 @@ router.get('/post-types/action/new/', function(req, res, next) {
 });
 router.post('/post-types/action/edit/', function(req, res, next) {
     // save the new post type
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
         // get page with validate session
@@ -1364,7 +1364,7 @@ router.get('/post-types/action/edit/:post_type_id/', function(req, res, next) {
     // get the current post
     var post_type_id = req.params.post_type_id;
     // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         e5ojs_post_type.e5ojs_post_type(post_type_id,function(post_type){
             // e5ojs_global_data  and e5ojs_user_data default
             e5ojs_read_template_files_json(function(templates_json){
@@ -1381,7 +1381,7 @@ router.get('/post-types/action/edit/:post_type_id/', function(req, res, next) {
 });
 router.post('/post-types/action/edit/:post_type_id/', function(req, res, next) {
     // save the current post type
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
         // get page with validate session
@@ -1455,7 +1455,7 @@ router.get('/post-types/action/:post_type_action/:post_type_id/', function(req, 
     var post_type_action = req.params.post_type_action;
     var post_type_id = req.params.post_type_id.split(",");
     // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
 
         if( post_type_action == 1 || post_type_action == 0 ) {
             // update post status
@@ -1490,14 +1490,14 @@ router.get('/post-types/action/:post_type_action/:post_type_id/', function(req, 
 });
 router.get('/post-types/', function(req, res, next) {
     // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // redirect to de same page
         res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/post-types/all/page/1/");
     });
 });
 router.get('/post-types/:post_type_status/page/:number_page/', function(req, res, next) {
     // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // e5ojs_global_data  and e5ojs_user_data default
         // request for all posts types on DB
 
@@ -1560,13 +1560,13 @@ router.get('/post-types/:post_type_status/page/:number_page/', function(req, res
 router.get('/users/', function(req, res, next) {
     // get page with validate session
     // redirect to post/all
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         res.redirect(e5ojs_global_data.admin_res.base_url+"/admin/users/all/page/1/");
     });
 });
 router.get('/users/:user_status/page/:number_page/', function(req, res, next) {
     // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // e5ojs_global_data  and e5ojs_user_data default
         // request for all posts types on DB
 
@@ -1614,7 +1614,7 @@ router.get('/users/:user_status/page/:number_page/', function(req, res, next) {
 });
 router.get('/users/action/new/', function(req, res, next) {
     // get page with new user form
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // get session message
         var e5ojs_message = e5ojs_get_session_message(req);
         // remove session message
@@ -1624,7 +1624,7 @@ router.get('/users/action/new/', function(req, res, next) {
 });
 router.post('/users/action/edit/', function(req, res, next) {
     // save new user and redirect to edit user
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // get user data
         var user_data = {
             user_id: '',
@@ -1692,7 +1692,7 @@ router.post('/users/action/edit/', function(req, res, next) {
 });
 router.get('/users/action/edit/:user_id/', function(req, res, next) {
     // get user with id and return user info with data to edit
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // get user data
         var user_id = req.params.user_id;
         e5ojs_user.e5ojs_user_get(user_id, function(user_result_data) {
@@ -1721,7 +1721,7 @@ router.get('/users/action/edit/:user_id/', function(req, res, next) {
 });
 router.post('/users/action/edit/:user_id/', function(req, res, next) {
     // update user data
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
 
         var user_data = {
             user_id: parseInt(req.params.user_id),
@@ -1774,7 +1774,7 @@ router.get('/users/action/:user_action/:user_ids/', function(req, res, next) {
     console.log("user_status_action",user_status_action);
     console.log("user_ids",user_ids);
     // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
 
         if( user_status_action == 1 || user_status_action == 0 ) {
             // update post status
@@ -1819,7 +1819,7 @@ router.get('/users/action/:user_action/:user_ids/', function(req, res, next) {
 
 router.get('/settings/', function(req, res, next) {
     // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // get settings
         e5ojs_settings.e5ojs_settings_get_all(function(result_settings){
             var settings_data = {};
@@ -1841,7 +1841,7 @@ router.get('/settings/', function(req, res, next) {
 router.post('/settings/', function(req, res, next) {
     // for save config settings
     // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // get vars to save
         var settings = [];
         // site settings
@@ -1957,7 +1957,7 @@ router.post('/settings/', function(req, res, next) {
 /* start e5ojs admin pages routers */
 router.get('/media/', function(req, res, next) {
     // get page with validate session
-    e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+    e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
         // return template with user data
         // e5ojs_global_data  and e5ojs_user_data default
         //console.log("ADMIN",e5ojs_global_data.admin_pages.admin_post_types);
@@ -2064,7 +2064,7 @@ router.get('/search/', function(req, res, next) {
     // get page with validate session
     var search_word = req.param('search','');
     if( search_word !== 'undefined' && search_word.length > 1 ) {
-        e5ojs_validate_admin_session_callback(req, res, function(user_data) {
+        e5ojs_session.e5ojs_validate_admin_session_callback(req, res, function(user_data) {
             e5ojs_search.search(search_word, function(result_search){
                 res.render('back-end/e5ojs-search-result', { page_data: e5ojs_global_data.admin_pages['search'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:user_data.e5ojs_user_data[0], result_search:result_search });
             });
@@ -2152,136 +2152,6 @@ router.get('/search/', function(req, res, next) {
 
 
 
-/* ============== start e5ojs validate session functions =============== */
-
-function e5ojs_validate_admin_session_callback(req, res, callback) {
-    // get session vars
-    var e5ojs_session = req.session;
-    if( e5ojs_session !== 'undefined' && typeof e5ojs_session.e5ojs_user_data !== 'undefined' && e5ojs_session.e5ojs_user_data != null ) {
-        // session vars exists
-        // get session user data
-        var user_login = e5ojs_session.e5ojs_user_data.user_login;
-        var user_pass = e5ojs_session.e5ojs_user_data.user_pass;
-        // ask to DB for this user credentials
-        e5ojs_get_user_info_callback(user_login,user_pass,use_md5=false,function(user_data){
-            // validate request user db result
-            // get menu data as post types data routers
-            //e5ojs_global_data_init(); // init global object data
-            e5ojs_init(function(){
-
-                if( user_data.result_login ) {
-                    // user credentials are ok
-                    // save user data on session var
-                    var e5ojs_session = req.session;
-                    e5ojs_session.e5ojs_user_data = user_data.e5ojs_user_data[0];
-                    user_data.e5ojs_user_data[0].user_avatar_url = "http://nodejs.dev/back-end/assets/default-profile-image.jpg";
-                    user_data.e5ojs_user_data[0].user_bkg_url = "http://nodejs.dev/back-end/assets/profile-menu.jpg";
-                    // return status and user info
-                    // get user avatar and wallpaper
-                    var user_avatar_media_id = e5ojs_session.e5ojs_user_data.user_avatar_media_id;
-                    var user_bkg_media_id = e5ojs_session.e5ojs_user_data.user_bkg_media_id;
-                    e5ojs_media.e5ojs_media_api_get_media(media_ids=[user_avatar_media_id,user_bkg_media_id], function(media_data_result){
-                        for( media_key in media_data_result ) {
-                            if( user_avatar_media_id == media_data_result[media_key].media_id ) {
-                                ext = media_data_result[media_key].media_mime_type.split("/");
-                                user_data.e5ojs_user_data[0].user_avatar_url = e5ojs_global_data.admin_res.media_uploads_sizes_url+media_data_result[media_key].media_file_name_clean+"-150x150."+ext[1];
-                            }
-                            if( user_bkg_media_id == media_data_result[media_key].media_id ) {
-                                ext = media_data_result[media_key].media_mime_type.split("/");
-                                user_data.e5ojs_user_data[0].user_bkg_url = e5ojs_global_data.admin_res.media_uploads_sizes_url+media_data_result[media_key].media_file_name_clean+"-300x150."+ext[1];
-                            }
-                        }
-                        callback(user_data);
-                    });
-                } else {
-                    // user not found or user credentials not match
-                    // clear session data
-                    var e5ojs_session = req.session;
-                    e5ojs_session.e5ojs_user_data = null;
-                    e5ojs_session.destroy();
-                    // render login page
-                    res.render('back-end/e5ojs-login', { page_data: e5ojs_global_data.admin_other_pages['login'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:null });
-                }
-
-            });
-        });
-    } else {
-        // session vars does not exists
-        // check for post vars
-        var user_login = req.body.user_login;
-        var user_pass = req.body.user_pass;
-        // validate for empty vars on body = {}
-        if( req.body != null ) {
-            // ask to DB for this user credentials
-            e5ojs_get_user_info_callback(user_login,user_pass,use_md5=true,function(user_data){
-                // validate request user db result
-                if( user_data.result_login ) {
-                    // user credentials are ok
-                    // save user data on session var
-                    var e5ojs_session = req.session;
-                    e5ojs_session.e5ojs_user_data = user_data.e5ojs_user_data[0];
-
-                    user_data.e5ojs_user_data[0].user_avatar_url = "http://nodejs.dev/back-end/assets/default-profile-image.jpg";
-                    user_data.e5ojs_user_data[0].user_bkg_url = "http://nodejs.dev/back-end/assets/profile-menu.jpg";
-                    // return status and user info
-                    // get user avatar and wallpaper
-                    var user_avatar_media_id = e5ojs_session.e5ojs_user_data.user_avatar_media_id;
-                    var user_bkg_media_id = e5ojs_session.e5ojs_user_data.user_bkg_media_id;
-                    e5ojs_media.e5ojs_media_api_get_media(media_ids=[user_avatar_media_id,user_bkg_media_id], function(media_data_result){
-                        for( media_key in media_data_result ) {
-                            if( user_avatar_media_id == media_data_result[media_key].media_id ) {
-                                ext = media_data_result[media_key].media_mime_type.split("/");
-                                user_data.e5ojs_user_data[0].user_avatar_url = e5ojs_global_data.admin_res.media_uploads_sizes_url+media_data_result[media_key].media_file_name_clean+"-150x150."+ext[1];
-                            }
-                            if( user_bkg_media_id == media_data_result[media_key].media_id ) {
-                                ext = media_data_result[media_key].media_mime_type.split("/");
-                                user_data.e5ojs_user_data[0].user_bkg_url = e5ojs_global_data.admin_res.media_uploads_sizes_url+media_data_result[media_key].media_file_name_clean+"-300x150."+ext[1];
-                            }
-                        }
-                        callback(user_data);
-                    });
-                } else {
-                    // user not found or user credentials not match
-                    // clear session data
-                    var e5ojs_session = req.session;
-                    e5ojs_session.e5ojs_user_data = null;
-                    e5ojs_session.destroy();
-                    // render login page
-                    res.render('back-end/e5ojs-login', { page_data: e5ojs_global_data.admin_other_pages['login'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:null });
-                }
-            });
-        } else {
-            // clear session
-            var e5ojs_session = req.session;
-            e5ojs_session.e5ojs_user_data = null;
-            e5ojs_session.destroy();
-            // render login page
-            res.render('back-end/e5ojs-login', { page_data: e5ojs_global_data.admin_other_pages['login'], e5ojs_global_data:e5ojs_global_data, e5ojs_user_data:null });
-        }
-    }
-}
-
-function e5ojs_get_user_info_callback(user_login,user_pass,use_md5,callback) {
-    // get post user data
-    var user_login = user_login;
-    var user_pass = ((use_md5)?md5(user_pass):user_pass); // admin = 21232f297a57a5a743894a0e4a801fc3
-    // request user on DB
-    db.e5ojs_user.find({'user_login':user_login,'user_pass':user_pass}, function(err, user){
-        if( err ) {
-            callback({ result_login:0, error:err });
-        } else {
-            if( user.length ) {
-                // user exists and it will be returned
-                callback({ result_login:1, e5ojs_user_data:user, error:err });
-            } else {
-                // user data does not exists on DB
-                callback({ result_login:0, error:err });
-            }
-        }
-    });
-}
-
-/* ============== end e5ojs validate session functions =============== */
 
 
 
