@@ -43,7 +43,7 @@ exports.e5ojs_get_media = function e5ojs_get_media(media_ids,callback) {
     }
     var media_ids_array = media_ids.split(",");
     var media_ids = [];
-    for( media_key in media_ids_array ) {
+    for( var media_key in media_ids_array ) {
         media_ids.push(parseInt(media_ids_array[media_key]));
     }
     db.e5ojs_media.find({'media_id':{$in:media_ids}},function(err, media_data){

@@ -27,7 +27,7 @@ exports.e5ojs_user_insert = function e5ojs_user_insert(user_data, callback) {
 }
 exports.e5ojs_valid_user_email = function e5ojs_valid_user_email(user_login,user_email, callback) {
     db.e5ojs_user.find({'user_login':user_login,'user_email':user_email}).count(function(q_req, q_res, q_next){
-        total_find = parseInt(q_res);
+        var total_find = parseInt(q_res);
         callback(total_find);
     });
 }
@@ -51,11 +51,11 @@ exports.e5ojs_change_user_status_multiple = function e5ojs_change_user_status_mu
             callback({ok:0});
         } else {
             if( result_data.nModified > 0 ) {
-                e5ojs_config.e5ojs_init(function(){
+                e5ojs_init(function(){
                     callback({status:1});
                 });
             } else {
-                e5ojs_config.e5ojs_init(function(){
+                e5ojs_init(function(){
                     callback({status:0});
                 });
             }
@@ -73,11 +73,11 @@ exports.e5ojs_remove_user_status_multiple = function e5ojs_remove_user_status_mu
             callback({ok:0});
         } else {
             if( result_data.nModified > 0 ) {
-                e5ojs_config.e5ojs_init(function(){
+                e5ojs_init(function(){
                     callback({status:1});
                 });
             } else {
-                e5ojs_config.e5ojs_init(function(){
+                e5ojs_init(function(){
                     callback({status:0});
                 });
             }

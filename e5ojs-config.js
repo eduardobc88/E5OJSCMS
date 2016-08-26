@@ -7,6 +7,7 @@ let e5ojs_config = {
     e5ojs_host_url: "http://nodejs.dev",
     e5ojs_refresh_router: false,
     e5ojs_global_data: {},
+    e5ojs_router : [],
 };
 
 // fill e5ojs admin tree
@@ -92,25 +93,3 @@ e5ojs_config.e5ojs_global_data.admin_api = {
     e5ojs_media_api: e5ojs_config.e5ojs_host_url+'/admin/e5ojs-media-api/page/',
 };
 module.exports = e5ojs_config;
-
-
-
-
-
-module.exports.e5ojs_init = function e5ojs_init(callback) {
-    // load all post types
-    e5ojs_config.e5ojs_global_data.admin_pages.admin_post_types = new Array();
-    e5ojs_post_type_get_all(function(post_types){
-        // fix post type info
-        for( var post_type_key in post_types ) {
-            var post_type = post_types[post_type_key];
-            e5ojs_config.e5ojs_global_data.admin_pages.admin_post_types[post_type.post_type_name] = {post_type_id:post_type.post_type_id,title:post_type.post_type_title,description:post_type.post_type_description,url:e5ojs_global_data.admin_res.base_url+"/admin/post-type/"+post_type.post_type_name+"/", icon_name:"insert_drive_file"};
-        }
-        // set router for each post type
-        for( var key in post_types ) {
-            var post_type = post_types[key];
-            e5ojs_add_post_type_router(post_type);
-        }
-        callback();
-    });
-}

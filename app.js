@@ -4,15 +4,15 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
-var front_end = require('./controller/front-end');
-var back_end = require('./controller/back-end');
-var api = require('./controller/api');
 var session = require("express-session");
 
 
 // e5ojs global settings
 var e5ojs_settings = require("./e5ojs-config.js");
+// index router files
+var front_end = require('./controller/front-end');
+var back_end = require('./controller/back-end');
+var api = require('./controller/api');
 
 
 /*
