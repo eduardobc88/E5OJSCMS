@@ -4,6 +4,7 @@ console.log(file_name,"Module loaded...");
 
 // e5ojs start local requires settings
 var e5ojs_config = require("../e5ojs-config.js");
+var e5ojs_init = require("../model/e5ojs-init.js");
 // e5ojs end local requires settings
 
 
@@ -51,11 +52,11 @@ exports.e5ojs_change_user_status_multiple = function e5ojs_change_user_status_mu
             callback({ok:0});
         } else {
             if( result_data.nModified > 0 ) {
-                e5ojs_init(function(){
+                e5ojs_init.e5ojs_init(function(){
                     callback({status:1});
                 });
             } else {
-                e5ojs_init(function(){
+                e5ojs_init.e5ojs_init(function(){
                     callback({status:0});
                 });
             }
@@ -73,11 +74,11 @@ exports.e5ojs_remove_user_status_multiple = function e5ojs_remove_user_status_mu
             callback({ok:0});
         } else {
             if( result_data.nModified > 0 ) {
-                e5ojs_init(function(){
+                e5ojs_init.e5ojs_init(function(){
                     callback({status:1});
                 });
             } else {
-                e5ojs_init(function(){
+                e5ojs_init.e5ojs_init(function(){
                     callback({status:0});
                 });
             }

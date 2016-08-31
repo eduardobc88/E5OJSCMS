@@ -59,8 +59,9 @@ exports.e5ojs_validate_admin_session_callback = function e5ojs_validate_admin_se
                     // save user data on session var
                     var e5ojs_session = req.session;
                     e5ojs_session.e5ojs_user_data = user_data.e5ojs_user_data[0];
-                    user_data.e5ojs_user_data[0].user_avatar_url = "http://nodejs.dev/back-end/assets/default-profile-image.jpg";
-                    user_data.e5ojs_user_data[0].user_bkg_url = "http://nodejs.dev/back-end/assets/profile-menu.jpg";
+
+                    user_data.e5ojs_user_data[0].user_avatar_url = e5ojs_global_data.admin_res.assets_url+"default-profile-image.jpg";
+                    user_data.e5ojs_user_data[0].user_bkg_url = e5ojs_global_data.admin_res.assets_url+"profile-menu.jpg";
                     // return status and user info
                     // get user avatar and wallpaper
                     var user_avatar_media_id = e5ojs_session.e5ojs_user_data.user_avatar_media_id;
@@ -108,8 +109,8 @@ exports.e5ojs_validate_admin_session_callback = function e5ojs_validate_admin_se
                     var e5ojs_session = req.session;
                     e5ojs_session.e5ojs_user_data = user_data.e5ojs_user_data[0];
 
-                    user_data.e5ojs_user_data[0].user_avatar_url = "http://nodejs.dev/back-end/assets/default-profile-image.jpg";
-                    user_data.e5ojs_user_data[0].user_bkg_url = "http://nodejs.dev/back-end/assets/profile-menu.jpg";
+                    user_data.e5ojs_user_data[0].user_avatar_url = e5ojs_global_data.admin_res.assets_url+"default-profile-image.jpg";
+                    user_data.e5ojs_user_data[0].user_bkg_url = e5ojs_global_data.admin_res.assets_url+"profile-menu.jpg";
                     // return status and user info
                     // get user avatar and wallpaper
                     var user_avatar_media_id = e5ojs_session.e5ojs_user_data.user_avatar_media_id;

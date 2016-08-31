@@ -1,11 +1,18 @@
+/* start requeriments */
+
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+var cookie_parser = require('cookie-parser');
+var body_parser = require('body-parser');
 var session = require("express-session");
+var mongo_store = require('connect-mongo')(session);
 
+/* end requeriments */
+
+
+/* start local app requeriments */
 
 // e5ojs global settings
 var e5ojs_settings = require("./e5ojs-config.js");
@@ -14,48 +21,60 @@ var front_end = require('./controller/front-end');
 var back_end = require('./controller/back-end');
 var api = require('./controller/api');
 
+/* end local app requeriments */
 
-/*
-for mongodb backup data use:
-mongodump
-mongorestore file_path
-in terminal.
-The backup will be created on current terminal location on dump/ Folder
-*/
+
+
+
+
 
 
 // init express
 var app = express();
 
-// view engine setup
+/* start confifure express app */
+
+// set view engine setup
 app.set('views', path.join(__dirname, 'view'));
 app.set('view engine', 'pug');
 
-// uncomment after placing your favicon in /public
+// set favicon
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 
-app.use(bodyParser.json({limit: '2mb'})); // check limit file size on nginx config too
-app.use(bodyParser.urlencoded({ extended: false, limit: '2mb' }));
-app.use(cookieParser());
-app.use(session({resave: false, saveUninitialized: true, secret: 'E5OA5A', cookie: { secure: false, maxAge: 6000000 }})); // express session
+// check limit file size on nginx config too
+app.use(body_parser.json({limit: '2mb'}));
+app.use(body_parser.urlencoded({ extended: false, limit: '2mb' }));
+app.use(cookie_parser());
+// set session mongo store
+app.use(session({
+     secret: 'E5OA5A',
+     store: new mongo_store({url:'mongodb://localhost:27017/e5ojs_db'}),
+     resave: false,
+     saveUninitialized: true
+}));
+//app.use(session({resave: false, saveUninitialized: true, secret: 'E5OA5A', cookie: { secure: false, maxAge: 6000000 }})); // express session
+
+// set public dir
 app.use(express.static(path.join(__dirname, 'public')));
 
-//  root controller for different access
+// set dir for template, admin and api
 app.use('/', front_end);
 app.use('/admin', back_end);
 app.use('/api', api);
 
-// catch 404 and forward to error handler
+/* end confifure express app */
+
+
+/* start error handler */
+
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
     //res.render('error', { title: 'Error 404!', description_err:"Not Found" });
     next(err);
 });
-
 // error handlers
-
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
@@ -67,7 +86,6 @@ if (app.get('env') === 'development') {
         });
     });
 }
-
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
@@ -77,6 +95,10 @@ app.use(function(err, req, res, next) {
         error: {}
     });
 });
+
+/* end error handler */
+
+
 
 
 module.exports = app;

@@ -82,6 +82,7 @@ e5ojs_config.e5ojs_global_data.admin_actions = {
 e5ojs_config.e5ojs_global_data.admin_res = {
     base_url: e5ojs_config.e5ojs_host_url,
     current_url: e5ojs_config.e5ojs_host_url,
+    assets_url: e5ojs_config.e5ojs_host_url+'/back-end/assets/',
     media_uploads_url: e5ojs_config.e5ojs_host_url+'/uploads/',
     media_uploads_sizes_url: e5ojs_config.e5ojs_host_url+'/uploads/sizes/',
     media_default_image_url: e5ojs_config.e5ojs_host_url+'/back-end/assets/default-post-img.png',
