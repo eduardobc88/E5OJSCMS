@@ -1,10 +1,22 @@
 #!/usr/bin/env node
 
+/*
+
+FOR CLUSTER APP USE PM2 MODULE
+INIT APP WITH PM2
+#pm2 start bin/www -i number_process_child --watch // in case of you change some code from the app and you want reload the server app
+SCALING THE APP USING THE APP NAME
+#pm2 scale app_name number_process_child
+FOR MONITOR THE APP USE
+#pm2 monit
+
+IN CASE OF PM2 NOT FUNCTION ON THE SERVER, YOU CAN USE INSTEAD OF PM2 USE cluster MODULE FROM NODE.JS AND IMLEMENT HERE...
+*/
+
+
 /**
 * Module dependencies.
 */
-var cluster = require('cluster');
-
 var app = require('../app');
 var debug = require('debug')('e5ojs:server');
 var http = require('http');
@@ -12,48 +24,21 @@ var http = require('http');
 
 
 
-
-
-// Code to run if we're in the master process
-if (cluster.isMaster) {
-
-    // Count the machine's CPUs
-    var cpuCount = require('os').cpus().length;
-
-    // Create a worker for each CPU
-    for (var i = 0; i < cpuCount; i += 1) {
-        cluster.fork();
-    }
-
-    // Listen for dying workers
-    cluster.on('exit', function (worker) {
-
-        // Replace the dead worker, we're not sentimental
-        console.log('Worker %d died :(', worker.id);
-        cluster.fork();
-
-    });
-
-    // Code to run if we're in a worker process
-} else {
-
-    /**
-    * Get port from environment and store in Express.
-    */
-    var port = normalizePort(process.env.PORT || '5000');
-    app.set('port', port);
-    /**
-    * Create HTTP server.
-    */
-    var server = http.createServer(app);
-    /**
-    * Listen on provided port, on all network interfaces.
-    */
-    server.listen(port);
-    server.on('error', onError);
-    server.on('listening', onListening);
-}
-
+/**
+* Get port from environment and store in Express.
+*/
+var port = normalizePort(process.env.PORT || '5000');
+app.set('port', port);
+/**
+* Create HTTP server.
+*/
+var server = http.createServer(app);
+/**
+* Listen on provided port, on all network interfaces.
+*/
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
 
 
 /**
@@ -85,15 +70,15 @@ function onError(error) {
     // handle specific listen errors with friendly messages
     switch (error.code) {
         case 'EACCES':
-        console.error(bind + ' requires elevated privileges');
-        process.exit(1);
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
         break;
         case 'EADDRINUSE':
-        console.error(bind + ' is already in use');
-        process.exit(1);
+            console.error(bind + ' is already in use');
+            process.exit(1);
         break;
         default:
-        throw error;
+            throw error;
     }
 }
 /**
