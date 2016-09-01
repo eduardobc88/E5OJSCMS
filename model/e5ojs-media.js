@@ -9,9 +9,8 @@ var e5ojs_config = require("../e5ojs-config.js");
 
 // MD5
 var md5 = require('md5');
-// mongojs
-var mongojs = require('mongojs');
-var db = mongojs("e5ojs_db");
+// mongodb
+var e5ojs_db = require('../config/e5ojs-mongodb.js');
 
 
 // get global data from config
@@ -22,7 +21,7 @@ var e5ojs_global_data = e5ojs_config.e5ojs_global_data;
 
 /* start media DB function */
 exports.e5ojs_get_all_media = function e5ojs_get_all_media(callback) {
-    db.e5ojs_media.find({},function(err, media_data){
+    e5ojs_db.e5ojs_media.find({},function(err, media_data){
         // validate error
         if( err ) {
             callback(false);
@@ -32,7 +31,7 @@ exports.e5ojs_get_all_media = function e5ojs_get_all_media(callback) {
     });
 }
 exports.e5ojs_insert_new_media = function e5ojs_insert_new_media(post_data,callback) {
-    db.e5ojs_media.insert(post_data,function(err, result_data){
+    e5ojs_db.e5ojs_media.insert(post_data,function(err, result_data){
         // validate error
         callback(result_data);
     });
@@ -46,7 +45,7 @@ exports.e5ojs_get_media = function e5ojs_get_media(media_ids,callback) {
     for( var media_key in media_ids_array ) {
         media_ids.push(parseInt(media_ids_array[media_key]));
     }
-    db.e5ojs_media.find({'media_id':{$in:media_ids}},function(err, media_data){
+    e5ojs_db.e5ojs_media.find({'media_id':{$in:media_ids}},function(err, media_data){
         if( err ) {
             callback(false);
         } else {
@@ -66,7 +65,7 @@ exports.e5ojs_get_media = function e5ojs_get_media(media_ids,callback) {
 /* start Media API DB functions */
 
 exports.e5ojs_media_api_get_media = function e5ojs_media_api_get_media(media_ids, callback) {
-    db.e5ojs_media.find({'media_id':{$in:media_ids}},function(err, media_result){
+    e5ojs_db.e5ojs_media.find({'media_id':{$in:media_ids}},function(err, media_result){
         if( err )
             callback([]);
         else
@@ -74,7 +73,7 @@ exports.e5ojs_media_api_get_media = function e5ojs_media_api_get_media(media_ids
     });
 }
 exports.e5ojs_media_api_delete_media = function e5ojs_media_api_delete_media(media_ids, callback) {
-    db.e5ojs_media.remove({'media_id':{$in:media_ids}},function(err, result_media_delete){
+    e5ojs_db.e5ojs_media.remove({'media_id':{$in:media_ids}},function(err, result_media_delete){
         if( err )
             callback([]);
         else

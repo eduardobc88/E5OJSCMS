@@ -4,15 +4,11 @@ console.log(file_name,"Module loaded...");
 
 /* ============== start e5ojs requires ============== */
 
-
 // expressjs for routers
 var express = require('express');
 var router = express.Router();
 // MD5
 var md5 = require('md5');
-// mongojs
-var mongojs = require('mongojs');
-var db = mongojs("e5ojs_db");
 // format date
 var date_format = require('dateformat');
 var current_date = new Date();
@@ -24,6 +20,8 @@ var getSlug = require('speakingurl');
 var multer = require('multer');
 
 
+// mongodb
+var e5ojs_db = require('../config/e5ojs-mongodb.js');
 
 
 // e5ojs start local requires settings
@@ -431,13 +429,13 @@ router.get('/page/:page_status/page/:number_page/', function(req, res, next) {
         var current_page = req.params.number_page;
 
         // total pages
-        db.e5ojs_page.find({'page_status':{$in:post_status_array}}).sort({'post_page_id':-1}).count(function(q_req, q_res, q_next){
+        e5ojs_db.e5ojs_page.find({'page_status':{$in:post_status_array}}).sort({'post_page_id':-1}).count(function(q_req, q_res, q_next){
             total_post = parseInt(q_res);
             total_pages = parseInt(total_post/limit_post);
-            total_pages = (( total_pages == 0 )?1:parseInt(total_pages)+parseInt(total_post%limit_post));
+            total_pages = (( total_pages == 0 )?1:parseInt(total_pages)+((parseInt(total_post%limit_post) > 0)?2:1));
         });
         // query with skip page
-        db.e5ojs_page.find({'page_status':{$in:post_status_array}}).sort({'post_type_id':-1}).skip(skip_posts).limit(limit_post, function(err, pages_data){
+        e5ojs_db.e5ojs_page.find({'page_status':{$in:post_status_array}}).sort({'post_type_id':-1}).skip(skip_posts).limit(limit_post, function(err, pages_data){
             // get pagination
             var e5ojs_pagination = e5ojs_base_pagination.e5ojs_get_pagination(total_pages,current_page,total_post,base_url=e5ojs_global_data.admin_pages['pages'].url+post_status+"/");
             // get session message
@@ -1016,13 +1014,13 @@ router.get('/post-types/:post_type_status/page/:number_page/', function(req, res
         var total_post = 0;
 
         // total pages
-        db.e5ojs_post_type.find({'post_type_status':{$in:post_status_array}}).sort({'post_type_id':-1}).count(function(q_req, q_res, q_next){
+        e5ojs_db.e5ojs_post_type.find({'post_type_status':{$in:post_status_array}}).sort({'post_type_id':-1}).count(function(q_req, q_res, q_next){
             total_post = parseInt(q_res);
             total_pages = parseInt(total_post/limit_post);
-            total_pages = (( total_pages == 0 )?1:parseInt(total_pages)+parseInt(total_post%limit_post));
+            total_pages = (( total_pages == 0 )?1:parseInt(total_pages)+((parseInt(total_post%limit_post) > 0)?2:1));
         });
         // query with skip page
-        db.e5ojs_post_type.find({'post_type_status':{$in:post_status_array}}).sort({'post_type_id':-1}).skip(skip_posts).limit(limit_post, function(err, post_types){
+        e5ojs_db.e5ojs_post_type.find({'post_type_status':{$in:post_status_array}}).sort({'post_type_id':-1}).skip(skip_posts).limit(limit_post, function(err, post_types){
             // get pagination
             var e5ojs_pagination = e5ojs_base_pagination.e5ojs_get_pagination(total_pages,current_page,total_post,base_url=e5ojs_global_data.admin_pages['post_type'].url+post_type_status+"/");
             // get session message
@@ -1085,13 +1083,13 @@ router.get('/users/:user_status/page/:number_page/', function(req, res, next) {
         var total_post = 0;
 
         // total pages
-        db.e5ojs_user.find({'user_status':{$in:post_status_array}}).sort({'user_id':-1}).count(function(q_req, q_res, q_next){
+        e5ojs_db.e5ojs_user.find({'user_status':{$in:post_status_array}}).sort({'user_id':-1}).count(function(q_req, q_res, q_next){
             total_post = parseInt(q_res);
             total_pages = parseInt(total_post/limit_post);
-            total_pages = (( total_pages == 0 )?1:parseInt(total_pages)+parseInt(total_post%limit_post));
+            total_pages = (( total_pages == 0 )?1:parseInt(total_pages)+((parseInt(total_post%limit_post) > 0)?2:1));
         });
         // query with skip page
-        db.e5ojs_user.find({'user_status':{$in:post_status_array}}).sort({'user_id':-1}).skip(skip_posts).limit(limit_post, function(err, users_data){
+        e5ojs_db.e5ojs_user.find({'user_status':{$in:post_status_array}}).sort({'user_id':-1}).skip(skip_posts).limit(limit_post, function(err, users_data){
             // get pagination
             var e5ojs_pagination = e5ojs_base_pagination.e5ojs_get_pagination(total_pages,current_page,total_post,base_url=e5ojs_global_data.admin_pages['users'].url+user_status+"/");
             // get session message
@@ -1476,13 +1474,13 @@ router.get('/e5ojs-media-api/page/:number_page/', function(req, res, next){
     var current_page = number_page;
 
     // total pages
-    db.e5ojs_media.find({}).sort({'media_date':-1}).count(function(q_req, q_res, q_next){
+    e5ojs_db.e5ojs_media.find({}).sort({'media_date':-1}).count(function(q_req, q_res, q_next){
         total_post = parseInt(q_res);
         total_pages = parseInt(total_post/limit_post);
-        total_pages = (( total_pages == 0 )?1:parseInt(total_pages)+parseInt(total_post%limit_post));
+        total_pages = (( total_pages == 0 )?1:parseInt(total_pages)+((parseInt(total_post%limit_post) > 0)?2:1));
     });
     // query with skip page
-    db.e5ojs_media.find({}).skip(skip_posts).limit(limit_post, function(err, pages_data){
+    e5ojs_db.e5ojs_media.find({}).skip(skip_posts).limit(limit_post, function(err, pages_data){
         // get pagination
         var e5ojs_pagination = e5ojs_base_pagination.e5ojs_get_pagination(total_pages,current_page,total_post,base_url=e5ojs_global_data.admin_pages['media'].url);
         // get media sizes

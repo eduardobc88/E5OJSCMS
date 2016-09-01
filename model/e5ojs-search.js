@@ -6,9 +6,8 @@ console.log(file_name,"Module loaded...");
 var e5ojs_config = require("../e5ojs-config.js");
 // e5ojs end local requires settings
 
-// mongojs
-var mongojs = require('mongojs');
-var db = mongojs("e5ojs_db");
+// mongodb
+var e5ojs_db = require('../config/e5ojs-mongodb.js');
 
 
 
@@ -21,9 +20,9 @@ var db = mongojs("e5ojs_db");
 /* start SEARCH DB functions */
 exports.search = function search(key_words, callback) {
     // before this you need indexes the each documents
-    // db.e5ojs_page.createIndex({"page_title":"text"})
+    // e5ojs_db.e5ojs_page.createIndex({"page_title":"text"})
     var result_search = [];
-    db.e5ojs_page.find({$text: {$search:key_words} }, function(err, page_result){
+    e5ojs_db.e5ojs_page.find({$text: {$search:key_words} }, function(err, page_result){
         if( page_result.length > 0 ) {
             for( var page_key in page_result ) {
                 result_search.push( {
@@ -34,13 +33,13 @@ exports.search = function search(key_words, callback) {
             }
         }
         // get post types
-        db.e5ojs_post_type.find({},function(err, post_types_result){
+        e5ojs_db.e5ojs_post_type.find({},function(err, post_types_result){
             var post_types = [];
             for( post_type_key in post_types_result ) {
                 post_types.push({post_type_id:post_types_result[post_type_key].post_type_id, slug:post_types_result[post_type_key].post_type_slug});
             }
             // get posts
-            db.e5ojs_post.find({$text: {$search:key_words} }, function(err, post_result){
+            e5ojs_db.e5ojs_post.find({$text: {$search:key_words} }, function(err, post_result){
                 if( post_result.length > 0 ) {
                     for( var post_key in post_result ) {
                         for( var pp_key in post_types ) {

@@ -8,9 +8,8 @@ var router = express.Router();
 // format date
 var date_format = require('dateformat');
 var current_date = new Date();
-// mongojs
-var mongojs = require('mongojs');
-var db = mongojs("e5ojs_db");// choose DB
+// mongodb
+var e5ojs_db = require('../config/e5ojs-mongodb.js');
 
 /* ============== end e5ojs requires ============== */
 
@@ -159,7 +158,7 @@ e5ojs_global_data_init();
 function e5ojs_generate_routers_for_pages() {
     // remove routers
     // get all publish pages
-    db.e5ojs_page.find({'page_status':'publish'}, function(err, e5ojs_pages_result){
+    e5ojs_db.e5ojs_page.find({'page_status':'publish'}, function(err, e5ojs_pages_result){
         if( e5ojs_pages_result.length ) {
             // generate router for each page
             for( var key_page in e5ojs_pages_result ){
@@ -172,7 +171,7 @@ function e5ojs_generate_routers_for_pages() {
 function e5ojs_generate_routers_for_post_types() {
     // remove routers
     // get all publish post types
-    db.e5ojs_post_type.find({'post_type_status':1}, function(err, e5ojs_post_types_result){
+    e5ojs_db.e5ojs_post_type.find({'post_type_status':1}, function(err, e5ojs_post_types_result){
         if( e5ojs_post_types_result.length ) {
             // generate router for each page
             for( var key_post_type in e5ojs_post_types_result ){
@@ -329,9 +328,9 @@ function e5ojs_generate_router_post_type(post_type_data) {
                 e5ojs_get_total_posts_by_post_type(post_type_id, function(total_post_result){
                     total_post = parseInt(total_post_result.total_post);
                     total_pages = parseInt(total_post/limit_post);
-                    total_pages = (( total_pages == 0 )?1:parseInt(total_pages)+parseInt(total_post%limit_post));
+                    total_pages = (( total_pages == 0 )?1:parseInt(total_pages)+((parseInt(total_post%limit_post) > 0)?2:1));
                     // query with skip page
-                    db.e5ojs_post.find({'post_status':'publish','post_post_type_id':parseInt(post_type_id)}).sort({'post_date':-1,'post_id':-1}).skip(skip_posts).limit(limit_post, function(err, posts){
+                    e5ojs_db.e5ojs_post.find({'post_status':'publish','post_post_type_id':parseInt(post_type_id)}).sort({'post_date':-1,'post_id':-1}).skip(skip_posts).limit(limit_post, function(err, posts){
                         // get pagination
                         var e5ojs_pagination = e5ojs_get_pagination(total_pages,current_page,total_post,base_url=e5ojs_global_data.res.base_url+"/"+post_type_name+"/");
                         // validate template name
@@ -480,7 +479,7 @@ if "new:false"  found object data but only update the passed fileds
 */
 
 function e5ojs_settings_get_all(callback) {
-    db.e5ojs_settings.find({},function(err, result_settings){
+    e5ojs_db.e5ojs_settings.find({},function(err, result_settings){
         if( err )
             callback(null);
         else
@@ -488,7 +487,7 @@ function e5ojs_settings_get_all(callback) {
     });
 }
 function e5ojs_page_get(page_id, callback) {
-    db.e5ojs_page.find({'page_id':parseInt(page_id)},function(err, result_page){
+    e5ojs_db.e5ojs_page.find({'page_id':parseInt(page_id)},function(err, result_page){
         if( err )
             callback(null);
         else
@@ -502,7 +501,7 @@ function e5ojs_page_get(page_id, callback) {
 
 
 function e5ojs_get_post_type_by_name(post_type_name, callback) {
-    db.e5ojs_post_type.find({'post_type_name':post_type_name},function(err,post_type_data){
+    e5ojs_db.e5ojs_post_type.find({'post_type_name':post_type_name},function(err,post_type_data){
         if( err )
             callback(null);
         else
@@ -511,7 +510,7 @@ function e5ojs_get_post_type_by_name(post_type_name, callback) {
 }
 function e5ojs_get_post_type_post_by_name(post_type_id, post_name ,callback) {
     // post_name: news/test-new
-    db.e5ojs_post.find({'post_post_type_id':parseInt(post_type_id),'post_name':post_name},function(err,post_data){
+    e5ojs_db.e5ojs_post.find({'post_post_type_id':parseInt(post_type_id),'post_name':post_name},function(err,post_data){
         if( err )
             callback(null);
         else
@@ -519,7 +518,7 @@ function e5ojs_get_post_type_post_by_name(post_type_id, post_name ,callback) {
     });
 }
 function e5ojs_get_total_posts_by_post_type(post_type_id, callback) {
-    db.e5ojs_post.find({'post_post_type_id':parseInt(post_type_id), 'post_status':'publish'}).count(function(err, total_result){
+    e5ojs_db.e5ojs_post.find({'post_post_type_id':parseInt(post_type_id), 'post_status':'publish'}).count(function(err, total_result){
         if( err )
             callback({err:err, total_post:parseInt(0)});
         else {
@@ -535,7 +534,7 @@ function e5ojs_get_total_posts_by_post_type(post_type_id, callback) {
 /* start get post meta by id page or post */
 
 function e5ojs_get_post_meta(post_id,callback) {
-    db.e5ojs_post_meta.find({'post_meta_post_id':parseInt(post_id)},function(err,post_meta_result){
+    e5ojs_db.e5ojs_post_meta.find({'post_meta_post_id':parseInt(post_id)},function(err,post_meta_result){
         if( err )
             callback(null);
         else

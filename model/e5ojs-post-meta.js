@@ -8,9 +8,8 @@ var e5ojs_counter = require('../model/e5ojs-counter.js');
 // e5ojs end local requires settings
 
 
-// mongojs
-var mongojs = require('mongojs');
-var db = mongojs("e5ojs_db");
+// mongodb
+var e5ojs_db = require('../config/e5ojs-mongodb.js');
 
 
 
@@ -70,7 +69,7 @@ exports.e5ojs_post_meta_fill_data = function e5ojs_post_meta_fill_data(post_meta
     });
 }
 exports.e5ojs_get_post_meta = function e5ojs_get_post_meta(post_id,callback) {
-    db.e5ojs_post_meta.find({'post_meta_post_id':parseInt(post_id)},function(err,post_meta_result){
+    e5ojs_db.e5ojs_post_meta.find({'post_meta_post_id':parseInt(post_id)},function(err,post_meta_result){
         if( err )
             callback(null);
         else
@@ -95,7 +94,7 @@ function e5ojs_update_post_meta_fill(post_meta_data,count_meta,total_meta,callba
     });
 }
 function e5ojs_update_post_meta_save(post_meta,callback) {
-    db.e5ojs_post_meta.update({'post_meta_id':parseInt(post_meta.post_meta_id),'post_meta_post_id':parseInt(post_meta.post_meta_post_id),'post_meta_name':post_meta.post_meta_name},{$set:{'post_meta_value':post_meta.post_meta_value}},{new:false},function(err,result_meta){
+    e5ojs_db.e5ojs_post_meta.update({'post_meta_id':parseInt(post_meta.post_meta_id),'post_meta_post_id':parseInt(post_meta.post_meta_post_id),'post_meta_name':post_meta.post_meta_name},{$set:{'post_meta_value':post_meta.post_meta_value}},{new:false},function(err,result_meta){
         if( err )
             callback(null);
         else
@@ -103,7 +102,7 @@ function e5ojs_update_post_meta_save(post_meta,callback) {
     });
 }
 function e5ojs_insert_post_meta_save(post_meta_data,callback) {
-    db.e5ojs_post_meta.insert(post_meta_data,function(err,result){
+    e5ojs_db.e5ojs_post_meta.insert(post_meta_data,function(err,result){
         if( err )
             callback(null);
         else

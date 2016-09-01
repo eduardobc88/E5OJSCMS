@@ -20,9 +20,8 @@ var e5ojs_media = require('../model/e5ojs-media.js');
 
 // MD5
 var md5 = require('md5');
-// mongojs
-var mongojs = require('mongojs');
-var db = mongojs("e5ojs_db");
+// mongodb
+var e5ojs_db = require('../config/e5ojs-mongodb.js');
 // generate slug from string
 var getSlug = require('speakingurl');
 // remove diacritics
@@ -92,13 +91,13 @@ exports.e5ojs_add_post_type_router = function e5ojs_add_post_type_router(post_ty
             var total_pages = 0;
             var current_page = req.params.page;
             // total pages
-            db.e5ojs_post.find({'post_status':{$in:post_status_array},'post_post_type_id':post_post_type_id}).count(function(q_req, q_res, q_next){
+            e5ojs_db.e5ojs_post.find({'post_status':{$in:post_status_array},'post_post_type_id':post_post_type_id}).count(function(q_req, q_res, q_next){
                 total_post = parseInt(q_res);
                 total_pages = parseInt(total_post/limit_post);
-                total_pages = (( total_pages == 0 )?1:parseInt(total_pages)+parseInt(total_post%limit_post));
+                total_pages = (( total_pages == 0 )?1:parseInt(total_pages)+((parseInt(total_post%limit_post) > 0)?2:1));
             });
             // query with skip page
-            db.e5ojs_post.find({'post_status':{$in:post_status_array},'post_post_type_id':post_post_type_id}).sort({'post_date':-1,'post_id':-1}).skip(skip_posts).limit(limit_post, function(err, posts){
+            e5ojs_db.e5ojs_post.find({'post_status':{$in:post_status_array},'post_post_type_id':post_post_type_id}).sort({'post_date':-1,'post_id':-1}).skip(skip_posts).limit(limit_post, function(err, posts){
                 // get pagination
                 var e5ojs_pagination = e5ojs_base_pagination.e5ojs_get_pagination(total_pages,current_page,total_post,post_type_info.url+post_status+"/");
                 // check if has message session
@@ -380,7 +379,7 @@ exports.e5ojs_add_post_type_router = function e5ojs_add_post_type_router(post_ty
             var post_media_attachment = req.body.post_media_id;
 
             // save new post on DB
-            //db.e5ojs_post.insert({post_id:});
+            //e5ojs_db.e5ojs_post.insert({post_id:});
             e5ojs_counter.e5ojs_get_next_id('post',function(data){
                 var next_id = data.seq;
                 // insert post data

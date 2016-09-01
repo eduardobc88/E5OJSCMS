@@ -6,9 +6,8 @@ console.log(file_name,"Module loaded...");
 var e5ojs_config = require("../e5ojs-config.js");
 // e5ojs end local requires settings
 
-// mongojs
-var mongojs = require('mongojs');
-var db = mongojs("e5ojs_db");
+// mongodb
+var e5ojs_db = require('../config/e5ojs-mongodb.js');
 
 
 
@@ -29,7 +28,7 @@ exports.e5ojs_settings_update = function e5ojs_settings_update(settings, setting
     });
 }
 exports.e5ojs_settings_get_by_id = function e5ojs_settings_get_by_id(settings_id, callback) {
-    db.e5ojs_settings.find({'settings_id':parseInt(settings_id)},function(err, result_settings){
+    e5ojs_db.e5ojs_settings.find({'settings_id':parseInt(settings_id)},function(err, result_settings){
         if( err )
             callback(null);
         else
@@ -37,7 +36,7 @@ exports.e5ojs_settings_get_by_id = function e5ojs_settings_get_by_id(settings_id
     });
 }
 exports.e5ojs_settings_get_all = function e5ojs_settings_get_all(callback) {
-    db.e5ojs_settings.find({},function(err, result_settings){
+    e5ojs_db.e5ojs_settings.find({},function(err, result_settings){
         if( err )
             callback(null);
         else
@@ -46,7 +45,7 @@ exports.e5ojs_settings_get_all = function e5ojs_settings_get_all(callback) {
 }
 // private function
 function e5ojs_settings_update_multiple(settings_id, settings_value, callback) {
-    db.e5ojs_settings.update({'settings_id':settings_id},{$set:{'settings_value':settings_value}},{new:false},function(err, result_settings){
+    e5ojs_db.e5ojs_settings.update({'settings_id':settings_id},{$set:{'settings_value':settings_value}},{new:false},function(err, result_settings){
         if( err )
             callback(null);
         else

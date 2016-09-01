@@ -14,7 +14,7 @@ exports.e5ojs_get_pagination = function e5ojs_get_pagination(total_pages, curren
         return e5ojs_pagintion;
     }
     for (var p = 1; p < total_pages; ++p) {
-        if( p >= (current_page-range) && p <= (current_page+range) ) {
+        if( p >= (parseInt(current_page)-parseInt(range)) && p <= (parseInt(current_page)+parseInt(range)) ) {
             e5ojs_pagintion[e5ojs_pagination_count++] = {url:base_url+'page/'+p+'/', number:p, current:((p==current_page)?'current':'')};
         }
     }

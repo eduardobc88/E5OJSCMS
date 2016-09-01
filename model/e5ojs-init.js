@@ -10,9 +10,8 @@ var e5ojs_post_type_router = require('../model/e5ojs-post-type-router.js');
 // e5ojs end local requires settings
 
 
-// mongojs
-var mongojs = require('mongojs');
-var db = mongojs("e5ojs_db");
+// mongodb
+//var e5ojs_db = require('../config/e5ojs-mongodb.js');
 
 
 

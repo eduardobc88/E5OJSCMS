@@ -10,9 +10,8 @@ var e5ojs_media = require('../model/e5ojs-media.js');
 
 // MD5
 var md5 = require('md5');
-// mongojs
-var mongojs = require('mongojs');
-var db = mongojs("e5ojs_db");
+// mongodb
+var e5ojs_db = require('../config/e5ojs-mongodb.js');
 
 
 // get global data from config
@@ -154,7 +153,7 @@ function e5ojs_get_user_info_callback(user_login,user_pass,use_md5,callback) {
     var user_login = user_login;
     var user_pass = ((use_md5)?md5(user_pass):user_pass); // admin = 21232f297a57a5a743894a0e4a801fc3
     // request user on DB
-    db.e5ojs_user.find({'user_login':user_login,'user_pass':user_pass}, function(err, user){
+    e5ojs_db.e5ojs_user.find({'user_login':user_login,'user_pass':user_pass}, function(err, user){
         if( err ) {
             callback({ result_login:0, error:err });
         } else {

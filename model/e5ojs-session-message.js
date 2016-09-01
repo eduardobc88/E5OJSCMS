@@ -12,9 +12,8 @@ var e5ojs_session = require('../model/e5ojs-session.js');
 
 // MD5
 var md5 = require('md5');
-// mongojs
-var mongojs = require('mongojs');
-var db = mongojs("e5ojs_db");
+// mongodb
+//var e5ojs_db = require('../config/e5ojs-mongodb.js');
 
 
 
