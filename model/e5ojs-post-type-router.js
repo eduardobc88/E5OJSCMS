@@ -80,7 +80,8 @@ exports.e5ojs_add_post_type_router = function e5ojs_add_post_type_router(post_ty
 
             // get posts
             // get total pages
-            var limit_post = 12;
+            var limit_post = e5ojs_config.e5ojs_admin_post_peer_page;
+            //console.log("============== limit_post =================",limit_post);
             var skip_posts = 0;
             var total_post = 0;
             if( parseInt(req.params.page) == 1 ) {

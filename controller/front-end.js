@@ -314,7 +314,7 @@ function e5ojs_generate_router_post_type(post_type_data) {
 
                 // get posts
                 // get total pages
-                var limit_post = 12;
+                var limit_post = e5ojs_config.e5ojs_theme_post_peer_page;
                 var skip_posts = 0;
                 var total_post = 0;
                 if( parseInt(number_page) == 1 ) {

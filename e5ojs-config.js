@@ -5,6 +5,9 @@ var current_date = new Date();
 
 let e5ojs_config = {
     e5ojs_host_url: "http://nodejs.dev",
+    e5ojs_admin_post_peer_page: 12,
+    e5ojs_theme_post_peer_page: 12,
+    e5ojs_refresh_admin_router: false,
     e5ojs_refresh_router: false,
     e5ojs_global_data: {},
     e5ojs_router : [],

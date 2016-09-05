@@ -22,6 +22,7 @@ exports.e5ojs_settings_update = function e5ojs_settings_update(settings, setting
         if( settings_count < settings.length ) {
             e5ojs_settings_update(settings, settings_count, callback); // only pass the callback instead of function to return to the init function call
         } else {
+            e5ojs_update_e5ojs_config(settings);
             // return callback
             callback(true);
         }
@@ -53,3 +54,24 @@ function e5ojs_settings_update_multiple(settings_id, settings_value, callback) {
     });
 }
 /* end settings function */
+
+/* start update settings global var */
+
+function e5ojs_update_e5ojs_config(settings) {
+    for( var settings_id in settings ) {
+        var setting_id = settings[settings_id].settings_id;
+        if( setting_id == 'settings_host_url' ) {
+            e5ojs_config.e5ojs_host_url = settings[settings_id].settings_value;
+        }
+        if( setting_id == 'settings_admin_posts_peer_page' ) {
+            e5ojs_config.e5ojs_admin_post_peer_page = settings[settings_id].settings_value;
+        }
+        if( setting_id == 'settings_posts_peer_page' ) {
+            e5ojs_config.e5ojs_theme_post_peer_page = settings[settings_id].settings_value;
+        }
+    }
+    e5ojs_config.e5ojs_refresh_admin_router = true;
+    //console.log( "========= global =========", e5ojs_config.e5ojs_global_data);
+}
+
+/* start end settings global var */

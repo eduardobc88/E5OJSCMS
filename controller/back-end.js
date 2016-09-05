@@ -60,7 +60,7 @@ var e5ojs_base_pagination = require('../model/e5ojs-pagination.js');
 
 /* ============== start e5ojs global var ============== */
 
-var host_url = e5ojs_config.e5ojs_host_url; // change for current host ip or domain
+//var host_url = e5ojs_config.e5ojs_host_url; // change for current host ip or domain
 var e5ojs_global_data = e5ojs_config.e5ojs_global_data; // contains all urls for admin
 // for image processing
 var e5ojs_image_sizes = new Array({width:150,height:150},{width:200,height:200},{width:300,height:150},{width:800,height:200});
@@ -169,12 +169,21 @@ e5ojs_init.e5ojs_global_data_init();
 
 
 
+
 /* ============== start e5ojs router ============== */
 
 
 /* start get current page request */
 router.get('*', function(req, res, next) {
     //console.log( " === REQUEST PAGE === ", req.originalUrl );
+
+    if( e5ojs_config.e5ojs_refresh_admin_router == true ) {
+        console.log(" ============ E5OJS Admin Regenerate Router ============= ",e5ojs_config.e5ojs_refresh_admin_router);
+        e5ojs_config.e5ojs_refresh_admin_router = false;
+        // create function to regenerate admin router urls
+        // when delete post type
+    }
+
     var original_url = req.originalUrl;
     var element_page_key = "dashboard";
     e5ojs_global_data.current_post_type_key = "";
@@ -183,7 +192,7 @@ router.get('*', function(req, res, next) {
         var admin_page_url = admin_page.url;
         admin_page = admin_page.url;
         if( admin_page !== undefined ) {
-            admin_page = admin_page.replace("http://nodejs.dev/admin","");
+            admin_page = admin_page.replace(e5ojs_config.e5ojs_host_url,"");
             if( original_url.indexOf(admin_page) >= 0 && admin_page.length > 1) {
                 element_page_key = admin_page_key;
             }
@@ -196,7 +205,7 @@ router.get('*', function(req, res, next) {
                 admin_page = post_type_elements[post_type_key].url;
                 //console.log("POST TYPE NAME = "+admin_page);
                 if( admin_page !== undefined ) {
-                    admin_page = admin_page.replace("http://nodejs.dev/admin","");
+                    admin_page = admin_page.replace(e5ojs_config.e5ojs_host_url,"");
                     if( original_url.indexOf(admin_page) >= 0 && admin_page.length > 1) {
                         element_page_key = admin_page_key;
                         // get post type key
@@ -220,7 +229,7 @@ router.post('*', function(req, res, next) {
         var admin_page_url = admin_page.url;
         admin_page = admin_page.url;
         if( admin_page !== undefined ) {
-            admin_page = admin_page.replace("http://nodejs.dev/admin","");
+            admin_page = admin_page.replace(e5ojs_config.e5ojs_host_url,"");
             if( original_url.indexOf(admin_page) >= 0 && admin_page.length > 1) {
                 element_page_key = admin_page_key;
             }
@@ -233,7 +242,7 @@ router.post('*', function(req, res, next) {
                 admin_page = post_type_elements[post_type_key].url;
                 //console.log("POST TYPE NAME = "+admin_page);
                 if( admin_page !== undefined ) {
-                    admin_page = admin_page.replace("http://nodejs.dev/admin","");
+                    admin_page = admin_page.replace(e5ojs_config.e5ojs_host_url,"");
                     if( original_url.indexOf(admin_page) >= 0 && admin_page.length > 1) {
                         element_page_key = admin_page_key;
                         // get post type key
@@ -417,7 +426,7 @@ router.get('/page/:page_status/page/:number_page/', function(req, res, next) {
 
         // get posts
         // get total pages
-        var limit_post = 12;
+        var limit_post = e5ojs_config.e5ojs_admin_post_peer_page;
         var skip_posts = 0;
         var total_post = 0;
         if( parseInt(req.params.number_page) == 1 ) {
@@ -1002,7 +1011,7 @@ router.get('/post-types/:post_type_status/page/:number_page/', function(req, res
                 post_status_array.push(0);
         }
         // get posts
-        var limit_post = 12;
+        var limit_post = e5ojs_config.e5ojs_admin_post_peer_page;
         var skip_posts = 0;
         if( parseInt(req.params.number_page) == 1 ) {
             skip_posts = 0;
@@ -1071,7 +1080,7 @@ router.get('/users/:user_status/page/:number_page/', function(req, res, next) {
                 post_status_array.push(0);
         }
         // get posts
-        var limit_post = 12;
+        var limit_post = e5ojs_config.e5ojs_admin_post_peer_page;
         var skip_posts = 0;
         if( parseInt(req.params.number_page) == 1 ) {
             skip_posts = 0;
