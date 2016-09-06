@@ -1,5 +1,4 @@
-# E5OJSCMS
-E5OJS - CMS
+# E5OJS - CMS
 <br>
 This is a Alpha preview
 <br>
