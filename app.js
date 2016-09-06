@@ -15,11 +15,11 @@ var mongo_store = require('connect-mongo')(session);
 /* start local app requeriments */
 
 // e5ojs global settings
-var e5ojs_settings = require("./e5ojs-config.js");
+var e5ojs_settings = require('./e5ojs-config/e5ojs-config.js');
 // index router files
-var front_end = require('./controller/front-end');
-var back_end = require('./controller/back-end');
-var api = require('./controller/api');
+var front_end = require('./e5ojs-controllers/front-end');
+var back_end = require('./e5ojs-controllers/back-end');
+var api = require('./e5ojs-controllers/api');
 
 /* end local app requeriments */
 
@@ -35,7 +35,7 @@ var app = express();
 /* start confifure express app */
 
 // set view engine setup
-app.set('views', path.join(__dirname, 'view'));
+app.set('views', path.join(__dirname, 'e5ojs-views'));
 app.set('view engine', 'pug');
 
 // set favicon
