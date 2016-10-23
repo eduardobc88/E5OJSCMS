@@ -91,10 +91,6 @@ textarea.materialize-textarea:focus.valid {
 .e5ojs-login-wrapper .card-content .card-title {
   text-align: center;
 }
-.e5ojs-login-wrapper {
-  padding-top: 50px;
-  padding-bottom: 50px;
-}
 .e5ojs-login-wrapper .card-title {
   text-shadow: 0px 0px 3px rgba(0,0,0,0.6);
 }
@@ -134,11 +130,12 @@ textarea.materialize-textarea:focus.valid {
   position: fixed;
   top: 0;
   bottom: 0;
-  display: table;
+  display: block;
   margin: auto;
   max-width: 500px;
   width: 100%;
   right: 0;
   left: 0;
+  max-height: 480px;
 }
 /* start e5ojs form */

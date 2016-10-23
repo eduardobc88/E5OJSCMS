@@ -894,7 +894,7 @@ router.post('/post-types/action/edit/:post_type_id/', function(req, res, next) {
         var post_type_single_template = req.body.post_type_single_template;
         var post_type_slug = getSlug(remove_diacritics( post_type_name ));
         var post_type_status = ((req.body.post_type_status=="on")?1:0);
-
+        var post_type_meta_to_remove = req.body.post_type_delete_meta;
 
         // check for the edited current post metas
         var post_type_current_metas = [];
@@ -906,6 +906,28 @@ router.post('/post-types/action/edit/:post_type_id/', function(req, res, next) {
                     meta_name:req.body[meta_key+"_meta_name"],
                     meta_type:req.body[meta_key+"_meta_type"],
                 });
+            }
+            // check for remove meta
+            if( post_type_meta_to_remove !== undefined ) {
+                if( !Array.isArray(post_type_meta_to_remove) ) {
+                    post_type_meta_to_remove = new Array(post_type_meta_to_remove);
+                }
+                post_type_current_metas.forEach(function(meta_val,meta_key){
+                    post_type_meta_to_remove.forEach(function(meta_rm_val,meta_rm_key){
+                        if( meta_val.meta_name == meta_rm_val ) {
+                            // mark meta from array to remove
+                            post_type_current_metas[meta_key] = "rm";
+                        }
+                    });
+                });
+                // get only no remove meta
+                var post_type_metas_to_save = [];
+                post_type_current_metas.forEach(function(meta_val,meta_key){
+                    if( meta_val != "rm" ) {
+                        post_type_metas_to_save.push(meta_val);
+                    }
+                });
+                post_type_current_metas = post_type_metas_to_save;
             }
         }
         if( req.body.post_type_meta_name != "" ) {
@@ -919,8 +941,9 @@ router.post('/post-types/action/edit/:post_type_id/', function(req, res, next) {
                 meta_type:meta_type,
             });
         }
-
+        //process.exit(1);
         if( post_type_status == 1 || post_type_status == 0 ) {
+            //console.log(" === post_type_current_metas A === ",post_type_current_metas);
             // update post type
             e5ojs_post_type.e5ojs_post_type_update({'post_type_id':parseInt(post_type_id),'post_type_title':post_type_title,'post_type_name':post_type_name,'post_type_description':post_type_description,'post_type_slug':post_type_slug,post_type_status:parseInt(post_type_status),post_type_meta:post_type_current_metas,post_type_archive_template:post_type_archive_template,post_type_single_template:post_type_single_template},function(post_type_data){
                 // create session message
@@ -1374,6 +1397,8 @@ router.post('/settings/', function(req, res, next) {
         var settings_admin_posts_peer_page = req.body.settings_admin_posts_peer_page;
         var settings_posts_peer_page = req.body.settings_posts_peer_page;
 
+        // get metas ids to remove
+        var settings_page_metas_to_remove = req.body.settings_delete_page_meta;
 
         // for current meta reques
         var page_type_current_metas = [];
@@ -1411,6 +1436,37 @@ router.post('/settings/', function(req, res, next) {
                 }
                 // replace page metas with req data
                 if( settings[settings_key].settings_id == 'settings_page_metas' ) {
+
+                    // remove page metas by ID if exists
+                    if( settings_page_metas_to_remove !== undefined ) {
+                        if( !Array.isArray(settings_page_metas_to_remove) ) {
+                            settings_page_metas_to_remove = new Array(settings_page_metas_to_remove);
+                        }
+                        //console.log("settings_page_metas_to_remove",settings_page_metas_to_remove);
+                        settings_page_metas_to_remove_alternative = new Array();
+                        settings_page_metas_to_remove.forEach(function(meta_rm_val,meta_rm_key){
+                            element_arr = meta_rm_val.split("|");
+                            settings_page_metas_to_remove_alternative.push(new Array(element_arr[0],element_arr[1]));
+                        });
+                        // mark metas to remove
+                        page_type_current_metas.forEach(function(meta_val,meta_key){
+                            settings_page_metas_to_remove_alternative.forEach(function(meta_rm_val,meta_rm_key){
+                                if( meta_val.page_meta_page_id == meta_rm_val[0] && meta_val.page_meta_name == meta_rm_val[1] ) {
+                                    // mark meta to remove
+                                    page_type_current_metas[meta_key] = "rm";
+                                }
+                            });
+                        });
+                        // get only no remove meta
+                        var page_type_metas_to_save = [];
+                        page_type_current_metas.forEach(function(meta_val,meta_key){
+                            if( meta_val != "rm" ) {
+                                page_type_metas_to_save.push(meta_val);
+                            }
+                        });
+                        page_type_current_metas = page_type_metas_to_save;
+
+                    }
                     settings[settings_key].settings_value = page_type_current_metas;
                 }
                 // replace admin page data
@@ -1418,6 +1474,9 @@ router.post('/settings/', function(req, res, next) {
                     settings[settings_key].settings_value = settings_admin_pages_data;
                 }
             }
+
+
+
             // validate for page new meta
             if( settings_page_meta_title != "" && settings_page_meta_name != "" && settings_page_meta_type != "" && settings_page_meta_post_id != "" ) {
                 for( settings_key in settings ) {
@@ -1427,6 +1486,7 @@ router.post('/settings/', function(req, res, next) {
                     }
                 }
             }
+
 
 
             // save settings

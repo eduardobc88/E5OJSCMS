@@ -56,7 +56,7 @@ app.use(session({
 //app.use(session({resave: false, saveUninitialized: true, secret: 'E5OA5A', cookie: { secure: false, maxAge: 6000000 }})); // express session
 
 // set public dir
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'e5ojs-public')));
 
 // set dir for template, admin and api
 app.use('/', front_end);

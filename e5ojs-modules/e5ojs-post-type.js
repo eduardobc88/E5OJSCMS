@@ -64,6 +64,7 @@ exports.e5ojs_post_type_update = function e5ojs_post_type_update(post_type_data,
     // update post type data
     // get current post type metas
     //e5ojs_db.e5ojs_post_type.find({'post_type_id':parseInt(post_type_data.post_type_id)},function(err, current_post_type){
+        //console.log(" === post_type_data B === ",post_type_data.post_type_meta);
         e5ojs_db.e5ojs_post_type.update({'post_type_id':parseInt(post_type_data.post_type_id)},{$set:post_type_data},{new:false},function(err,result_data){
             e5ojs_init.e5ojs_init(function(){
                 callback(result_data);
